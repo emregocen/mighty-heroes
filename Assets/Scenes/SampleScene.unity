@@ -1310,9 +1310,13 @@ MonoBehaviour:
   _turnSystemController: {fileID: 709627123}
   _puzzleController: {fileID: 1092054649}
   _heroComponent: {fileID: 1220234849}
-  _enemyComponents:
-  - {fileID: 1129091960}
-  - {fileID: 1841566398}
+  _enemyFormation:
+  - Enemy: {fileID: 1129091960}
+    LineIndex: 0
+    SlotIndex: 0
+  - Enemy: {fileID: 1841566398}
+    LineIndex: 1
+    SlotIndex: 0
 --- !u!4 &1533193206
 Transform:
   m_ObjectHideFlags: 0

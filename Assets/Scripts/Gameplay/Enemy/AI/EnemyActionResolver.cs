@@ -1,5 +1,4 @@
 using MightyHeroes.Gameplay.Common.Actions;
-using MightyHeroes.Gameplay.Enemy;
 
 namespace MightyHeroes.Gameplay.Enemy.AI
 {
