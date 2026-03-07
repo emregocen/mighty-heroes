@@ -1,0 +1,18 @@
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]serSettings/
+
+# OS files
+.DS_Store
+
+# Rider / VS
+.idea/
+.vscode/
+*.csproj
+*.sln
+*.user
+*.userprefs
