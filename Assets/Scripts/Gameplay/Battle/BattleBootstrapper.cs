@@ -167,7 +167,8 @@ namespace MightyHeroes.Core.Battle
                 EnemyStateMachine enemyStateMachine = new EnemyStateMachine(
                     _eventHub,
                     config.Enemy,
-                    actionResolver);
+                    actionResolver,
+                    _heroComponent.EntityId);
 
                 config.Enemy.Initialize(enemyStateMachine, _idGenerator.Generate());
                 enemyStateMachine.Start();

@@ -15,7 +15,7 @@ namespace MightyHeroes.Gameplay.Combat
     ///
     /// Single responsibility: receive AttackHit intent -> resolve damage -> apply -> publish result.
     ///
-    /// Target selection is fully delegated to IBattleFieldQuery.
+    /// Target selection is fully delegated to IBattleField.
     /// This system has zero knowledge of animations, FSMs, formation layout,
     /// or which enemy is in which line.
     /// </summary>
@@ -169,12 +169,26 @@ namespace MightyHeroes.Gameplay.Combat
                 return;
             }
 
+            bool wasAlive = target.IsAlive;
+
             int damage = _combatResolver.ResolveDamage(attacker, target, payload.AttackIntensity);
 
             GameLogger.Log(LogSourceType.CombatSystem,
                 $"Enemy[{payload.EnemyId}] hit Hero Damage={damage} Direction={payload.HitDirection}");
 
             target.ReceiveDamage(damage, payload.HitDirection);
+
+            // Raise CombatHitResolved so enemy FSMs can detect hero defeat
+            // and set their IsBattleEnded flag via OnCombatHitResolved.
+            _eventHub.CombatEvents.CombatHitResolvedEvent.Raise(
+                new CombatHitResolvedPayload(
+                    attackerId: attacker.EntityId,
+                    targetId: target.EntityId,
+                    stepIndex: payload.StepIndex,
+                    totalSteps: payload.TotalSteps,
+                    damageApplied: true,
+                    targetWasAlive: wasAlive,
+                    targetIsAliveAfter: target.IsAlive));
         }
     }
 }

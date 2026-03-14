@@ -30,6 +30,14 @@ namespace MightyHeroes.Core.TurnSystem.States
             GameLogger.Log(LogSourceType.TurnSystem, "TurnEndState entered. Finalizing turn.");
 
             Context.AdvanceTurn();
+
+            if (Context.IsBattleEnded)
+            {
+                GameLogger.Log(LogSourceType.TurnSystem,
+                    "TurnEndState: Battle ended. Halting turn loop.");
+                return;
+            }
+
             StateMachine.SwitchToStartState();
         }
     }

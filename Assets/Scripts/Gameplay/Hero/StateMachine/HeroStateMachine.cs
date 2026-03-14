@@ -133,10 +133,14 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine
             SwitchState(new HeroTakingHitState(this, direction));
         }
 
-        /// <summary>Transitions hero to defeated state when health reaches zero.</summary>
-        public void SwitchToDefeatedState()
+        /// <summary>
+        /// Transitions hero to defeated state with the direction of the killing blow.
+        /// Damage is already applied in HeroComponent.ReceiveDamage before this is called.
+        /// </summary>
+        /// <param name="hitDirection">Direction of the killing hit for defeat animation.</param>
+        public void SwitchToDefeatedState(HitDirection hitDirection)
         {
-            SwitchState(new HeroDefeatedState(this));
+            SwitchState(new HeroDefeatedState(this, hitDirection));
         }
 
         /// <summary>

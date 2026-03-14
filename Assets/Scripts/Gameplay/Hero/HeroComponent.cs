@@ -30,22 +30,34 @@ namespace MightyHeroes.Gameplay.Hero
     {
         // CONSTANTS — Animator parameter hashes
 
-        /// <summary>Animator int parameter selecting the attack animation variant.</summary>
+        /// <summary>
+        /// Animator int parameter selecting the attack animation variant.
+        /// </summary>
         private static readonly int Anim_AttackVariant = Animator.StringToHash("AttackVariant");
 
-        /// <summary>Animator int parameter representing attack intensity (also defines combo length).</summary>
+        /// <summary>
+        /// Animator int parameter representing attack intensity (also defines combo length).
+        /// </summary>
         private static readonly int Anim_AttackIntensity = Animator.StringToHash("AttackIntensity");
 
-        /// <summary>Animator trigger that starts the attack sequence.</summary>
-        private static readonly int Anim_DoAttack = Animator.StringToHash("DoAttack");
+        /// <summary>
+        /// Animator trigger that starts the attack sequence.
+        /// </summary>
+        private static readonly int Anim_DoAttack = Animator.StringToHash("Attack");
 
-        /// <summary>Animator int parameter representing hit direction.</summary>
+        /// <summary>
+        /// Animator int parameter representing hit direction.
+        /// </summary>
         private static readonly int Anim_HitDirection = Animator.StringToHash("HitDirection");
 
-        /// <summary>Animator trigger that plays hit reaction animation.</summary>
-        private static readonly int Anim_DoHit = Animator.StringToHash("DoHit");
+        /// <summary>
+        /// Animator trigger that plays hit reaction animation.
+        /// </summary>
+        private static readonly int Anim_DoHit = Animator.StringToHash("TakeHit");
 
-        /// <summary>Animator trigger that plays defeat animation.</summary>
+        /// <summary>
+        /// Animator trigger that plays defeat animation.
+        /// </summary>
         private static readonly int Anim_Defeat = Animator.StringToHash("Defeat");
 
         /// <summary>
@@ -130,7 +142,8 @@ namespace MightyHeroes.Gameplay.Hero
 
             if (!IsAlive)
             {
-                _stateMachine.SwitchToDefeatedState();
+                // Pass hit direction so defeated animation plays toward correct side.
+                _stateMachine.SwitchToDefeatedState(hitDirection);
                 return;
             }
 
@@ -186,11 +199,13 @@ namespace MightyHeroes.Gameplay.Hero
         }
 
         /// <summary>
-        /// Plays the defeat animation.
-        /// Must only be called from a State (HeroDefeatedState).
+        /// Plays the defeat animation toward the direction of the killing blow.
+        /// Must only be called from HeroDefeatedState.
         /// </summary>
-        public void PlayDefeat()
+        /// <param name="hitDirection">Direction of the killing hit for animation.</param>
+        public void PlayDefeat(HitDirection hitDirection)
         {
+            _animator.SetInteger(Anim_HitDirection, (int)hitDirection);
             _animator.SetTrigger(Anim_Defeat);
         }
 

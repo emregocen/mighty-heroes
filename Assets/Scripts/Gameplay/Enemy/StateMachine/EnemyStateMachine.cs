@@ -33,6 +33,8 @@ namespace MightyHeroes.Gameplay.Enemy.StateMachine
         private readonly EventHub _eventHub;
         private readonly EnemyComponent _enemy;
         private readonly EnemyActionResolver _actionResolver;
+        private readonly int _heroEntityId;
+        private bool _isBattleEnded;
 
         // PROPERTIES
 
@@ -45,6 +47,13 @@ namespace MightyHeroes.Gameplay.Enemy.StateMachine
         /// <summary>Resolves enemy AI decisions into action executions.</summary>
         public EnemyActionResolver ActionResolver => _actionResolver;
 
+        /// <summary>
+        /// True when the hero has been defeated.
+        /// Set via CombatHitResolvedEvent — no external context injection required.
+        /// When true, SwitchToReadyState redirects to idle to prevent post-battle actions.
+        /// </summary>
+        public bool IsBattleEnded => _isBattleEnded;
+
         // CONSTRUCTOR
 
         /// <summary>
@@ -54,14 +63,17 @@ namespace MightyHeroes.Gameplay.Enemy.StateMachine
         /// <param name="eventHub">Battle-scoped event hub shared by all systems.</param>
         /// <param name="enemy">Enemy entity component this FSM controls.</param>
         /// <param name="actionResolver">Resolver that converts AI decisions into actions.</param>
+        /// <param name="heroEntityId">Entity ID of the hero, used to detect hero defeat.</param>
         public EnemyStateMachine(
             EventHub eventHub,
             EnemyComponent enemy,
-            EnemyActionResolver actionResolver)
+            EnemyActionResolver actionResolver,
+            int heroEntityId)
         {
             _eventHub = eventHub;
             _enemy = enemy;
             _actionResolver = actionResolver;
+            _heroEntityId = heroEntityId;
 
             _eventHub.HeroEvents.HeroHitReactionEndedEvent.Register(OnHeroHitReactionEnded);
             _eventHub.CombatEvents.CombatHitResolvedEvent.Register(OnCombatHitResolved);
@@ -100,9 +112,21 @@ namespace MightyHeroes.Gameplay.Enemy.StateMachine
             SwitchState(new EnemyIdleState(this));
         }
 
-        /// <summary>Transitions enemy to ready state (preparing to execute an action).</summary>
+        /// <summary>
+        /// Transitions enemy to ready state (preparing to execute an action).
+        /// If the battle has ended due to hero defeat, redirects to idle
+        /// to prevent this enemy from acting after the battle is over.
+        /// </summary>
         public void SwitchToReadyState()
         {
+            if (_isBattleEnded)
+            {
+                GameLogger.Log(LogSourceType.Enemy,
+                    $"Enemy[{_enemy.EntityId}] SwitchToReadyState blocked: battle ended.");
+                SwitchState(new EnemyIdleState(this));
+                return;
+            }
+
             SwitchState(new EnemyReadyState(this));
         }
 
@@ -125,10 +149,14 @@ namespace MightyHeroes.Gameplay.Enemy.StateMachine
             SwitchState(new EnemyTakingHitState(this, hitDirection));
         }
 
-        /// <summary>Transitions enemy to defeated state when health reaches zero.</summary>
-        public void SwitchToDefeatedState()
+        /// <summary>
+        /// Transitions enemy to defeated state with the direction of the killing blow.
+        /// Damage is already applied in EnemyComponent.ReceiveDamage before this is called.
+        /// </summary>
+        /// <param name="hitDirection">Direction of the killing hit for defeat animation.</param>
+        public void SwitchToDefeatedState(HitDirection hitDirection)
         {
-            SwitchState(new EnemyDefeatedState(this));
+            SwitchState(new EnemyDefeatedState(this, hitDirection));
         }
 
         /// <summary>
@@ -197,9 +225,18 @@ namespace MightyHeroes.Gameplay.Enemy.StateMachine
         /// Receives CombatHitResolved from EventHub.
         /// Converts to local signal so EnemyAttackState can detect
         /// mid-combo target death and trigger a forced sequence finish.
+        /// Also sets IsBattleEnded when the hero is the defeated target,
+        /// preventing this enemy from acting after the battle ends.
         /// </summary>
         private void OnCombatHitResolved(CombatHitResolvedPayload payload)
         {
+            if (!payload.TargetIsAliveAfter && payload.TargetId == _heroEntityId)
+            {
+                _isBattleEnded = true;
+                GameLogger.Log(LogSourceType.Enemy,
+                    $"Enemy[{_enemy.EntityId}]: Hero defeated. IsBattleEnded set.");
+            }
+
             Notify(new EnemyCombatHitResolvedSignal(payload));
         }
     }

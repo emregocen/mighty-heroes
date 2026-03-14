@@ -1,40 +1,55 @@
 using MightyHeroes.Core.Logging;
+using MightyHeroes.Gameplay.Combat.Types;
 
 namespace MightyHeroes.Gameplay.Hero.StateMachine.States
 {
     /// <summary>
     /// Terminal state representing hero defeat.
-    /// In this state, the hero can no longer perform actions.
+    ///
+    /// Plays the defeat animation toward the direction of the killing blow.
+    /// Disables puzzle input so the player cannot act after death.
+    ///
+    /// This state is terminal — no further transitions occur.
+    /// Battle end is handled by BattleBootstrapper listening to EntityDiedEvent.
     /// </summary>
     public sealed class HeroDefeatedState : HeroBaseState
     {
-        /// <summary>
-        /// Indicates that this state is terminal, meaning the hero cannot transition to any other state from here.
-        /// </summary>
+        // FIELDS
+
+        private readonly HitDirection _hitDirection;
+
+        // PROPERTIES
+
+        /// <summary>Marks this state as terminal — hero cannot leave defeated state.</summary>
         public override bool IsTerminal => true;
 
-        /// <summary>
-        /// Creates a new hero defeated state.
-        /// </summary>
-        public HeroDefeatedState(HeroStateMachine stateMachine)
-            : base(stateMachine)
-        {
-        }
+        // CONSTRUCTOR
 
         /// <summary>
-        /// Called when the hero enters the defeated state.
+        /// Creates a new defeated state.
+        /// </summary>
+        /// <param name="stateMachine">Owning hero state machine.</param>
+        /// <param name="hitDirection">Direction of the killing blow for animation.</param>
+        public HeroDefeatedState(HeroStateMachine stateMachine, HitDirection hitDirection)
+            : base(stateMachine)
+        {
+            _hitDirection = hitDirection;
+        }
+
+        // PUBLIC METHODS
+
+        /// <summary>
+        /// Disables puzzle input and plays the directional defeat animation.
         /// </summary>
         public override void Enter()
         {
-            GameLogger.Log(
-                LogSourceType.Hero,
-                "Hero entered Defeated state."
-            );
+            GameLogger.Log(LogSourceType.Hero,
+                $"Hero entered HeroDefeatedState Direction={_hitDirection}");
 
-            // Future:
-            // - Disable puzzle input
-            // - Trigger defeat UI
-            // - Notify battle system
+            StateMachine.Hero.SetPuzzlePlayable(false);
+            StateMachine.Hero.PlayDefeat(_hitDirection);
         }
+
+        public override void Exit() { }
     }
 }

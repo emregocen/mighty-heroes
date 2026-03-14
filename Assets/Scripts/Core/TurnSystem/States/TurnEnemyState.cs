@@ -148,16 +148,20 @@ namespace MightyHeroes.Core.TurnSystem.States
             EnemyComponent currentEnemy = _enemies[_currentEnemyIndex];
 
             if (payload.EnemyId != currentEnemy.EntityId)
-            {
-                GameLogger.Log(LogSourceType.TurnSystem,
-                    $"TurnEnemyState: Ignored EnemyTurnEnded EntityId={payload.EnemyId}. Expected={currentEnemy.EntityId}");
                 return;
-            }
 
             _currentEnemyIndex++;
 
             GameLogger.Log(LogSourceType.TurnSystem,
                 $"TurnEnemyState: EnemyTurnEnded EntityId={payload.EnemyId}. NextIndex={_currentEnemyIndex}");
+
+            // Hero may have died during this enemy's turn — stop immediately.
+            if (StateMachine.Context.IsBattleEnded)
+            {
+                GameLogger.Log(LogSourceType.TurnSystem,
+                    "TurnEnemyState: Battle ended during enemy phase. Stopping.");
+                return;
+            }
 
             if (_currentEnemyIndex >= _enemies.Count)
             {
