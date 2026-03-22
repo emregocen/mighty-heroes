@@ -1,4 +1,4 @@
-namespace MightyHeroes.Core.TurnSystem.Payloads
+namespace MightyHeroes.Battle.TurnFlow.Payloads
 {
     /// <summary>
     /// Payload raised when the hero phase of the turn begins.

@@ -24,12 +24,6 @@ namespace MightyHeroes.Gameplay.Enemy.Events
             Registry.GetEvent<EnemyAttackHitPayload>();
 
         /// <summary>
-        /// Raised when an enemy receives resolved combat damage.
-        /// </summary>
-        public GameEvent<EnemyDamagedPayload> EnemyDamagedEvent =>
-            Registry.GetEvent<EnemyDamagedPayload>();
-
-        /// <summary>
         /// Raised when a single enemy completes its action phase.
         /// </summary>
         public GameEvent<EnemyTurnEndedPayload> EnemyTurnEndedEvent =>

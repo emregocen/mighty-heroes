@@ -1,5 +1,5 @@
 using MightyHeroes.Core.Logging;
-using MightyHeroes.Core.TurnSystem.Payloads;
+using MightyHeroes.Battle.TurnFlow.Payloads;
 
 namespace MightyHeroes.Gameplay.Enemy.StateMachine.States
 {

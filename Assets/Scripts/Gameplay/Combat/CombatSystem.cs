@@ -1,5 +1,3 @@
-// File: Assets/Scripts/Gameplay/Combat/CombatSystem.cs
-
 using System;
 using MightyHeroes.Core.EventSystem;
 using MightyHeroes.Core.Logging;
@@ -136,7 +134,7 @@ namespace MightyHeroes.Gameplay.Combat
                 $"Hero hit Enemy[{target.EntityId}] Damage={damage} Direction={payload.HitDirection}");
 
             _eventHub.CombatEvents.CombatDamageIntentEvent.Raise(
-                new DamageIntentPayload(
+                new CombatDamageIntentPayload(
                     targetEntityId: target.EntityId,
                     attackerEntityId: attacker.EntityId,
                     damageAmount: damage,
@@ -173,7 +171,7 @@ namespace MightyHeroes.Gameplay.Combat
                 $"Enemy[{payload.EnemyId}] hit Hero Damage={damage} Direction={payload.HitDirection}");
 
             _eventHub.CombatEvents.CombatDamageIntentEvent.Raise(
-                new DamageIntentPayload(
+                new CombatDamageIntentPayload(
                     targetEntityId: target.EntityId,
                     attackerEntityId: attacker.EntityId,
                     damageAmount: damage,

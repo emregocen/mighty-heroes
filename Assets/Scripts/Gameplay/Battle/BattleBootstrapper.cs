@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using MightyHeroes.Core.EventSystem;
 using MightyHeroes.Core.Logging;
-using MightyHeroes.Core.TurnSystem;
+using MightyHeroes.Battle.TurnFlow;
 using MightyHeroes.Gameplay.Battle.Formation;
 using MightyHeroes.Gameplay.Combat;
 using MightyHeroes.Gameplay.Enemy.AI;

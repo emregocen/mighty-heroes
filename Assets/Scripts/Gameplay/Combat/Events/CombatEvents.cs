@@ -1,5 +1,3 @@
-// File: Assets/Scripts/Gameplay/Combat/Events/CombatEvents.cs
-
 using MightyHeroes.Core.EventSystem;
 using MightyHeroes.Gameplay.Combat.Payloads;
 
@@ -32,8 +30,8 @@ namespace MightyHeroes.Gameplay.Combat.Events
         /// CombatSystem raises this and its job ends here.
         /// It does not call ReceiveDamage directly on any component.
         /// </summary>
-        public GameEvent<DamageIntentPayload> CombatDamageIntentEvent =>
-            Registry.GetEvent<DamageIntentPayload>();
+        public GameEvent<CombatDamageIntentPayload> CombatDamageIntentEvent =>
+            Registry.GetEvent<CombatDamageIntentPayload>();
 
         /// <summary>
         /// Raised after a hit step has been fully resolved.
@@ -42,12 +40,5 @@ namespace MightyHeroes.Gameplay.Combat.Events
         public GameEvent<CombatHitResolvedPayload> CombatHitResolvedEvent =>
             Registry.GetEvent<CombatHitResolvedPayload>();
 
-        /// <summary>
-        /// Raised when final damage is calculated.
-        /// Consumed by floating damage number UI and VFX systems.
-        /// Not consumed by any gameplay logic.
-        /// </summary>
-        public GameEvent<CombatDamageResolvedPayload> CombatDamageResolvedEvent =>
-            Registry.GetEvent<CombatDamageResolvedPayload>();
     }
 }

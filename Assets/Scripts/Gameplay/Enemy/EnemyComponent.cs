@@ -1,5 +1,3 @@
-// File: Assets/Scripts/Gameplay/Enemy/EnemyComponent.cs
-
 using UnityEngine;
 using MightyHeroes.Core.Logging;
 using MightyHeroes.Gameplay.Common.Entity;
@@ -227,7 +225,7 @@ namespace MightyHeroes.Gameplay.Enemy
         /// then notifies the state machine for the correct FSM transition.
         /// This method does NOT play animations — that is the entering state's responsibility.
         /// </summary>
-        private void OnDamageIntent(DamageIntentPayload payload)
+        private void OnDamageIntent(CombatDamageIntentPayload payload)
         {
             if (payload.TargetEntityId != EntityId)
                 return;

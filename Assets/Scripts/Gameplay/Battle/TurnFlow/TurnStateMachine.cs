@@ -1,11 +1,11 @@
 using MightyHeroes.Core.EventSystem;
 using MightyHeroes.Core.StateMachine;
-using MightyHeroes.Core.TurnSystem.Payloads;
-using MightyHeroes.Core.TurnSystem.States;
-using MightyHeroes.Core.TurnSystem.Types;
+using MightyHeroes.Battle.TurnFlow.Payloads;
+using MightyHeroes.Battle.TurnFlow.States;
+using MightyHeroes.Battle.TurnFlow.Types;
 using MightyHeroes.Gameplay.Battle.Formation;
 
-namespace MightyHeroes.Core.TurnSystem
+namespace MightyHeroes.Battle.TurnFlow
 {
     /// <summary>
     /// State machine responsible for controlling the turn flow.

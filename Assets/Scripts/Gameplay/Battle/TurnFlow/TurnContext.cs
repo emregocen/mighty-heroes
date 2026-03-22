@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace MightyHeroes.Core.TurnSystem
+namespace MightyHeroes.Battle.TurnFlow
 {
     /// <summary>
     /// Holds all runtime data required by the turn state machine.

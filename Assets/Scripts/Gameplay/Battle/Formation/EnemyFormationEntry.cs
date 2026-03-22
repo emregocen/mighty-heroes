@@ -1,6 +1,3 @@
-// File: Assets/Scripts/Gameplay/Battle/EnemyFormationEntry.cs
-// Namespace: MightyHeroes.Gameplay.Battle
-
 using MightyHeroes.Gameplay.Enemy;
 
 namespace MightyHeroes.Gameplay.Battle.Formation

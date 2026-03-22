@@ -1,5 +1,3 @@
-// File: Assets/Scripts/Gameplay/Combat/Interfaces/ICombatTarget.cs
-
 namespace MightyHeroes.Gameplay.Combat.Interfaces
 {
     /// <summary>

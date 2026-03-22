@@ -1,4 +1,4 @@
-namespace MightyHeroes.Core.TurnSystem.Payloads
+namespace MightyHeroes.Battle.TurnFlow.Payloads
 {
     /// <summary>
     /// Raised when the enemy phase selects the next enemy to act.
