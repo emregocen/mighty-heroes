@@ -1,3 +1,5 @@
+// File: Assets/Scripts/Gameplay/Combat/Events/CombatEvents.cs
+
 using MightyHeroes.Core.EventSystem;
 using MightyHeroes.Gameplay.Combat.Payloads;
 
@@ -6,11 +8,10 @@ namespace MightyHeroes.Gameplay.Combat.Events
     /// <summary>
     /// Provides access to all combat-resolution-related events.
     ///
-    /// These events represent the authoritative results of
-    /// combat intent processing performed by CombatSystem.
-    ///
-    /// Combat events do not control animations or state machines.
-    /// They only communicate resolved outcomes.
+    /// Event flow:
+    /// 1. DamageIntentEvent    — CombatSystem calculated damage, target should apply it.
+    /// 2. CombatHitResolvedEvent — CombatSystem confirmed the hit outcome (alive/dead).
+    /// 3. CombatDamageResolvedEvent — Optional, for floating numbers and VFX.
     /// </summary>
     public sealed class CombatEvents : EventGroupBase
     {
@@ -24,31 +25,27 @@ namespace MightyHeroes.Gameplay.Combat.Events
         }
 
         /// <summary>
-        /// Raised after a combat hit intent has been fully resolved.
+        /// Raised by CombatSystem after damage has been calculated.
+        /// Target entities listen to this event, match their EntityId,
+        /// and apply the damage through their own health system.
         ///
-        /// This event is emitted by CombatSystem for every hit frame,
-        /// even if the target was already dead.
-        ///
-        /// It represents the authoritative resolution result of that hit step.
-        ///
-        /// Consumers:
-        /// - HeroAttackState (to decide combo progression or forced finish)
-        /// - EnemyAttackState
-        /// - Damage UI systems
+        /// CombatSystem raises this and its job ends here.
+        /// It does not call ReceiveDamage directly on any component.
+        /// </summary>
+        public GameEvent<DamageIntentPayload> CombatDamageIntentEvent =>
+            Registry.GetEvent<DamageIntentPayload>();
+
+        /// <summary>
+        /// Raised after a hit step has been fully resolved.
+        /// Consumed by attack states to drive combo flow and forced finish detection.
         /// </summary>
         public GameEvent<CombatHitResolvedPayload> CombatHitResolvedEvent =>
             Registry.GetEvent<CombatHitResolvedPayload>();
 
         /// <summary>
-        /// Raised when final damage has been calculated and confirmed,
-        /// before or after it is applied to the target.
-        ///
-        /// This event is optional and can be used for:
-        /// - Floating damage numbers
-        /// - Sound effects
-        /// - Analytics
-        ///
-        /// It does not imply that the target survived the hit.
+        /// Raised when final damage is calculated.
+        /// Consumed by floating damage number UI and VFX systems.
+        /// Not consumed by any gameplay logic.
         /// </summary>
         public GameEvent<CombatDamageResolvedPayload> CombatDamageResolvedEvent =>
             Registry.GetEvent<CombatDamageResolvedPayload>();

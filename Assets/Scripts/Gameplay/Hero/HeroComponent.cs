@@ -1,8 +1,12 @@
+// File: Assets/Scripts/Gameplay/Hero/HeroComponent.cs
+
 using UnityEngine;
+using MightyHeroes.Core.EventSystem;
 using MightyHeroes.Core.Logging;
 using MightyHeroes.Gameplay.Common.Entity;
 using MightyHeroes.Gameplay.Common.Stats;
 using MightyHeroes.Gameplay.Combat.Interfaces;
+using MightyHeroes.Gameplay.Combat.Payloads;
 using MightyHeroes.Gameplay.Combat.Types;
 using MightyHeroes.Gameplay.Hero.Presentation;
 using MightyHeroes.Gameplay.Hero.StateMachine;
@@ -18,9 +22,12 @@ namespace MightyHeroes.Gameplay.Hero
     /// but never decides WHEN to play them. That decision always belongs to a State.
     ///
     /// Health flow:
-    /// CombatSystem -> ReceiveDamage -> Health.ApplyDamage (raises HealthEvents)
-    ///   -> IsAlive check -> StateMachine.SwitchToDefeatedState or SwitchToTakingHitState
-    ///     -> State.Enter -> PlayTakeHit / PlayDefeat (animator called here, never before)
+    /// CombatSystem raises DamageIntentEvent
+    ///   → OnDamageIntent (self-identifies by EntityId)
+    ///     → Health.ApplyDamage (raises HealthEvents)
+    ///       → IsAlive check
+    ///         → StateMachine.SwitchToDefeatedState or SwitchToTakingHitState
+    ///           → State.Enter → PlayTakeHit / PlayDefeat (animator called here, never before)
     ///
     /// Event raise ownership:
     /// HeroHitReactionEndedEvent is raised in HeroTakingHitState.OnHitReactionEnded,
@@ -30,46 +37,28 @@ namespace MightyHeroes.Gameplay.Hero
     {
         // CONSTANTS — Animator parameter hashes
 
-        /// <summary>
-        /// Animator int parameter selecting the attack animation variant.
-        /// </summary>
+        /// <summary>Animator int parameter selecting the attack animation variant.</summary>
         private static readonly int Anim_AttackVariant = Animator.StringToHash("AttackVariant");
 
-        /// <summary>
-        /// Animator int parameter representing attack intensity (also defines combo length).
-        /// </summary>
+        /// <summary>Animator int parameter representing attack intensity (also defines combo length).</summary>
         private static readonly int Anim_AttackIntensity = Animator.StringToHash("AttackIntensity");
 
-        /// <summary>
-        /// Animator trigger that starts the attack sequence.
-        /// </summary>
+        /// <summary>Animator trigger that starts the attack sequence.</summary>
         private static readonly int Anim_DoAttack = Animator.StringToHash("Attack");
 
-        /// <summary>
-        /// Animator int parameter representing hit direction.
-        /// </summary>
+        /// <summary>Animator int parameter representing hit direction.</summary>
         private static readonly int Anim_HitDirection = Animator.StringToHash("HitDirection");
 
-        /// <summary>
-        /// Animator trigger that plays hit reaction animation.
-        /// </summary>
+        /// <summary>Animator trigger that plays hit reaction animation.</summary>
         private static readonly int Anim_DoHit = Animator.StringToHash("TakeHit");
 
-        /// <summary>
-        /// Animator trigger that plays defeat animation.
-        /// </summary>
+        /// <summary>Animator trigger that plays defeat animation.</summary>
         private static readonly int Anim_Defeat = Animator.StringToHash("Defeat");
 
-        /// <summary>
-        /// Animator trigger that advances an ongoing combo to the next step.
-        /// Used for synchronization: waits for target reaction before proceeding.
-        /// </summary>
+        /// <summary>Animator trigger that advances an ongoing combo to the next step.</summary>
         private static readonly int Anim_AdvanceCombo = Animator.StringToHash("AdvanceCombo");
 
-        /// <summary>
-        /// Animator trigger that force-finishes the combo sequence early.
-        /// Used when the target dies mid-combo so remaining hit animations are skipped.
-        /// </summary>
+        /// <summary>Animator trigger that force-finishes the combo sequence early.</summary>
         private static readonly int Anim_ForceFinishCombo = Animator.StringToHash("ForceFinishCombo");
 
         // FIELDS
@@ -84,6 +73,7 @@ namespace MightyHeroes.Gameplay.Hero
         [SerializeField] private HeroAnimationEventProxy _animationEventProxy;
 
         private HeroStateMachine _stateMachine;
+        private EventHub _eventHub;
 
         // PROPERTIES
 
@@ -99,55 +89,32 @@ namespace MightyHeroes.Gameplay.Hero
         /// 1. Assign _stateMachine — required by OnInitialized.
         /// 2. base.Initialize(entityId) — assigns EntityId, calls OnInitialized.
         /// 3. InitializeHealth — requires EntityId, must follow base.Initialize.
+        /// 4. RegisterEvents — requires EntityId to filter DamageIntentEvent.
         /// </summary>
         /// <param name="stateMachine">Battle-scoped hero state machine.</param>
         /// <param name="entityId">Unique entity identifier assigned by BattleBootstrapper.</param>
         public void Initialize(HeroStateMachine stateMachine, int entityId)
         {
             _stateMachine = stateMachine;
+            _eventHub = stateMachine.EventHub;
 
             base.Initialize(entityId);
 
             base.InitializeHealth(
-                stateMachine.EventHub,
+                _eventHub,
                 _heroStatsData.MaxHealth,
                 _heroStatsData.MaxShield);
+
+            RegisterEvents();
         }
 
-        // PUBLIC METHODS — Combat
-
         /// <summary>
-        /// Receives resolved combat damage from CombatSystem.
-        ///
-        /// Responsibilities:
-        /// 1. Apply damage through Health so HealthEvents are raised.
-        /// 2. Check IsAlive and notify state machine for the correct transition.
-        ///
-        /// This method does NOT play animations.
-        /// Animation is the entering state's responsibility, not the component's.
+        /// Unregisters EventHub listeners.
+        /// Called by BattleBootstrapper.OnDestroy.
         /// </summary>
-        /// <param name="damage">Final resolved damage value from CombatResolver.</param>
-        /// <param name="hitDirection">Direction of the incoming hit, forwarded to the state.</param>
-        public void ReceiveDamage(int damage, HitDirection hitDirection)
+        public void Dispose()
         {
-            GameLogger.Log(LogSourceType.Hero,
-                $"Hero.ReceiveDamage Damage={damage}, Direction={hitDirection}");
-
-            Health.ApplyDamage(
-                amount: damage,
-                damageType: DamageType.Physical,
-                hitDirection: hitDirection,
-                sourceEntityId: 0,
-                lifestealPercent: 0f);
-
-            if (!IsAlive)
-            {
-                // Pass hit direction so defeated animation plays toward correct side.
-                _stateMachine.SwitchToDefeatedState(hitDirection);
-                return;
-            }
-
-            _stateMachine.SwitchToTakingHitState(hitDirection);
+            UnregisterEvents();
         }
 
         // PUBLIC METHODS — Animation commands (called only by States)
@@ -179,7 +146,6 @@ namespace MightyHeroes.Gameplay.Hero
 
         /// <summary>
         /// Advances the current combo to the next step.
-        /// Called after the target's hit reaction animation ends, ensuring synchronization.
         /// Must only be called from a State (HeroAttackState).
         /// </summary>
         /// <param name="nextStepIndex">Next combo step index (1-based).</param>
@@ -190,7 +156,6 @@ namespace MightyHeroes.Gameplay.Hero
 
         /// <summary>
         /// Force-finishes the combo sequence early when the target dies mid-combo.
-        /// Remaining hit animations are skipped so the hero returns to idle cleanly.
         /// Must only be called from a State (HeroAttackState).
         /// </summary>
         public void PlayForcedAttackFinish()
@@ -225,10 +190,7 @@ namespace MightyHeroes.Gameplay.Hero
 
         /// <summary>
         /// Called by HeroHitReactionEndedBehaviour when hit reaction animation completes.
-        /// Forwards to FSM as a signal only.
-        ///
-        /// Event raise responsibility belongs to HeroTakingHitState.OnHitReactionEnded,
-        /// not here. Raising the event in both places causes double-fire.
+        /// Forwards to FSM as a signal only. Event raise belongs to HeroTakingHitState.
         /// </summary>
         public void NotifyHitReactionEnded()
         {
@@ -237,7 +199,6 @@ namespace MightyHeroes.Gameplay.Hero
 
         /// <summary>
         /// Called by animator state behaviour when a single attack clip ends.
-        /// Signal is routed only to HeroAttackState via HeroStateMachine.Notify.
         /// </summary>
         public void NotifyAttackClipEnded()
         {
@@ -254,9 +215,7 @@ namespace MightyHeroes.Gameplay.Hero
 
         // PROTECTED METHODS
 
-        /// <summary>
-        /// Provides hero-specific stats data for base class runtime stat initialization.
-        /// </summary>
+        /// <summary>Provides hero-specific stats data for base class runtime stat initialization.</summary>
         protected override EntityStatsData GetStatsData()
         {
             return _heroStatsData;
@@ -270,6 +229,63 @@ namespace MightyHeroes.Gameplay.Hero
         {
             _stateMachine.Start();
             _animationEventProxy.Initialize(_stateMachine);
+        }
+
+        // PRIVATE METHODS
+
+        private void RegisterEvents()
+        {
+            _eventHub.CombatEvents.CombatDamageIntentEvent.Register(OnDamageIntent);
+        }
+
+        private void UnregisterEvents()
+        {
+            _eventHub.CombatEvents.CombatDamageIntentEvent.Unregister(OnDamageIntent);
+        }
+
+        // EVENT HANDLERS
+
+        /// <summary>
+        /// Listens to DamageIntentEvent and self-identifies by EntityId.
+        ///
+        /// Applies damage through Health so HealthEvents are raised,
+        /// then notifies the state machine for the correct FSM transition.
+        /// This method does NOT play animations — that is the entering state's responsibility.
+        /// </summary>
+        private void OnDamageIntent(DamageIntentPayload payload)
+        {
+            if (payload.TargetEntityId != EntityId)
+                return;
+
+            GameLogger.Log(LogSourceType.Hero,
+                $"Hero.OnDamageIntent Damage={payload.DamageAmount} Direction={payload.HitDirection}");
+
+            Health.ApplyDamage(
+                amount: payload.DamageAmount,
+                damageType: payload.DamageType,
+                hitDirection: payload.HitDirection,
+                sourceEntityId: payload.AttackerEntityId,
+                lifestealPercent: 0f);
+
+            // Raise CombatHitResolvedEvent here — after damage is applied —
+            // so targetIsAliveAfter is authoritative regardless of local or network execution.
+            _eventHub.CombatEvents.CombatHitResolvedEvent.Raise(
+                new CombatHitResolvedPayload(
+                    attackerId: payload.AttackerEntityId,
+                    targetId: EntityId,
+                    stepIndex: payload.StepIndex,
+                    totalSteps: payload.TotalSteps,
+                    damageApplied: true,
+                    targetWasAlive: true,
+                    targetIsAliveAfter: IsAlive));
+
+            if (!IsAlive)
+            {
+                _stateMachine.SwitchToDefeatedState(payload.HitDirection);
+                return;
+            }
+
+            _stateMachine.SwitchToTakingHitState(payload.HitDirection);
         }
     }
 }

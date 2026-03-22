@@ -1,3 +1,5 @@
+// File: Assets/Scripts/Gameplay/Combat/CombatSystem.cs
+
 using System;
 using MightyHeroes.Core.EventSystem;
 using MightyHeroes.Core.Logging;
@@ -13,11 +15,17 @@ namespace MightyHeroes.Gameplay.Combat
     /// <summary>
     /// Minimal combat resolution system.
     ///
-    /// Single responsibility: receive AttackHit intent -> resolve damage -> apply -> publish result.
+    /// Single responsibility: receive AttackHit intent → resolve damage → raise DamageIntentEvent → publish CombatHitResolved.
     ///
+    /// This system has zero knowledge of animations, FSMs, or entity component internals.
     /// Target selection is fully delegated to IBattleField.
-    /// This system has zero knowledge of animations, FSMs, formation layout,
-    /// or which enemy is in which line.
+    /// Damage application is fully delegated to the target entity via DamageIntentEvent.
+    ///
+    /// Flow:
+    /// HeroAttackHitEvent / EnemyAttackHitEvent
+    ///   → CombatSystem resolves damage amount
+    ///     → DamageIntentEvent (target applies damage independently)
+    ///       → CombatHitResolvedEvent (combo flow / forced finish)
     /// </summary>
     public sealed class CombatSystem : IDisposable
     {
@@ -36,7 +44,7 @@ namespace MightyHeroes.Gameplay.Combat
         /// </summary>
         /// <param name="eventHub">Battle-scoped event hub.</param>
         /// <param name="combatResolver">Damage calculation resolver.</param>
-        /// <param name="heroEntity">Hero combat entity.</param>
+        /// <param name="heroEntity">Hero combat entity for attacker stat access.</param>
         /// <param name="battleField">Formation query for target selection and enemy lookup.</param>
         public CombatSystem(
             EventHub eventHub,
@@ -85,8 +93,8 @@ namespace MightyHeroes.Gameplay.Combat
 
         /// <summary>
         /// Handles hero attack hit events.
-        /// Queries BattleFieldManager for the current primary target,
-        /// resolves and applies damage, then publishes CombatHitResolved.
+        /// Queries IBattleField for the current primary target, resolves damage,
+        /// raises DamageIntentEvent, then publishes CombatHitResolved.
         /// </summary>
         private void OnHeroAttackHit(HeroAttackHitPayload payload)
         {
@@ -122,31 +130,21 @@ namespace MightyHeroes.Gameplay.Combat
                 return;
             }
 
-            bool wasAlive = target.IsAlive;
-
-            int damage = _combatResolver.ResolveDamage(
-                attacker, target, payload.AttackIntensity);
+            int damage = _combatResolver.ResolveDamage(attacker, target, payload.AttackIntensity);
 
             GameLogger.Log(LogSourceType.CombatSystem,
                 $"Hero hit Enemy[{target.EntityId}] Damage={damage} Direction={payload.HitDirection}");
 
-            target.ReceiveDamage(damage, payload.HitDirection);
-
-            _eventHub.CombatEvents.CombatHitResolvedEvent.Raise(
-                new CombatHitResolvedPayload(
-                    attackerId: attacker.EntityId,
-                    targetId: target.EntityId,
+            _eventHub.CombatEvents.CombatDamageIntentEvent.Raise(
+                new DamageIntentPayload(
+                    targetEntityId: target.EntityId,
+                    attackerEntityId: attacker.EntityId,
+                    damageAmount: damage,
+                    damageType: DamageType.Physical,
+                    hitDirection: payload.HitDirection,
                     stepIndex: payload.StepIndex,
-                    totalSteps: payload.TotalSteps,
-                    damageApplied: true,
-                    targetWasAlive: wasAlive,
-                    targetIsAliveAfter: target.IsAlive));
+                    totalSteps: payload.TotalSteps));
         }
-
-        /// <summary>
-        /// Handles enemy attack hit events.
-        /// Looks up the attacking enemy via BattleFieldManager, applies damage to hero.
-        /// </summary>
         private void OnEnemyAttackHit(EnemyAttackHitPayload payload)
         {
             if (_isDisposed)
@@ -169,26 +167,20 @@ namespace MightyHeroes.Gameplay.Combat
                 return;
             }
 
-            bool wasAlive = target.IsAlive;
-
             int damage = _combatResolver.ResolveDamage(attacker, target, payload.AttackIntensity);
 
             GameLogger.Log(LogSourceType.CombatSystem,
                 $"Enemy[{payload.EnemyId}] hit Hero Damage={damage} Direction={payload.HitDirection}");
 
-            target.ReceiveDamage(damage, payload.HitDirection);
-
-            // Raise CombatHitResolved so enemy FSMs can detect hero defeat
-            // and set their IsBattleEnded flag via OnCombatHitResolved.
-            _eventHub.CombatEvents.CombatHitResolvedEvent.Raise(
-                new CombatHitResolvedPayload(
-                    attackerId: attacker.EntityId,
-                    targetId: target.EntityId,
+            _eventHub.CombatEvents.CombatDamageIntentEvent.Raise(
+                new DamageIntentPayload(
+                    targetEntityId: target.EntityId,
+                    attackerEntityId: attacker.EntityId,
+                    damageAmount: damage,
+                    damageType: DamageType.Physical,
+                    hitDirection: payload.HitDirection,
                     stepIndex: payload.StepIndex,
-                    totalSteps: payload.TotalSteps,
-                    damageApplied: true,
-                    targetWasAlive: wasAlive,
-                    targetIsAliveAfter: target.IsAlive));
+                    totalSteps: payload.TotalSteps));
         }
     }
 }

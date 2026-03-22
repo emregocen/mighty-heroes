@@ -61,7 +61,7 @@ namespace MightyHeroes.Core.Battle
         private void Awake()
         {
             GameLogger.Log(LogSourceType.BattleSystem,
-                $"BattleBootstrapper.Awake InstanceId={GetInstanceID()}");
+                $"BattleBootstrapper.Awake InstanceId={GetEntityId()}");
 
             _idGenerator = new BattleIdGenerator();
 
