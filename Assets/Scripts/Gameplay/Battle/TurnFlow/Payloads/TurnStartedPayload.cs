@@ -1,4 +1,4 @@
-namespace MightyHeroes.Core.TurnSystem.Payloads
+namespace MightyHeroes.Battle.TurnFlow.Payloads
 {
     /// <summary>
     /// Contains contextual data for the start of a turn cycle.

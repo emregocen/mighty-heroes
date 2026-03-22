@@ -1,8 +1,8 @@
 using MightyHeroes.Core.StateMachine;
 using MightyHeroes.Core.StateMachine.Signals;
-using MightyHeroes.Core.TurnSystem.Types;
+using MightyHeroes.Battle.TurnFlow.Types;
 
-namespace MightyHeroes.Core.TurnSystem.States
+namespace MightyHeroes.Battle.TurnFlow.States
 {
     /// <summary>
     /// Base class for all turn states.

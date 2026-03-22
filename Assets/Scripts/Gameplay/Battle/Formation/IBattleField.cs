@@ -1,6 +1,3 @@
-// File: Assets/Scripts/Gameplay/Battle/IBattleField.cs
-// Namespace: MightyHeroes.Gameplay.Battle
-
 using MightyHeroes.Gameplay.Combat.Interfaces;
 
 namespace MightyHeroes.Gameplay.Battle.Formation

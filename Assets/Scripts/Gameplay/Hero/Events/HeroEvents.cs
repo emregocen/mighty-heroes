@@ -26,13 +26,6 @@ namespace MightyHeroes.Gameplay.Hero.Events
             Registry.GetEvent<HeroTurnEndedPayload>();
 
         /// <summary>
-        /// Raised when the hero receives confirmed and resolved damage.
-        /// Used by the Hero FSM to enter TakingHit or Defeated states.
-        /// </summary>
-        public GameEvent<HeroDamagedPayload> HeroDamagedEvent =>
-            Registry.GetEvent<HeroDamagedPayload>();
-
-        /// <summary>
         /// Raised when hero hit reaction animation has fully completed.
         ///
         /// This event is critical for synchronizing

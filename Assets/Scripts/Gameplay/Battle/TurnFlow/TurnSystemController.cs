@@ -1,7 +1,7 @@
 using MightyHeroes.Core.Logging;
 using UnityEngine;
 
-namespace MightyHeroes.Core.TurnSystem
+namespace MightyHeroes.Battle.TurnFlow
 {
     /// <summary>
     /// Unity-facing controller that bridges the Unity lifecycle with the turn state machine.
@@ -28,7 +28,7 @@ namespace MightyHeroes.Core.TurnSystem
         {
             GameLogger.Log(
                 LogSourceType.TurnSystem,
-                $"TurnSystemController.OnDestroy InstanceId={GetInstanceID()}"
+                $"TurnSystemController.OnDestroy InstanceId={GetEntityId()}"
             );
         }
 
@@ -45,7 +45,7 @@ namespace MightyHeroes.Core.TurnSystem
 
             GameLogger.Log(
                 LogSourceType.TurnSystem,
-                $"TurnSystemController.Initialize InstanceId={GetInstanceID()}"
+                $"TurnSystemController.Initialize InstanceId={GetEntityId()}"
             );
         }
     }

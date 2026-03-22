@@ -1,7 +1,7 @@
 using MightyHeroes.Core.Logging;
-using MightyHeroes.Core.TurnSystem.Types;
+using MightyHeroes.Battle.TurnFlow.Types;
 
-namespace MightyHeroes.Core.TurnSystem.States
+namespace MightyHeroes.Battle.TurnFlow.States
 {
     /// <summary>
     /// Handles companion actions during the turn if companions are present.

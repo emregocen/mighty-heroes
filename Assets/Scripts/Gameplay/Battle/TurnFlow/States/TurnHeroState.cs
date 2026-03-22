@@ -1,8 +1,8 @@
 using MightyHeroes.Core.Logging;
-using MightyHeroes.Core.TurnSystem.Types;
+using MightyHeroes.Battle.TurnFlow.Types;
 using MightyHeroes.Gameplay.Hero.Payloads;
 
-namespace MightyHeroes.Core.TurnSystem.States
+namespace MightyHeroes.Battle.TurnFlow.States
 {
     /// <summary>
     /// Represents the hero action phase of the turn flow.

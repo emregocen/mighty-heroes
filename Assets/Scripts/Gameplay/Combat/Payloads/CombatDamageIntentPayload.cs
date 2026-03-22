@@ -1,5 +1,3 @@
-// File: Assets/Scripts/Gameplay/Combat/Payloads/DamageIntentPayload.cs
-
 using MightyHeroes.Gameplay.Combat.Types;
 
 namespace MightyHeroes.Gameplay.Combat.Payloads
@@ -21,7 +19,7 @@ namespace MightyHeroes.Gameplay.Combat.Payloads
     ///   → HeroComponent listens: if TargetEntityId matches → Health.ApplyDamage → HeroDamagedEvent
     ///   → EnemyComponent listens: if TargetEntityId matches → Health.ApplyDamage → EnemyDamagedEvent
     /// </summary>
-    public sealed class DamageIntentPayload
+    public sealed class CombatDamageIntentPayload
     {
         /// <summary>
         /// Unique runtime identifier of the entity that should receive this damage.
@@ -67,7 +65,7 @@ namespace MightyHeroes.Gameplay.Combat.Payloads
         /// <summary>
         /// Creates a new damage intent payload.
         /// </summary>
-        public DamageIntentPayload(
+        public CombatDamageIntentPayload(
             int targetEntityId,
             int attackerEntityId,
             int damageAmount,

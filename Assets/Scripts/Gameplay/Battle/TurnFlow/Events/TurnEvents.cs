@@ -1,7 +1,7 @@
 using MightyHeroes.Core.EventSystem;
-using MightyHeroes.Core.TurnSystem.Payloads;
+using MightyHeroes.Battle.TurnFlow.Payloads;
 
-namespace MightyHeroes.Core.TurnSystem.Events
+namespace MightyHeroes.Battle.TurnFlow.Events
 {
     /// <summary>
     /// Provides access to all turn-related game events.
