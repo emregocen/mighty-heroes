@@ -82,6 +82,9 @@ namespace MightyHeroes.Gameplay.Enemy
         /// 2. base.Initialize(entityId) — assigns EntityId, calls OnInitialized.
         /// 3. InitializeHealth — requires EntityId, must follow base.Initialize.
         /// 4. RegisterEvents — requires EntityId to filter DamageIntentEvent.
+        ///
+        /// FSM is NOT started here. Call StartStateMachine() explicitly after Initialize()
+        /// so BattleBootstrapper owns the full actor boot sequence for all entity types.
         /// </summary>
         /// <param name="stateMachine">Battle-scoped enemy state machine.</param>
         /// <param name="entityId">Unique entity identifier assigned by BattleBootstrapper.</param>
@@ -93,6 +96,16 @@ namespace MightyHeroes.Gameplay.Enemy
             base.InitializeHealth(_stateMachine.EventHub, _enemyStatsData.MaxHealth, _enemyStatsData.MaxShield);
 
             RegisterEvents();
+        }
+
+        /// <summary>
+        /// Starts the enemy FSM. Must be called by BattleBootstrapper after Initialize().
+        /// Separated from Initialize so the bootstrapper controls the exact start order
+        /// for all entity types (hero, enemy, companion) uniformly.
+        /// </summary>
+        public void StartStateMachine()
+        {
+            _stateMachine.Start();
         }
 
         /// <summary>
@@ -120,6 +133,10 @@ namespace MightyHeroes.Gameplay.Enemy
         /// <summary>
         /// Starts the attack animation sequence.
         /// Must only be called from a State (EnemyAttackState).
+        ///
+        /// AdvanceCombo trigger is reset before starting a new sequence to prevent
+        /// a stale trigger from a previous combo from firing immediately on the
+        /// first clip of the new attack. Mirrors HeroComponent.PlayAttack exactly.
         /// </summary>
         /// <param name="attackVariant">Attack animation variant index.</param>
         /// <param name="attackIntensity">Attack intensity level (also defines combo length).</param>
@@ -127,6 +144,7 @@ namespace MightyHeroes.Gameplay.Enemy
         {
             _animator.SetInteger(Anim_AttackVariant, attackVariant);
             _animator.SetInteger(Anim_AttackIntensity, attackIntensity);
+            _animator.ResetTrigger(Anim_AdvanceCombo);
             _animator.SetTrigger(Anim_DoAttack);
         }
 

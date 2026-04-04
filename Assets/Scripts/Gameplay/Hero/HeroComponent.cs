@@ -88,6 +88,9 @@ namespace MightyHeroes.Gameplay.Hero
         /// 2. base.Initialize(entityId) — assigns EntityId, calls OnInitialized.
         /// 3. InitializeHealth — requires EntityId, must follow base.Initialize.
         /// 4. RegisterEvents — requires EntityId to filter DamageIntentEvent.
+        ///
+        /// FSM is NOT started here. Call StartStateMachine() explicitly after Initialize()
+        /// so BattleBootstrapper owns the full actor boot sequence for all entity types.
         /// </summary>
         /// <param name="stateMachine">Battle-scoped hero state machine.</param>
         /// <param name="entityId">Unique entity identifier assigned by BattleBootstrapper.</param>
@@ -104,6 +107,16 @@ namespace MightyHeroes.Gameplay.Hero
                 _heroStatsData.MaxShield);
 
             RegisterEvents();
+        }
+
+        /// <summary>
+        /// Starts the hero FSM. Must be called by BattleBootstrapper after Initialize().
+        /// Separated from Initialize so the bootstrapper controls the exact start order
+        /// for all entity types (hero, enemy, companion) uniformly.
+        /// </summary>
+        public void StartStateMachine()
+        {
+            _stateMachine.Start();
         }
 
         /// <summary>
@@ -131,6 +144,10 @@ namespace MightyHeroes.Gameplay.Hero
         /// <summary>
         /// Starts the attack animation sequence.
         /// Must only be called from a State (HeroAttackState).
+        ///
+        /// AdvanceCombo trigger is reset before starting a new sequence to prevent
+        /// a stale trigger from a previous combo from firing immediately on the
+        /// first clip of the new attack. Mirrors EnemyComponent.PlayAttack exactly.
         /// </summary>
         /// <param name="attackVariant">Attack animation variant index.</param>
         /// <param name="attackIntensity">Attack intensity level (also defines combo length).</param>
@@ -221,11 +238,11 @@ namespace MightyHeroes.Gameplay.Hero
 
         /// <summary>
         /// Called by EntityComponent.Initialize after EntityId is assigned.
-        /// Starts the hero FSM and binds the animation event proxy.
+        /// Binds the animation event proxy to the state machine.
+        /// FSM is NOT started here — StartStateMachine() must be called explicitly by BattleBootstrapper.
         /// </summary>
         protected override void OnInitialized()
         {
-            _stateMachine.Start();
             _animationEventProxy.Initialize(_stateMachine);
         }
 

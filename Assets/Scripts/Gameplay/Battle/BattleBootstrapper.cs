@@ -91,8 +91,10 @@ namespace MightyHeroes.Core.Battle
         {
             UnregisterEntityDeathListener();
             DisposeCombatSystem();
+            DisposeEnemyComponents();
             DisposeEnemyStateMachines();
             DisposeHeroStateMachine();
+            DisposeHeroComponent();
 
             GameLogger.Log(LogSourceType.BattleSystem, "BattleBootstrapper.OnDestroy complete.");
         }
@@ -133,7 +135,11 @@ namespace MightyHeroes.Core.Battle
                 _heroComponent,
                 heroActionResolver);
 
+            // Initialize binds the state machine, assigns EntityId, sets up health and event subscriptions.
+            // StartStateMachine is called separately so the bootstrapper owns the full boot sequence
+            // for all entity types uniformly: create FSM → Initialize → StartStateMachine.
             _heroComponent.Initialize(_heroStateMachine, _idGenerator.Generate());
+            _heroComponent.StartStateMachine();
 
             GameLogger.Log(LogSourceType.BattleSystem,
                 $"Hero initialized. EntityId={_heroComponent.EntityId}");
@@ -170,8 +176,10 @@ namespace MightyHeroes.Core.Battle
                     actionResolver,
                     _heroComponent.EntityId);
 
+                // Initialize binds the state machine, assigns EntityId, sets up health and event subscriptions.
+                // StartStateMachine is called separately — same boot pattern as hero.
                 config.Enemy.Initialize(enemyStateMachine, _idGenerator.Generate());
-                enemyStateMachine.Start();
+                config.Enemy.StartStateMachine();
 
                 _enemyStateMachines.Add(enemyStateMachine);
                 _turnContext.RegisterEnemy();
@@ -283,6 +291,39 @@ namespace MightyHeroes.Core.Battle
             _heroStateMachine = null;
 
             GameLogger.Log(LogSourceType.BattleSystem, "HeroStateMachine disposed.");
+        }
+
+        /// <summary>
+        /// Disposes HeroComponent to unregister its EventHub subscriptions.
+        /// Must be called after DisposeHeroStateMachine so the FSM is already
+        /// torn down before the component cleans up its own listeners.
+        /// </summary>
+        private void DisposeHeroComponent()
+        {
+            if (_heroComponent == null)
+                return;
+
+            _heroComponent.Dispose();
+
+            GameLogger.Log(LogSourceType.BattleSystem, "HeroComponent disposed.");
+        }
+
+        /// <summary>
+        /// Disposes all EnemyComponent instances to unregister their EventHub subscriptions.
+        /// Must be called after DisposeEnemyStateMachines so FSMs are torn down first.
+        /// </summary>
+        private void DisposeEnemyComponents()
+        {
+            if (_enemyFormation == null)
+                return;
+
+            foreach (EnemyFormationConfig config in _enemyFormation)
+            {
+                if (config.Enemy != null)
+                    config.Enemy.Dispose();
+            }
+
+            GameLogger.Log(LogSourceType.BattleSystem, "All enemy components disposed.");
         }
 
         // EVENT HANDLERS
