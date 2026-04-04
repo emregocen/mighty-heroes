@@ -21,10 +21,21 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine
     ///   be forwarded into the active state as signals regardless of which
     ///   state is currently active (EnemyHitReactionEnded, CombatHitResolved).
     ///
-    /// Design note:
+    /// Design note — state-local vs battle-lifetime subscriptions:
     /// State-local subscriptions (puzzle match, turn start) live inside each
     /// state's Enter/Exit. Battle-lifetime subscriptions are set up once in the
     /// constructor and torn down in Dispose.
+    ///
+    /// Design note — no battle-end guard in this FSM:
+    /// Unlike EnemyStateMachine, HeroStateMachine has no IsBattleEnded flag or
+    /// SwitchToReadyState guard. This asymmetry is intentional:
+    /// When the hero dies, HeroComponent.OnDamageIntent calls SwitchToDefeatedState,
+    /// which transitions the hero FSM to the terminal HeroDefeatedState immediately.
+    /// BattleBootstrapper.OnEntityDied then calls TurnContext.EndBattle(), halting
+    /// the TurnStateMachine. There is no re-entry path into hero active states after
+    /// death, so no guard is needed. EnemyStateMachine requires its guard because
+    /// enemies can receive a turn signal while already processing the hero's final
+    /// attack in the same turn cycle.
     /// </summary>
     public sealed class HeroStateMachine : BaseStateMachine
     {
@@ -212,9 +223,16 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine
         /// Receives CombatHitResolved from EventHub.
         /// Converts it to a local signal so HeroAttackState can detect
         /// mid-combo target death and trigger a forced sequence finish.
+        ///
+        /// Guard: only forward when the hero is the attacker or the target.
+        /// Events from enemy-vs-enemy or future PvP actors are irrelevant to
+        /// this FSM and must not reach the active state.
         /// </summary>
         private void OnCombatHitResolved(CombatHitResolvedPayload payload)
         {
+            if (payload.AttackerId != _hero.EntityId && payload.TargetId != _hero.EntityId)
+                return;
+
             Notify(new HeroCombatHitResolvedSignal(payload));
         }
     }

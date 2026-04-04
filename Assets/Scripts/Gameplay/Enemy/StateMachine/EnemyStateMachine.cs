@@ -114,8 +114,21 @@ namespace MightyHeroes.Gameplay.Enemy.StateMachine
 
         /// <summary>
         /// Transitions enemy to ready state (preparing to execute an action).
-        /// If the battle has ended due to hero defeat, redirects to idle
-        /// to prevent this enemy from acting after the battle is over.
+        ///
+        /// Battle-end guard: if the hero has been defeated, redirects to idle
+        /// instead of ready to prevent this enemy from acting after the battle is over.
+        ///
+        /// Design decision — why this guard exists here and not in HeroStateMachine:
+        /// Hero defeat is detected via CombatHitResolvedEvent in OnCombatHitResolved.
+        /// That event arrives while the enemy may still be mid-turn (attack animation
+        /// in progress), so the guard must be checked at the point of re-entry into
+        /// ReadyState rather than at the event itself.
+        ///
+        /// HeroStateMachine has no equivalent guard because hero death immediately
+        /// transitions the hero FSM to the terminal HeroDefeatedState, and
+        /// BattleBootstrapper.OnEntityDied calls TurnContext.EndBattle() which halts
+        /// the TurnStateMachine. There is no re-entry path in HeroStateMachine that
+        /// requires a guard — the asymmetry is intentional.
         /// </summary>
         public void SwitchToReadyState()
         {
@@ -212,21 +225,29 @@ namespace MightyHeroes.Gameplay.Enemy.StateMachine
         /// Receives HeroHitReactionEnded from EventHub.
         /// Converts to local signal so EnemyAttackState can advance combo
         /// after the hero finishes reacting to a hit.
+        ///
+        /// No entity-id filter here: HeroHitReactionEndedPayload does not carry
+        /// attacker information. All enemy FSMs receive this signal and forward it.
+        /// The active EnemyAttackState uses its own step-synchronization guards
+        /// (HitFrameFiredForStep, LastHitStep) to ignore signals that do not
+        /// belong to the current combo step.
         /// </summary>
         private void OnHeroHitReactionEnded(HeroHitReactionEndedPayload payload)
         {
-            if (payload.HeroEntityId == _enemy.EntityId)
-                return;
-
             Notify(new EnemyTargetHitReactionEndedSignal(payload));
         }
 
         /// <summary>
         /// Receives CombatHitResolved from EventHub.
-        /// Converts to local signal so EnemyAttackState can detect
-        /// mid-combo target death and trigger a forced sequence finish.
-        /// Also sets IsBattleEnded when the hero is the defeated target,
-        /// preventing this enemy from acting after the battle ends.
+        /// Has two independent responsibilities:
+        ///
+        /// 1. IsBattleEnded flag — set when hero is the defeated target.
+        ///    No entity-id filter here: ALL enemies must detect hero death
+        ///    regardless of whether this enemy was the attacker.
+        ///
+        /// 2. Signal forwarding — only forward when this enemy is the attacker
+        ///    or this enemy is the target. Events from hero-vs-other-enemy
+        ///    or future companion/PvP actors are irrelevant to this FSM.
         /// </summary>
         private void OnCombatHitResolved(CombatHitResolvedPayload payload)
         {
@@ -236,6 +257,9 @@ namespace MightyHeroes.Gameplay.Enemy.StateMachine
                 GameLogger.Log(LogSourceType.Enemy,
                     $"Enemy[{_enemy.EntityId}]: Hero defeated. IsBattleEnded set.");
             }
+
+            if (payload.AttackerId != _enemy.EntityId && payload.TargetId != _enemy.EntityId)
+                return;
 
             Notify(new EnemyCombatHitResolvedSignal(payload));
         }
