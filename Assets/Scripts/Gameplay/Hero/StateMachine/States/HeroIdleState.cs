@@ -7,17 +7,20 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
     /// Default hero state when the hero is not actively performing an action.
     ///
     /// Responsibilities:
-    /// - Listen for TurnHeroPhaseStartedEvent and transition to ReadyState.
+    /// - Dims the AP view on entry to signal the hero turn is not active.
+    /// - Listens for TurnHeroPhaseStartedEvent and transitions to PreReadyState.
     ///
     /// Hit reaction is NOT handled here.
-    /// HeroComponent.ReceiveDamage calls StateMachine.SwitchToTakingHitState directly,
+    /// HeroComponent.OnDamageIntent calls StateMachine.SwitchToTakingHitState directly,
     /// regardless of which state the hero is currently in.
-    /// Listening to HeroDamagedEvent here would duplicate that transition.
     /// </summary>
     public sealed class HeroIdleState : HeroBaseState
     {
         // CONSTRUCTOR
 
+        /// <summary>
+        /// Creates a new hero idle state.
+        /// </summary>
         public HeroIdleState(HeroStateMachine stateMachine)
             : base(stateMachine)
         {
@@ -25,17 +28,23 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
 
         // PUBLIC METHODS
 
+        /// <summary>
+        /// Dims the AP view and registers turn event listener.
+        /// AP view is dimmed here because idle is the resting state between turns.
+        /// </summary>
         public override void Enter()
         {
             GameLogger.Log(LogSourceType.Hero, "Enter HeroIdleState");
-
+            StateMachine.Hero.SetActionPointViewTurnActive(false);
             RegisterEvents();
         }
 
+        /// <summary>
+        /// Unregisters turn event listener.
+        /// </summary>
         public override void Exit()
         {
             GameLogger.Log(LogSourceType.Hero, "Exit HeroIdleState");
-
             UnregisterEvents();
         }
 
@@ -59,12 +68,11 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
 
         /// <summary>
         /// Called when the hero turn phase starts.
-        /// Resets action points and transitions to ReadyState to enable puzzle input.
+        /// Transitions to PreReadyState which owns AP reset and delay.
         /// </summary>
         private void OnTurnHeroStarted(TurnHeroPhaseStartedPayload payload)
         {
-            StateMachine.Hero.ResetActionPoints();
-            StateMachine.SwitchToReadyState();
+            StateMachine.SwitchToPreReadyState();
         }
     }
 }

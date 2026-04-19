@@ -17,5 +17,5 @@ MonoBehaviour:
   _maxShield: 0
   _baseAttack: 10
   _baseDefense: 100
-  _baseActionPoints: 3
+  _baseActionPoints: 4
   _comboThresholdForUltimate: 3

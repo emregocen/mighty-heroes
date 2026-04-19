@@ -14,6 +14,7 @@ namespace MightyHeroes.Core.Logging
         CombatSystem,
         StateMachine,
         Animation,
-        System
+        System,
+        UI
     }
 }

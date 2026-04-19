@@ -10,15 +10,21 @@ namespace MightyHeroes.Gameplay.Battle.Formation
     [System.Serializable]
     public struct EnemyFormationConfig
     {
-        /// <summary>Enemy component reference assigned in Inspector.</summary>
+        /// <summary>
+        /// Enemy component reference assigned in Inspector.
+        /// </summary>
         public EnemyComponent Enemy;
 
-        /// <summary>Row index in formation. 0 = front row. Higher values = back rows.</summary>
+        /// <summary>
+        /// Row index in formation. 0 = front row. Higher values = back rows.
+        /// </summary>
         [Range(0, 5)]
-        public int LineIndex;
+        public int RowIndex;
 
-        /// <summary>Position within the row. 0 = leftmost slot.</summary>
+        /// <summary>
+        /// Position within the row. 0 = leftmost slot.
+        /// </summary>
         [Range(0, 9)]
-        public int SlotIndex;
+        public int ColumnIndex;
     }
 }
