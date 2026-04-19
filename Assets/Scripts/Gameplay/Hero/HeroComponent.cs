@@ -10,6 +10,7 @@ using MightyHeroes.Gameplay.Hero.Presentation;
 using MightyHeroes.Gameplay.Hero.StateMachine;
 using MightyHeroes.Gameplay.Hero.Stats;
 using MightyHeroes.Gameplay.Puzzle;
+using MightyHeroes.UI.Battle.Views;
 
 namespace MightyHeroes.Gameplay.Hero
 {
@@ -27,13 +28,19 @@ namespace MightyHeroes.Gameplay.Hero
     ///         → StateMachine.SwitchToDefeatedState or SwitchToTakingHitState
     ///           → State.Enter → PlayTakeHit / PlayDefeat (animator called here, never before)
     ///
+    /// Action point flow:
+    /// HeroAttackState.TryConsumeActionPoint()
+    ///   → HeroComponent.TryConsumeActionPoints(1)  ← overrides EntityComponent
+    ///     → base.TryConsumeActionPoints(amount)    ← mutates _runtimeStats
+    ///       → RefreshActionPointView()             ← updates pip HUD immediately after
+    ///
     /// Event raise ownership:
     /// HeroHitReactionEndedEvent is raised in HeroTakingHitState.OnHitReactionEnded,
     /// not here. NotifyHitReactionEnded only forwards the signal to the FSM.
     /// </summary>
     public sealed class HeroComponent : EntityComponent, ICombatTarget, ICombatAttacker
     {
-        // CONSTANTS — Animator parameter hashes
+        // CONSTANTS
 
         /// <summary>Animator int parameter selecting the attack animation variant.</summary>
         private static readonly int Anim_AttackVariant = Animator.StringToHash("AttackVariant");
@@ -70,7 +77,20 @@ namespace MightyHeroes.Gameplay.Hero
         /// <summary>Receives animation events and forwards them to HeroStateMachine as signals.</summary>
         [SerializeField] private HeroAnimationEventProxy _animationEventProxy;
 
+        [Header("HUD")]
+        /// <summary>Hero health bar presentation view.</summary>
+        [SerializeField] private HealthBarView _healthBarView;
+
+        /// <summary>Hero shield bar presentation view.</summary>
+        [SerializeField] private ShieldBarView _shieldBarView;
+
+        /// <summary>Hero action point presentation view.</summary>
+        [SerializeField] private ActionPointView _actionPointView;
+
+        /// <summary>Reference to the hero state machine. Assigned by BattleBootstrapper during Initialize().</summary>
         private HeroStateMachine _stateMachine;
+
+        /// <summary>Reference to the battle-scoped event hub. Cached from stateMachine.EventHub on Initialize().</summary>
         private EventHub _eventHub;
 
         // PROPERTIES
@@ -84,7 +104,7 @@ namespace MightyHeroes.Gameplay.Hero
         /// Battle-scope entry point. Called by BattleBootstrapper.
         ///
         /// Order matters:
-        /// 1. Assign _stateMachine — required by OnInitialized.
+        /// 1. Assign _stateMachine and cache _eventHub — required by OnInitialized.
         /// 2. base.Initialize(entityId) — assigns EntityId, calls OnInitialized.
         /// 3. InitializeHealth — requires EntityId, must follow base.Initialize.
         /// 4. RegisterEvents — requires EntityId to filter DamageIntentEvent.
@@ -100,13 +120,10 @@ namespace MightyHeroes.Gameplay.Hero
             _eventHub = stateMachine.EventHub;
 
             base.Initialize(entityId);
-
-            base.InitializeHealth(
-                _eventHub,
-                _heroStatsData.MaxHealth,
-                _heroStatsData.MaxShield);
+            base.InitializeHealth(_eventHub, _heroStatsData.MaxHealth, _heroStatsData.MaxShield);
 
             RegisterEvents();
+            InitializeHud();
         }
 
         /// <summary>
@@ -128,7 +145,42 @@ namespace MightyHeroes.Gameplay.Hero
             UnregisterEvents();
         }
 
-        // PUBLIC METHODS — Animation commands (called only by States)
+        // PUBLIC METHODS — Action Points
+
+        /// <summary>
+        /// Attempts to consume the specified amount of action points and
+        /// immediately refreshes the AP HUD to reflect the new value.
+        ///
+        /// This override is the single correct place to update ActionPointView
+        /// on consumption. State classes must not call RefreshActionPointView
+        /// directly; they call this method via EntityComponent's public API.
+        /// </summary>
+        /// <param name="amount">Action point cost to consume.</param>
+        /// <returns>True if the action points were consumed successfully.</returns>
+        public new bool TryConsumeActionPoints(int amount)
+        {
+            bool consumed = base.TryConsumeActionPoints(amount);
+
+            if (consumed)
+                RefreshActionPointView();
+
+            return consumed;
+        }
+
+        /// <summary>
+        /// Resets action points at the start of a new hero turn and
+        /// immediately refreshes the AP HUD to reflect the restored value.
+        ///
+        /// This override is the single correct place to update ActionPointView
+        /// on reset. Mirrors TryConsumeActionPoints override by the same pattern.
+        /// </summary>
+        public new void ResetActionPoints()
+        {
+            base.ResetActionPoints();
+            RefreshActionPointView();
+        }
+
+        // PUBLIC METHODS — Animation Commands
 
         /// <summary>
         /// Plays hit reaction animation.
@@ -147,7 +199,7 @@ namespace MightyHeroes.Gameplay.Hero
         ///
         /// AdvanceCombo trigger is reset before starting a new sequence to prevent
         /// a stale trigger from a previous combo from firing immediately on the
-        /// first clip of the new attack. Mirrors EnemyComponent.PlayAttack exactly.
+        /// first clip of the new attack.
         /// </summary>
         /// <param name="attackVariant">Attack animation variant index.</param>
         /// <param name="attackIntensity">Attack intensity level (also defines combo length).</param>
@@ -189,6 +241,18 @@ namespace MightyHeroes.Gameplay.Hero
             _animator.SetTrigger(Anim_Defeat);
         }
 
+        // PUBLIC METHODS — HUD
+
+        /// <summary>
+        /// Activates or dims the AP view to indicate turn ownership.
+        /// Called by HeroPreReadyState.Enter (activate) and HeroIdleState.Enter (dim).
+        /// </summary>
+        /// <param name="isActive">True when the hero turn is active.</param>
+        public void SetActionPointViewTurnActive(bool isActive)
+        {
+            _actionPointView?.SetTurnActive(isActive);
+        }
+
         // PUBLIC METHODS — Puzzle
 
         /// <summary>
@@ -201,7 +265,7 @@ namespace MightyHeroes.Gameplay.Hero
             PuzzleController.Instance.IsPlayable = isPlayable;
         }
 
-        // PUBLIC METHODS — Animation event bridge
+        // PUBLIC METHODS — Animation Event Bridge
 
         /// <summary>
         /// Called by HeroHitReactionEndedBehaviour when hit reaction animation completes.
@@ -248,14 +312,71 @@ namespace MightyHeroes.Gameplay.Hero
 
         // PRIVATE METHODS
 
+        /// <summary>
+        /// Initializes all hero HUD views with correct runtime values at battle start.
+        /// AP view starts dimmed — hero turn is not active at battle start.
+        /// Called once from Initialize() after health and stats are ready.
+        /// </summary>
+        private void InitializeHud()
+        {
+            RefreshHealthView(false);
+            RefreshShieldView(false);
+            RefreshActionPointView();
+            SetActionPointViewTurnActive(false);
+        }
+
+        /// <summary>
+        /// Registers listeners for relevant EventHub events.
+        /// </summary>
         private void RegisterEvents()
         {
             _eventHub.CombatEvents.CombatDamageIntentEvent.Register(OnDamageIntent);
         }
 
+        /// <summary>
+        /// Unregisters listeners for EventHub events.
+        /// </summary>
         private void UnregisterEvents()
         {
             _eventHub.CombatEvents.CombatDamageIntentEvent.Unregister(OnDamageIntent);
+        }
+
+        /// <summary>
+        /// Refreshes the health bar view from the current runtime health state.
+        /// </summary>
+        /// <param name="animate">Whether the presentation should animate the change.</param>
+        private void RefreshHealthView(bool animate)
+        {
+            if (_healthBarView == null || Health == null)
+                return;
+
+            _healthBarView.SetValue(Health.CurrentHealth, Health.MaxHealth, animate);
+        }
+
+        /// <summary>
+        /// Refreshes the shield bar view from the current runtime shield state.
+        /// </summary>
+        /// <param name="animate">Whether the presentation should animate the change.</param>
+        private void RefreshShieldView(bool animate)
+        {
+            if (_shieldBarView == null || Health == null)
+                return;
+
+            _shieldBarView.SetValue(Health.CurrentShield, Health.MaxShield, animate);
+            _shieldBarView.SetVisible(Health.MaxShield > 0 && Health.CurrentShield > 0);
+        }
+
+        /// <summary>
+        /// Refreshes the action point pip view from the current runtime AP state.
+        /// Called on initialization and after every successful AP consumption or reset.
+        /// </summary>
+        private void RefreshActionPointView()
+        {
+            if (_actionPointView == null)
+                return;
+
+            _actionPointView.SetValue(CurrentActionPoints, _heroStatsData.BaseActionPoints);
+            _actionPointView.SetVisible(true);
         }
 
         // EVENT HANDLERS
@@ -282,8 +403,9 @@ namespace MightyHeroes.Gameplay.Hero
                 sourceEntityId: payload.AttackerEntityId,
                 lifestealPercent: 0f);
 
-            // Raise CombatHitResolvedEvent here — after damage is applied —
-            // so targetIsAliveAfter is authoritative regardless of local or network execution.
+            RefreshHealthView(true);
+            RefreshShieldView(true);
+
             _eventHub.CombatEvents.CombatHitResolvedEvent.Raise(
                 new CombatHitResolvedPayload(
                     attackerId: payload.AttackerEntityId,

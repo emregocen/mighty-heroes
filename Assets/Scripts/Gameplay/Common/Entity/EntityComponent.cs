@@ -37,6 +37,11 @@ namespace MightyHeroes.Gameplay.Common.Entity
         /// Current health value used by combat systems and UI.
         /// </summary>
         public int CurrentHealth => _health != null ? _health.CurrentHealth : _runtimeStats != null ? _runtimeStats.CurrentHealth : 0;
+        
+        /// <summary>
+        /// Current action points value sed by combat system
+        /// </summary>
+        public int CurrentActionPoints => _runtimeStats != null ? _runtimeStats.CurrentActionPoints : 0;
 
         /// <summary>
         /// Indicates whether the entity is alive.
@@ -51,9 +56,7 @@ namespace MightyHeroes.Gameplay.Common.Entity
         /// <summary>
         /// Indicates whether the hero still has remaining action points.
         /// </summary>
-        public bool HasRemainingActionPoints =>
-            _runtimeStats != null && _runtimeStats.CurrentActionPoints > 0;
-
+        public bool HasRemainingActionPoints => _runtimeStats != null && _runtimeStats.CurrentActionPoints > 0;
 
         /// <summary>
         /// Provides access to runtime stats for derived classes.

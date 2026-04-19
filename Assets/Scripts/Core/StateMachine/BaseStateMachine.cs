@@ -60,7 +60,7 @@ namespace MightyHeroes.Core.StateMachine
             // IMPORTANT:
             // This hook is invoked AFTER the state has fully entered.
             // Derived state machines can react safely here.
-            OnStateEntered(_currentState);
+            OnStateEntered(initialState);
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace MightyHeroes.Core.StateMachine
             // IMPORTANT:
             // Ensures the new state is fully initialized
             // before any derived logic is triggered.
-            OnStateEntered(_currentState);
+            OnStateEntered(nextState);
         }
 
         /// <summary>

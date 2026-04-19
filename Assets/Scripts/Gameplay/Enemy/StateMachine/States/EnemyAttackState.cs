@@ -169,7 +169,8 @@ namespace MightyHeroes.Gameplay.Enemy.StateMachine.States
                 StateMachine.SwitchToReadyState();
                 return;
             }
-
+            
+            StateMachine.SwitchToIdleState();
             StateMachine.FinishEnemyTurn();
         }
     }

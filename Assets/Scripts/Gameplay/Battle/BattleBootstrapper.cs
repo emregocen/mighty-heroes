@@ -13,6 +13,7 @@ using MightyHeroes.Gameplay.Hero.Actions;
 using MightyHeroes.Gameplay.Hero.StateMachine;
 using MightyHeroes.Gameplay.Puzzle;
 using MightyHeroes.Core.BattleSystem;
+using MightyHeroes.UI.Battle.Presenters;
 
 namespace MightyHeroes.Core.Battle
 {
@@ -41,6 +42,7 @@ namespace MightyHeroes.Core.Battle
 
         [SerializeField] private TurnSystemController _turnSystemController;
         [SerializeField] private PuzzleController _puzzleController;
+        [SerializeField] private BattleUIPresenter _battleUIPresenter;
         [SerializeField] private HeroComponent _heroComponent;
         [SerializeField] private EnemyFormationConfig[] _enemyFormation;
 
@@ -72,6 +74,7 @@ namespace MightyHeroes.Core.Battle
             InitializeTurnSystem();
             InitializeCombatSystem();
             InitializePuzzleSystem();
+            InitializeBattleHud();
             RegisterEntityDeathListener();
         }
 
@@ -101,6 +104,10 @@ namespace MightyHeroes.Core.Battle
 
         // PRIVATE METHODS — Initialization
 
+        /// <summary>
+        /// Creates the battle-scoped EventHub instance used for decoupled communication
+        /// between battle systems, actors, and presentation components.
+        /// </summary>
         private void CreateEventHub()
         {
             _eventHub = new EventHub();
@@ -119,6 +126,10 @@ namespace MightyHeroes.Core.Battle
             _battleFormation = new BattleFormation();
         }
 
+        /// <summary>
+        /// Initializes the hero component and its state machine,
+        /// assigns a runtime entity identifier, and starts the hero FSM.
+        /// </summary>
         private void InitializeHero()
         {
             if (_heroComponent == null)
@@ -185,15 +196,19 @@ namespace MightyHeroes.Core.Battle
                 _turnContext.RegisterEnemy();
 
                 formationEntries.Add(
-                    new EnemyFormationEntry(config.Enemy, config.LineIndex, config.SlotIndex));
+                    new EnemyFormationEntry(config.Enemy, config.RowIndex, config.ColumnIndex));
 
                 GameLogger.Log(LogSourceType.BattleSystem,
-                    $"Enemy initialized. EntityId={config.Enemy.EntityId} Line={config.LineIndex} Slot={config.SlotIndex}");
+                    $"Enemy initialized. EntityId={config.Enemy.EntityId} Line={config.RowIndex} Slot={config.ColumnIndex}");
             }
 
             _battleFormation.Initialize(formationEntries);
         }
 
+        /// <summary>
+        /// Creates and initializes the turn flow state machine,
+        /// then binds it to the TurnSystemController for scene-level orchestration.
+        /// </summary>
         private void InitializeTurnSystem()
         {
             if (_turnSystemController == null)
@@ -216,6 +231,10 @@ namespace MightyHeroes.Core.Battle
                 $"TurnSystem initialized. AliveEnemyCount={_turnContext.AliveEnemyCount}");
         }
 
+        /// <summary>
+        /// Creates the CombatSystem and wires hero-target resolution
+        /// through the current battle formation state.
+        /// </summary>
         private void InitializeCombatSystem()
         {
             if (_heroComponent == null)
@@ -237,6 +256,10 @@ namespace MightyHeroes.Core.Battle
             GameLogger.Log(LogSourceType.BattleSystem, "CombatSystem initialized.");
         }
 
+        /// <summary>
+        /// Initializes the puzzle controller with the shared battle EventHub
+        /// so puzzle results can publish gameplay events into the combat flow.
+        /// </summary>
         private void InitializePuzzleSystem()
         {
             if (_puzzleController == null)
@@ -249,6 +272,19 @@ namespace MightyHeroes.Core.Battle
             _puzzleController.Initialize(_eventHub);
         }
 
+        /// <summary>
+        /// Initializes scene-level HUD elements.
+        /// Entity-owned HUD (health bars) is initialized by entity components themselves.
+        /// </summary>
+        private void InitializeBattleHud()
+        {
+            _battleUIPresenter.Initialize(_eventHub);
+        }
+
+        /// <summary>
+        /// Registers the battle-level death listener so entity death events
+        /// can update turn flow and battle completion state.
+        /// </summary>
         private void RegisterEntityDeathListener()
         {
             _eventHub.HealthEvents.EntityDiedEvent.Register(OnEntityDied);
@@ -256,11 +292,18 @@ namespace MightyHeroes.Core.Battle
 
         // PRIVATE METHODS — Dispose
 
+        /// <summary>
+        /// Unregisters the battle-level death listener during teardown
+        /// to prevent callbacks after destruction.
+        /// </summary>
         private void UnregisterEntityDeathListener()
         {
             _eventHub?.HealthEvents.EntityDiedEvent.Unregister(OnEntityDied);
         }
 
+        /// <summary>
+        /// Disposes the CombatSystem and clears its runtime reference.
+        /// </summary>
         private void DisposeCombatSystem()
         {
             if (_combatSystem == null)
@@ -272,6 +315,9 @@ namespace MightyHeroes.Core.Battle
             GameLogger.Log(LogSourceType.BattleSystem, "CombatSystem disposed.");
         }
 
+        /// <summary>
+        /// Disposes all created enemy state machines and clears the runtime collection.
+        /// </summary>
         private void DisposeEnemyStateMachines()
         {
             foreach (EnemyStateMachine esm in _enemyStateMachines)
@@ -282,6 +328,9 @@ namespace MightyHeroes.Core.Battle
             GameLogger.Log(LogSourceType.BattleSystem, "All enemy state machines disposed.");
         }
 
+        /// <summary>
+        /// Disposes the hero state machine and clears its runtime reference.
+        /// </summary>
         private void DisposeHeroStateMachine()
         {
             if (_heroStateMachine == null)
