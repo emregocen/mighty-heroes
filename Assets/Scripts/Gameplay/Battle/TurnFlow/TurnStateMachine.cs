@@ -4,6 +4,7 @@ using MightyHeroes.Battle.TurnFlow.Payloads;
 using MightyHeroes.Battle.TurnFlow.States;
 using MightyHeroes.Battle.TurnFlow.Types;
 using MightyHeroes.Gameplay.Battle.Formation;
+using MightyHeroes.Core.Logging;
 
 namespace MightyHeroes.Battle.TurnFlow
 {
@@ -111,7 +112,9 @@ namespace MightyHeroes.Battle.TurnFlow
             switch (turnState.StateType)
             {
                 case TurnStateType.TurnStart:
-                    EventHub.TurnEvents.TurnStartedEvent.Raise(new TurnStartedPayload());
+                    //GameLogger.Debug(LogSourceType.TurnSystem, $"[TURN DEBUG] OnStateEntered TurnStart. TurnIndex={Context.TurnIndex}");
+
+                    EventHub.TurnEvents.TurnStartedEvent.Raise(new TurnStartedPayload(Context.TurnIndex, Context.IsFirstTurn));
                     break;
 
                 case TurnStateType.TurnHero:

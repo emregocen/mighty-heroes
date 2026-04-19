@@ -13,14 +13,10 @@ namespace MightyHeroes.Core.Logging
     /// </summary>
     public static class GameLogger
     {
-        // 0) CONSTANTS
-
         /// <summary>
         /// Standard log output format applied to all log entries.
         /// </summary>
         private const string LOG_FORMAT = "{0}|{1}| {2}";
-
-        // 1) FIELDS
 
         /// <summary>
         /// Enables or disables flow-related logs globally.
@@ -79,10 +75,10 @@ namespace MightyHeroes.Core.Logging
         /// </summary>
         public static bool EnableAnimationLogs = true;
 
-        // 3) CONSTRUCTOR
-        // None
-
-        // 4) PUBLIC METHODS
+        /// <summary>
+        /// Enables logs originating from UI systems.
+        /// </summary>
+        public static bool EnableUILogs = true;
 
         /// <summary>
         /// Writes a flow-level log entry for the specified source.
@@ -163,6 +159,7 @@ namespace MightyHeroes.Core.Logging
                 LogSourceType.StateMachine => EnableStateMachineLogs,
                 LogSourceType.Animation => EnableAnimationLogs,
                 LogSourceType.System => true,
+                LogSourceType.UI => EnableUILogs,
                 _ => true
             };
         }
@@ -198,6 +195,7 @@ namespace MightyHeroes.Core.Logging
                 LogSourceType.StateMachine => "FSM   ",
                 LogSourceType.Animation => "ANIM  ",
                 LogSourceType.System => "SYSTEM",
+                LogSourceType.UI => "UI    ",
                 _ => "LOG"
             };
         }

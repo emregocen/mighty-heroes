@@ -119,6 +119,15 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine
         {
             SwitchState(new HeroIdleState(this));
         }
+        
+        /// <summary>
+        /// Transitions hero to pre-ready state after turn phase starts.
+        /// Pre-ready state owns AP reset, AP view activation and the pre-action delay.
+        /// </summary>
+        public void SwitchToPreReadyState()
+        {
+            SwitchState(new HeroPreReadyState(this));
+        }
 
         /// <summary>Transitions hero to ready state (puzzle input enabled).</summary>
         public void SwitchToReadyState()

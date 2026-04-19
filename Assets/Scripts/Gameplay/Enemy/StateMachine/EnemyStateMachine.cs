@@ -113,22 +113,26 @@ namespace MightyHeroes.Gameplay.Enemy.StateMachine
         }
 
         /// <summary>
-        /// Transitions enemy to ready state (preparing to execute an action).
-        ///
-        /// Battle-end guard: if the hero has been defeated, redirects to idle
-        /// instead of ready to prevent this enemy from acting after the battle is over.
-        ///
-        /// Design decision — why this guard exists here and not in HeroStateMachine:
-        /// Hero defeat is detected via CombatHitResolvedEvent in OnCombatHitResolved.
-        /// That event arrives while the enemy may still be mid-turn (attack animation
-        /// in progress), so the guard must be checked at the point of re-entry into
-        /// ReadyState rather than at the event itself.
-        ///
-        /// HeroStateMachine has no equivalent guard because hero death immediately
-        /// transitions the hero FSM to the terminal HeroDefeatedState, and
-        /// BattleBootstrapper.OnEntityDied calls TurnContext.EndBattle() which halts
-        /// the TurnStateMachine. There is no re-entry path in HeroStateMachine that
-        /// requires a guard — the asymmetry is intentional.
+        /// Transitions enemy to pre-ready state after turn start.
+        /// Pre-ready state activates the AP view and waits before transitioning to ReadyState.
+        /// Battle-end guard redirects to idle if the battle has already ended.
+        /// </summary>
+        public void SwitchToPreReadyState()
+        {
+            if (_isBattleEnded)
+            {
+                GameLogger.Log(LogSourceType.Enemy,
+                    $"Enemy[{_enemy.EntityId}] SwitchToPreReadyState blocked: battle ended.");
+                SwitchState(new EnemyIdleState(this));
+                return;
+            }
+
+            SwitchState(new EnemyPreReadyState(this));
+        }
+
+        /// <summary>
+        /// Transitions enemy to ready state to resolve the next action.
+        /// Battle-end guard redirects to idle if the battle has already ended.
         /// </summary>
         public void SwitchToReadyState()
         {

@@ -29,8 +29,13 @@ namespace MightyHeroes.Gameplay.Enemy.StateMachine.States
 
         // PUBLIC METHODS
 
+        /// <summary>
+        /// Dims the AP view and registers turn event listener.
+        /// AP view is dimmed here because idle is the resting state between turns.
+        /// </summary>
         public override void Enter()
         {
+            StateMachine.Enemy.SetActionPointViewTurnActive(false);
             RegisterEvents();
         }
 
@@ -59,7 +64,7 @@ namespace MightyHeroes.Gameplay.Enemy.StateMachine.States
 
         /// <summary>
         /// Received when TurnSystem announces which enemy should start acting.
-        /// Transitions to ReadyState only if this enemy is the announced one.
+        /// Transitions to PreReadyState only if this enemy is the announced one.
         /// </summary>
         private void OnTurnEnemyStarted(TurnEnemyStartedPayload payload)
         {
@@ -69,7 +74,7 @@ namespace MightyHeroes.Gameplay.Enemy.StateMachine.States
             if (payload.EnemyId != StateMachine.Enemy.EntityId)
                 return;
 
-            StateMachine.SwitchToReadyState();
+            StateMachine.SwitchToPreReadyState();
         }
     }
 }
