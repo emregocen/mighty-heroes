@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fb6210b867a8464eb4a66e1ba2bccc3, type: 3}
   m_Name: TurnPhaseTextStyle
   m_EditorClassIdentifier: Assembly-CSharp::TextStyleConfig
-  FaceColor: {r: 0.3443396, g: 0.6175315, b: 1, a: 1}
-  OutlineColor: {r: 0.06790684, g: 0.044143822, b: 0.3018868, a: 1}
-  OutlineWidth: 0.5
+  FaceColor: {r: 0, g: 0.71723115, b: 1, a: 1}
+  OutlineColor: {r: 0.044695295, g: 0, b: 0.4811321, a: 1}
+  OutlineWidth: 0.51
   UseUnderlay: 0
   UnderlayColor: {r: 0, g: 0, b: 0, a: 1}
   UnderlayOffset: {x: 1, y: -1}
   UnderlaySoftness: 0.3
   UseGlow: 0
-  GlowColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  GlowPower: 0.3
+  GlowColor: {r: 0.06666667, g: 0.043137256, b: 0.3019608, a: 1}
+  GlowPower: 0.25

@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfe1900e6f1264d9d83f14c3d90e9630, type: 3}
+  m_Name: WVC_Mace_01
+  m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Equipment.Data.WeaponVisualConfig
+  _weaponId: 2
+  _displayName: Mace
+  _weaponPrefab: {fileID: 1022962149991736, guid: 3068d57202960404b8d79e3845baf3e8, type: 3}
+  _localPosition: {x: 0, y: 0, z: 0}
+  _localEulerAngles: {x: 0, y: 0, z: 0}
+  _localScale: {x: 1.2, y: 1.2, z: 1.2}
