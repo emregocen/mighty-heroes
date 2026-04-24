@@ -22,8 +22,8 @@ namespace MightyHeroes.UI.Battle.Views
         [SerializeField] private GameObject _visualRoot;
 
         [Header("Texts")]
-        [SerializeField] private string _heroTurnText = "YOUR TURN";
-        [SerializeField] private string _enemyTurnText = "ENEMY TURN";
+        [SerializeField] private string _heroTurnText = "PLAYER TURN!";
+        [SerializeField] private string _enemyTurnText = "ENEMY TURN!";
 
         [Header("Shake Animation")]
         [SerializeField] private float _shakeDuration = 1.0f;
