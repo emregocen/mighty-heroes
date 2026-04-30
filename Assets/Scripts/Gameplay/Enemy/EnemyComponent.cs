@@ -10,6 +10,7 @@ using MightyHeroes.Gameplay.Enemy.Presentation;
 using MightyHeroes.Gameplay.Enemy.StateMachine;
 using MightyHeroes.Gameplay.Enemy.Stats;
 using MightyHeroes.UI.Battle.Views;
+using MightyHeroes.Gameplay.Animation.Interfaces;
 
 namespace MightyHeroes.Gameplay.Enemy
 {
@@ -37,7 +38,7 @@ namespace MightyHeroes.Gameplay.Enemy
     /// EnemyHitReactionEndedEvent is raised in EnemyTakingHitState.OnHitReactionEnded,
     /// not here. NotifyHitReactionEnded only forwards the signal to the FSM.
     /// </summary>
-    public sealed class EnemyComponent : EntityComponent, ICombatTarget, ICombatAttacker
+    public sealed class EnemyComponent : EntityComponent, ICombatTarget, ICombatAttacker, IAnimationSignalReceiver
     {
         // CONSTANTS
 
@@ -277,6 +278,15 @@ namespace MightyHeroes.Gameplay.Enemy
         public void NotifyAttackSequenceEnded()
         {
             _stateMachine.NotifyAttackSequenceEnded();
+        }
+
+        /// <summary>
+        /// Called by AttackHitBehaviour when the hit frame of the attack animation is reached.
+        /// </summary>
+        /// <param name="hitDirection">Direction of the hit.</param>
+        public void NotifyAttackHit(HitDirection hitDirection)
+        {
+            _stateMachine.NotifyAttackHitFrame(hitDirection);
         }
 
         // PROTECTED METHODS

@@ -2,7 +2,7 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!1107 &-8809402758133600080
 AnimatorStateMachine:
-  serializedVersion: 6
+  serializedVersion: 7
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -65,6 +65,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3a7eca934b04133aa578b90b96e46e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Enemy.Animation.Behaviours.EnemyHitReactionEndedBehaviour
+  _hasTriggered: 0
+  _enemy: {fileID: 0}
 --- !u!1101 &-7586654099932693695
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -106,7 +108,7 @@ AnimatorState:
   m_Transitions:
   - {fileID: -6209258080773150619}
   m_StateMachineBehaviours:
-  - {fileID: 1507088865455020925}
+  - {fileID: 3522321211276051500}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -134,7 +136,7 @@ AnimatorState:
   m_Transitions:
   - {fileID: 4175075507620532934}
   m_StateMachineBehaviours:
-  - {fileID: -563854049601887207}
+  - {fileID: 7862472275845911405}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -223,7 +225,7 @@ AnimatorState:
   m_Transitions:
   - {fileID: -7757723992852877124}
   m_StateMachineBehaviours:
-  - {fileID: -4119945121774361158}
+  - {fileID: 1822021149066448360}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -358,9 +360,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad26430ee058949128e87cf3d18410fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Hero.Animation.Behaviours.EnemyAttackSequenceEndedBehaviour
+  _enemy: {fileID: 0}
 --- !u!1107 &-3621979296041561189
 AnimatorStateMachine:
-  serializedVersion: 6
+  serializedVersion: 7
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -463,6 +466,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3a7eca934b04133aa578b90b96e46e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Enemy.Animation.Behaviours.EnemyHitReactionEndedBehaviour
+  _hasTriggered: 0
+  _enemy: {fileID: 0}
 --- !u!1109 &-499670744717664266
 AnimatorTransition:
   m_ObjectHideFlags: 1
@@ -480,6 +485,18 @@ AnimatorTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 1
+--- !u!114 &-471002322177817615
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85951e61568034f719780cdaa9019c09, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Animation.Behaviours.HitReactionEndedBehaviour
 --- !u!1102 &-359451948955507895
 AnimatorState:
   serializedVersion: 6
@@ -493,7 +510,7 @@ AnimatorState:
   m_Transitions:
   - {fileID: 1247030193500900847}
   m_StateMachineBehaviours:
-  - {fileID: 6665934641955507882}
+  - {fileID: -471002322177817615}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -515,7 +532,7 @@ AnimatorController:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Enemy_Melee_Sword
-  serializedVersion: 5
+  serializedVersion: 6
   m_AnimatorParameters:
   - m_Name: AttackVariant
     m_Type: 3
@@ -572,6 +589,7 @@ AnimatorController:
     m_IKPass: 0
     m_SyncedLayerAffectsTiming: 0
     m_Controller: {fileID: 9100000}
+  m_EvaluateTransitionsOnStart: 0
 --- !u!1101 &180887836026158746
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -634,6 +652,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad26430ee058949128e87cf3d18410fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Hero.Animation.Behaviours.EnemyAttackSequenceEndedBehaviour
+  _enemy: {fileID: 0}
 --- !u!1109 &1617124812572277794
 AnimatorTransition:
   m_ObjectHideFlags: 1
@@ -670,6 +689,18 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!114 &1822021149066448360
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cf30f8b5667040b78a551c927697360, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Animation.Behaviours.AttackSequenceEndedBehaviour
 --- !u!1109 &2268923161932044225
 AnimatorTransition:
   m_ObjectHideFlags: 1
@@ -714,6 +745,18 @@ AnimatorState:
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
   m_TimeParameter: 
+--- !u!114 &3522321211276051500
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cf30f8b5667040b78a551c927697360, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Animation.Behaviours.AttackSequenceEndedBehaviour
 --- !u!1101 &4175075507620532934
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -830,9 +873,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3a7eca934b04133aa578b90b96e46e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Enemy.Animation.Behaviours.EnemyHitReactionEndedBehaviour
+  _hasTriggered: 0
+  _enemy: {fileID: 0}
 --- !u!1107 &6805207107906997292
 AnimatorStateMachine:
-  serializedVersion: 6
+  serializedVersion: 7
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -915,9 +960,21 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!114 &7350437371224147704
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85951e61568034f719780cdaa9019c09, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Animation.Behaviours.HitReactionEndedBehaviour
 --- !u!1107 &7487663536438614707
 AnimatorStateMachine:
-  serializedVersion: 6
+  serializedVersion: 7
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -968,7 +1025,7 @@ AnimatorState:
   m_Transitions:
   - {fileID: -4683947683344251917}
   m_StateMachineBehaviours:
-  - {fileID: -7707209464528056134}
+  - {fileID: 7350437371224147704}
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
   m_WriteDefaultValues: 1
@@ -983,6 +1040,18 @@ AnimatorState:
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
   m_TimeParameter: 
+--- !u!114 &7862472275845911405
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85951e61568034f719780cdaa9019c09, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Animation.Behaviours.HitReactionEndedBehaviour
 --- !u!1101 &8107176207104896728
 AnimatorStateTransition:
   m_ObjectHideFlags: 1

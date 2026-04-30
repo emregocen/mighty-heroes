@@ -6,7 +6,7 @@ namespace MightyHeroes.Gameplay.Combat.Types
     /// </summary>
     public enum HitDirection
     {
-        Front = 1,
+        Center = 1,
         Left = 2,
         Right = 3
     }
