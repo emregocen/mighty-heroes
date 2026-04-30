@@ -441,15 +441,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5069404754867028534, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0.8
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5069404754867028534, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5069404754867028534, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
       propertyPath: m_AnchorMin.x
-      value: 0.8
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -562,8 +562,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4efef7a08216746459095c28ba426e25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Equipment.Views.CharacterWeaponView
-  _rightHandSocket: {fileID: 555814460}
+  _weaponSocket: {fileID: 555814460}
   _defaultWeapon: {fileID: 11400000, guid: 47fa313ceaeaf4f2596a38d4238500d1, type: 2}
+--- !u!1 &372371456 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3304950686886907432, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
+  m_PrefabInstance: {fileID: 1523348631}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &412586095
 GameObject:
   m_ObjectHideFlags: 0
@@ -610,6 +615,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Synty.Tools.SyntyPropBoneTool.PropBone
   _wasSpawnedBySyntyTool: 1
+--- !u!4 &430705405 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1397412323705664454, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
+  m_PrefabInstance: {fileID: 1523348631}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &474227834
 GameObject:
   m_ObjectHideFlags: 0
@@ -2409,6 +2419,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1225583223337818, guid: c2e12a23c03102543ab990b5a676fb53, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1838490852}
+    - targetCorrespondingSourceObject: {fileID: 1225583223337818, guid: c2e12a23c03102543ab990b5a676fb53, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1838490853}
   m_SourcePrefab: {fileID: 100100000, guid: c2e12a23c03102543ab990b5a676fb53, type: 3}
 --- !u!1 &1220234848
 GameObject:
@@ -2476,7 +2489,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4efef7a08216746459095c28ba426e25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Equipment.Views.CharacterWeaponView
-  _rightHandSocket: {fileID: 218452178}
+  _weaponSocket: {fileID: 218452178}
   _defaultWeapon: {fileID: 11400000, guid: fd235e3c514a7481da144c8ae5713a44, type: 2}
 --- !u!114 &1250906365 stripped
 MonoBehaviour:
@@ -2489,6 +2502,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1407599344 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1400858170778982928, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
+  m_PrefabInstance: {fileID: 1523348631}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &1407599347 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 1306095302407086294, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
+  m_PrefabInstance: {fileID: 1523348631}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1407599348
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1407599344}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6fab5212c04fb442799fa9f3f33247ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Synty.Tools.SyntyPropBoneTool.PropBoneBinder
+  animator: {fileID: 1407599347}
+  propBoneConfig: {fileID: 11400000, guid: 6b6b2cbd560674639bda985c1741edd4, type: 2}
+  updateType: 2
+  rebindOnAwake: 0
+  _propBoneBindings:
+  - bone: {fileID: 1528811769}
+    socket: {fileID: 1461875861}
+    rotationOffset: {x: 347.75015, y: 309.00076, z: 260.39807}
+    scale: 1.4546219
 --- !u!1 &1415689103
 GameObject:
   m_ObjectHideFlags: 0
@@ -2593,6 +2637,51 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!1 &1461875860
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1461875861}
+  - component: {fileID: 1461875862}
+  m_Layer: 0
+  m_Name: Prop_R_Socket
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1461875861
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1461875860}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.26478738, y: 0.34983802, z: 0.7151153, w: -0.54416096}
+  m_LocalPosition: {x: 0.00000005592895, y: -0.0000003088039, z: 0.0000004422216}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1528811769}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1461875862
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1461875860}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04570063543744548b5cc95cea8bbff6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Synty.Tools.SyntyPropBoneTool.PropBone
+  _wasSpawnedBySyntyTool: 1
 --- !u!4 &1482865596 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4555883491348096, guid: 071b4da7cfff18347a371c677585b749, type: 3}
@@ -2704,20 +2793,29 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5069404754867028534, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0.8
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5069404754867028534, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5069404754867028534, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
       propertyPath: m_AnchorMin.x
-      value: 0.8
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 1397412323705664454, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1528811769}
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3304950686886907432, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1523348634}
+    - targetCorrespondingSourceObject: {fileID: 1400858170778982928, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1407599348}
   m_SourcePrefab: {fileID: 100100000, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
 --- !u!4 &1523348632 stripped
 Transform:
@@ -2729,12 +2827,72 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 763958437473869267, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
   m_PrefabInstance: {fileID: 1523348631}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 372371456}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4947dcbbaefb14c608f26eef06ce7324, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Enemy.EnemyComponent
+--- !u!114 &1523348634
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 372371456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4efef7a08216746459095c28ba426e25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Equipment.Views.CharacterWeaponView
+  _weaponSocket: {fileID: 1461875861}
+  _defaultWeapon: {fileID: 11400000, guid: 47fa313ceaeaf4f2596a38d4238500d1, type: 2}
+--- !u!1 &1528811768
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1528811769}
+  - component: {fileID: 1528811770}
+  m_Layer: 0
+  m_Name: Prop_R
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1528811769
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1528811768}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1461875861}
+  m_Father: {fileID: 430705405}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1528811770
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1528811768}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04570063543744548b5cc95cea8bbff6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Synty.Tools.SyntyPropBoneTool.PropBone
+  _wasSpawnedBySyntyTool: 1
 --- !u!1 &1533193204
 GameObject:
   m_ObjectHideFlags: 0
@@ -3476,6 +3634,19 @@ MonoBehaviour:
     socket: {fileID: 218452178}
     rotationOffset: {x: -0.0000030041715, y: 0.000003207736, z: 270.14746}
     scale: 0.99999976
+--- !u!114 &1838490853
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1838490848}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6f53d1d400ce4d58ade1a46e2c74966, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Equipment.Views.CharacterWeaponAnimationEventReceiver
+  _weaponEffectView: {fileID: 0}
 --- !u!4 &1877987136 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1397412323705664454, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
