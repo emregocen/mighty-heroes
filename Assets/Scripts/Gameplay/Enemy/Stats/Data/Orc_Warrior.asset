@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Orc_Warrior
   m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Enemy.Stats.EnemyStatsData
   _entityKey: enemy.orc.warrior
-  _maxHealth: 110
+  _maxHealth: 60
   _maxShield: 0
   _baseAttack: 3
   _baseDefense: 40

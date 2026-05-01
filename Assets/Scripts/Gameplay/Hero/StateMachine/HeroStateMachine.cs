@@ -1,3 +1,4 @@
+using MightyHeroes.Battle.TurnFlow.Payloads;
 using MightyHeroes.Core.EventSystem;
 using MightyHeroes.Core.Logging;
 using MightyHeroes.Core.StateMachine;
@@ -71,10 +72,7 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine
         /// <param name="eventHub">Battle-scoped event hub shared by all systems.</param>
         /// <param name="hero">Hero entity component this FSM controls.</param>
         /// <param name="actionResolver">Resolver that converts puzzle results into hero actions.</param>
-        public HeroStateMachine(
-            EventHub eventHub,
-            HeroComponent hero,
-            HeroActionResolver actionResolver)
+        public HeroStateMachine(EventHub eventHub, HeroComponent hero, HeroActionResolver actionResolver)
         {
             _eventHub = eventHub;
             _hero = hero;
@@ -82,6 +80,7 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine
 
             _eventHub.EnemyEvents.EnemyHitReactionEndedEvent.Register(OnEnemyHitReactionEnded);
             _eventHub.CombatEvents.CombatHitResolvedEvent.Register(OnCombatHitResolved);
+            _eventHub.TurnEvents.TurnBattleVictoryEvent.Register(OnBattleVictory);
 
             GameLogger.Log(LogSourceType.Hero, $"Hero FSM EventHub Hash = {_eventHub.GetHashCode()}");
         }
@@ -107,6 +106,8 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine
         {
             _eventHub.EnemyEvents.EnemyHitReactionEndedEvent.Unregister(OnEnemyHitReactionEnded);
             _eventHub.CombatEvents.CombatHitResolvedEvent.Unregister(OnCombatHitResolved);
+            _eventHub.TurnEvents.TurnBattleVictoryEvent.Unregister(OnBattleVictory);
+
             Stop();
         }
 
@@ -119,7 +120,7 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine
         {
             SwitchState(new HeroIdleState(this));
         }
-        
+
         /// <summary>
         /// Transitions hero to pre-ready state after turn phase starts.
         /// Pre-ready state owns AP reset, AP view activation and the pre-action delay.
@@ -161,6 +162,16 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine
         public void SwitchToDefeatedState(HitDirection hitDirection)
         {
             SwitchState(new HeroDefeatedState(this, hitDirection));
+        }
+
+        /// <summary>
+        /// Transitions hero to terminal victory state.
+        /// Called when BattleVictoryEvent is received in HeroIdleState.
+        /// No further state transitions occur after this point.
+        /// </summary>
+        public void SwitchToVictoryState()
+        {
+            SwitchState(new HeroVictoryState(this));
         }
 
         /// <summary>
@@ -219,9 +230,10 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine
         // ------------------------------------------------------------------
 
         /// <summary>
-        /// Receives EnemyHitReactionEnded from EventHub.
-        /// Converts it to a local signal so HeroAttackState can advance
-        /// to the next combo step after the enemy finishes reacting.
+        /// Battle-lifetime subscription. Receives EnemyHitReactionEnded from EventHub
+        /// and routes it into the active state as a local signal.
+        /// Kept here instead of HeroAttackState to avoid reentrant unregister risk
+        /// during forced finish sequences where Exit() and the event can occur in the same call stack.
         /// </summary>
         private void OnEnemyHitReactionEnded(EnemyHitReactionEndedPayload payload)
         {
@@ -229,13 +241,10 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine
         }
 
         /// <summary>
-        /// Receives CombatHitResolved from EventHub.
-        /// Converts it to a local signal so HeroAttackState can detect
-        /// mid-combo target death and trigger a forced sequence finish.
-        ///
-        /// Guard: only forward when the hero is the attacker or the target.
-        /// Events from enemy-vs-enemy or future PvP actors are irrelevant to
-        /// this FSM and must not reach the active state.
+        /// Battle-lifetime subscription. Receives CombatHitResolved from EventHub
+        /// and routes it into the active state as a local signal.
+        /// Kept here instead of HeroAttackState for the same reentrant safety reason as OnEnemyHitReactionEnded.
+        /// Guard ensures only events where the hero is attacker or target are forwarded.
         /// </summary>
         private void OnCombatHitResolved(CombatHitResolvedPayload payload)
         {
@@ -243,6 +252,17 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine
                 return;
 
             Notify(new HeroCombatHitResolvedSignal(payload));
+        }
+
+        /// <summary>
+        /// Battle-lifetime subscription. Receives BattleVictoryEvent from EventHub
+        /// and transitions hero to terminal victory state regardless of which state is currently active.
+        /// Kept here because the event must be caught in any hero state — the timing is not predictable
+        /// from the hero FSM's perspective.
+        /// </summary>
+        private void OnBattleVictory(TurnBattleVictoryPayload payload)
+        {
+            SwitchToVictoryState();
         }
     }
 }

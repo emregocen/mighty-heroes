@@ -67,6 +67,9 @@ namespace MightyHeroes.Gameplay.Hero
         /// <summary>Animator trigger that force-finishes the combo sequence early.</summary>
         private static readonly int Anim_ForceFinishCombo = Animator.StringToHash("ForceFinishCombo");
 
+        /// <summary>Animator trigger that plays the victory animation.</summary>
+        private static readonly int Anim_Victory = Animator.StringToHash("Victory");
+
         // FIELDS
 
         /// <summary>Static hero stats assigned via inspector. Used only to initialize runtime stats.</summary>
@@ -184,6 +187,16 @@ namespace MightyHeroes.Gameplay.Hero
         // PUBLIC METHODS — Animation Commands
 
         /// <summary>
+        /// Advances the current combo to the next step.
+        /// Must only be called from a State (HeroAttackState).
+        /// </summary>
+        /// <param name="nextStepIndex">Next combo step index (1-based).</param>
+        public void AdvanceCombo(int nextStepIndex)
+        {
+            _animator.SetTrigger(Anim_AdvanceCombo);
+        }
+
+        /// <summary>
         /// Plays hit reaction animation.
         /// Must only be called from a State (HeroTakingHitState).
         /// </summary>
@@ -213,16 +226,6 @@ namespace MightyHeroes.Gameplay.Hero
         }
 
         /// <summary>
-        /// Advances the current combo to the next step.
-        /// Must only be called from a State (HeroAttackState).
-        /// </summary>
-        /// <param name="nextStepIndex">Next combo step index (1-based).</param>
-        public void AdvanceCombo(int nextStepIndex)
-        {
-            _animator.SetTrigger(Anim_AdvanceCombo);
-        }
-
-        /// <summary>
         /// Force-finishes the combo sequence early when the target dies mid-combo.
         /// Must only be called from a State (HeroAttackState).
         /// </summary>
@@ -240,6 +243,15 @@ namespace MightyHeroes.Gameplay.Hero
         {
             _animator.SetInteger(Anim_HitDirection, (int)hitDirection);
             _animator.SetTrigger(Anim_Defeat);
+        }
+
+        /// <summary> Plays the victory animation.
+        /// Must only be called from HeroVictoryState.
+        /// </summary>
+        public void PlayVictoryAnimation()
+        {
+            _animator.SetTrigger(Anim_ForceFinishCombo);
+            _animator.SetTrigger(Anim_Victory);
         }
 
         // PUBLIC METHODS — HUD

@@ -46,10 +46,7 @@ namespace MightyHeroes.Battle.TurnFlow
         /// <param name="eventHub">Shared event hub instance.</param>
         /// <param name="context">Shared turn context.</param>
         /// <param name="formation">Formation query for ordered enemy turn sequencing.</param>
-        public TurnStateMachine(
-            EventHub eventHub,
-            TurnContext context,
-            IFormation formation)
+        public TurnStateMachine(EventHub eventHub, TurnContext context, IFormation formation)
         {
             EventHub = eventHub;
             Context = context;
@@ -97,6 +94,12 @@ namespace MightyHeroes.Battle.TurnFlow
             SwitchState(new TurnEndState(this));
         }
 
+        /// <summary>Switches the flow to the victory state.</summary>
+        public void SwitchToVictoryState()
+        {
+            SwitchState(new TurnVictoryState(this));
+        }
+
         // PROTECTED METHODS
 
         /// <summary>
@@ -112,8 +115,6 @@ namespace MightyHeroes.Battle.TurnFlow
             switch (turnState.StateType)
             {
                 case TurnStateType.TurnStart:
-                    //GameLogger.Debug(LogSourceType.TurnSystem, $"[TURN DEBUG] OnStateEntered TurnStart. TurnIndex={Context.TurnIndex}");
-
                     EventHub.TurnEvents.TurnStartedEvent.Raise(new TurnStartedPayload(Context.TurnIndex, Context.IsFirstTurn));
                     break;
 
@@ -132,6 +133,11 @@ namespace MightyHeroes.Battle.TurnFlow
                 case TurnStateType.TurnEnd:
                     EventHub.TurnEvents.TurnEndedEvent.Raise(
                         new TurnEndedPayload(Context.TurnIndex, Context.IsBattleEnded));
+                    break;
+
+                case TurnStateType.BattleVictory:
+                    EventHub.TurnEvents.TurnBattleVictoryEvent.Raise(
+                        new TurnBattleVictoryPayload(Context.TurnIndex));
                     break;
             }
         }
