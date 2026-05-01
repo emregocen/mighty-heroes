@@ -23,9 +23,9 @@ namespace MightyHeroes.Gameplay.Equipment.Views
         [Header("Default Weapon")]
         [SerializeField] private WeaponVisualConfig _defaultWeapon;
 
-        private GameObject         _weaponInstance;
+        private GameObject _weaponInstance;
         private WeaponVisualConfig _currentConfig;
-        private TrailRenderer      _trailRenderer;
+        private TrailRenderer _trailRenderer;
 
         // ─── PROPERTIES ───────────────────────────────────────────────
 
@@ -37,7 +37,7 @@ namespace MightyHeroes.Gameplay.Equipment.Views
         private void Start()
         {
             if (_defaultWeapon != null)
-                Equip(_defaultWeapon);
+                StartCoroutine(EquipNextFrame(_defaultWeapon));
         }
 
         // ─── PUBLIC METHODS ───────────────────────────────────────────
@@ -76,7 +76,7 @@ namespace MightyHeroes.Gameplay.Equipment.Views
             _weaponInstance = Instantiate(config.WeaponPrefab, _weaponSocket);
             _weaponInstance.transform.localPosition = config.LocalPosition;
             _weaponInstance.transform.localRotation = Quaternion.Euler(config.LocalEulerAngles);
-            _weaponInstance.transform.localScale    = config.LocalScale;
+            _weaponInstance.transform.localScale = config.LocalScale;
 
             _currentConfig = config;
             _trailRenderer = CreateTrail(config);
@@ -203,9 +203,9 @@ namespace MightyHeroes.Gameplay.Equipment.Views
         /// <param name="config">Source config.</param>
         private static void ApplyTrailConfig(TrailRenderer trail, WeaponVisualConfig config)
         {
-            trail.time              = config.TrailTime;
-            trail.startWidth        = config.TrailStartWidth;
-            trail.endWidth          = config.TrailEndWidth;
+            trail.time = config.TrailTime;
+            trail.startWidth = config.TrailStartWidth;
+            trail.endWidth = config.TrailEndWidth;
             trail.minVertexDistance = config.TrailMinVertexDistance;
 
             if (config.TrailColor != null)
@@ -225,11 +225,11 @@ namespace MightyHeroes.Gameplay.Equipment.Views
                 return;
 
             GameObject instance = Instantiate(prefab, parent);
-            float      xScale   = hitDirection == HitDirection.Left ? -1f : 1f;
+            float xScale = hitDirection == HitDirection.Left ? -1f : 1f;
 
             instance.transform.localPosition = Vector3.zero;
             instance.transform.localRotation = Quaternion.identity;
-            instance.transform.localScale    = new Vector3(xScale, 1f, 1f);
+            instance.transform.localScale = new Vector3(xScale, 1f, 1f);
 
             StartCoroutine(DestroyAfter(instance, lifetime));
         }
@@ -251,6 +251,18 @@ namespace MightyHeroes.Gameplay.Equipment.Views
 
             if (instance != null)
                 Destroy(instance);
+        }
+
+        /// <summary>
+        /// Waits one frame before equipping the default weapon.
+        /// This ensures PropBoneBinder has completed its first binding
+        /// calculation before the weapon is spawned on Prop_R_Socket.
+        /// </summary>
+        /// <param name="config">Weapon config to equip after the frame delay.</param>
+        private IEnumerator EquipNextFrame(WeaponVisualConfig config)
+        {
+            yield return null;
+            Equip(config);
         }
     }
 }
