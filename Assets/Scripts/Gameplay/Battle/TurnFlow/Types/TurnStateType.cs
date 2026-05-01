@@ -10,6 +10,7 @@ namespace MightyHeroes.Battle.TurnFlow.Types
         TurnHero,
         TurnCompanion,
         TurnEnemy,
-        TurnEnd
+        TurnEnd,
+        BattleVictory
     }
 }

@@ -18,7 +18,7 @@ namespace MightyHeroes.Gameplay.Animation.Behaviours
         /// Normalised time threshold after which the hit reaction is considered complete.
         /// Gameplay advances before the full animation finishes for responsive feel.
         /// </summary>
-        private const float ReactionEndThreshold = 0.5f;
+        private const float ReactionEndThreshold = 0.4f;
 
         // ─── FIELDS ───────────────────────────────────────────────────
 

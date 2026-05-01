@@ -428,6 +428,7 @@ namespace MightyHeroes.Core.Battle
             {
                 GameLogger.Log(LogSourceType.BattleSystem, "All enemies defeated. Ending battle.");
                 _turnContext.EndBattle();
+                _turnStateMachine.SwitchToVictoryState();
             }
         }
     }
