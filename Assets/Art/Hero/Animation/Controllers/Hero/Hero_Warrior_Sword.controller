@@ -1,30 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1101 &-9215300624492616393
-AnimatorStateTransition:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_Conditions:
-  - m_ConditionMode: 1
-    m_ConditionEvent: Release
-    m_EventTreshold: 0
-  m_DstStateMachine: {fileID: 0}
-  m_DstState: {fileID: 0}
-  m_Solo: 0
-  m_Mute: 0
-  m_IsExit: 1
-  serializedVersion: 3
-  m_TransitionDuration: 0.25
-  m_TransitionOffset: 0
-  m_ExitTime: 1
-  m_HasExitTime: 1
-  m_HasFixedDuration: 1
-  m_InterruptionSource: 0
-  m_OrderedInterruption: 1
-  m_CanTransitionToSelf: 1
 --- !u!1102 &-9171019001568980136
 AnimatorState:
   serializedVersion: 6
@@ -199,11 +174,11 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: A_Idle_Flourish01_Sword
+  m_Name: A_Idle_Flourish01_Sword - 1
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions:
-  - {fileID: -9215300624492616393}
+  - {fileID: 3050697934907229145}
   m_StateMachineBehaviours: []
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
@@ -691,6 +666,23 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!1109 &-4742109020187243456
+AnimatorTransition:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_Conditions:
+  - m_ConditionMode: 6
+    m_ConditionEvent: IdleVariant
+    m_EventTreshold: 1
+  m_DstStateMachine: {fileID: 0}
+  m_DstState: {fileID: 258787478426768760}
+  m_Solo: 0
+  m_Mute: 0
+  m_IsExit: 0
+  serializedVersion: 1
 --- !u!1101 &-4723127031957907029
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -728,6 +720,7 @@ AnimatorState:
   - {fileID: -1506907226860002584}
   - {fileID: -1077181767132306629}
   - {fileID: -3301896532467119607}
+  - {fileID: -2778215841716459520}
   m_StateMachineBehaviours: []
   m_Position: {x: 50, y: 50, z: 0}
   m_IKOnFeet: 0
@@ -754,16 +747,22 @@ AnimatorStateMachine:
   m_ChildStates:
   - serializedVersion: 1
     m_State: {fileID: -7954802118832125851}
-    m_Position: {x: 320, y: 120, z: 0}
+    m_Position: {x: 280, y: -70, z: 0}
+  - serializedVersion: 1
+    m_State: {fileID: -1019706921888836700}
+    m_Position: {x: 280, y: 10, z: 0}
+  - serializedVersion: 1
+    m_State: {fileID: 2233354630131687144}
+    m_Position: {x: 280, y: 90, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions: []
   m_EntryTransitions: []
   m_StateMachineTransitions: {}
   m_StateMachineBehaviours: []
-  m_AnyStatePosition: {x: 50, y: 20, z: 0}
-  m_EntryPosition: {x: 50, y: 120, z: 0}
-  m_ExitPosition: {x: 660, y: 130, z: 0}
-  m_ParentStateMachinePosition: {x: 800, y: 20, z: 0}
+  m_AnyStatePosition: {x: 300, y: -190, z: 0}
+  m_EntryPosition: {x: 300, y: -140, z: 0}
+  m_ExitPosition: {x: 300, y: 180, z: 0}
+  m_ParentStateMachinePosition: {x: 280, y: -250, z: 0}
   m_DefaultState: {fileID: -7954802118832125851}
 --- !u!1102 &-4523811847389157518
 AnimatorState:
@@ -935,6 +934,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Hero.Animation.Behaviours.HeroAttackStateBehaviour
   _hero: {fileID: 0}
+--- !u!1101 &-3786069881886092723
+AnimatorStateTransition:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_Conditions: []
+  m_DstStateMachine: {fileID: 0}
+  m_DstState: {fileID: 0}
+  m_Solo: 0
+  m_Mute: 0
+  m_IsExit: 1
+  serializedVersion: 3
+  m_TransitionDuration: 0.25
+  m_TransitionOffset: 0
+  m_ExitTime: 0.8
+  m_HasExitTime: 1
+  m_HasFixedDuration: 1
+  m_InterruptionSource: 0
+  m_OrderedInterruption: 1
+  m_CanTransitionToSelf: 1
 --- !u!114 &-3697542064690847327
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1091,6 +1112,34 @@ AnimatorStateMachine:
   m_ExitPosition: {x: 480, y: 210, z: 0}
   m_ParentStateMachinePosition: {x: -130, y: -340, z: 0}
   m_DefaultState: {fileID: 7576518469673300055}
+--- !u!1101 &-2778215841716459520
+AnimatorStateTransition:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_Conditions:
+  - m_ConditionMode: 3
+    m_ConditionEvent: IdleVariant
+    m_EventTreshold: 0
+  - m_ConditionMode: 1
+    m_ConditionEvent: Idle
+    m_EventTreshold: 0
+  m_DstStateMachine: {fileID: -2523530572305405423}
+  m_DstState: {fileID: 0}
+  m_Solo: 0
+  m_Mute: 0
+  m_IsExit: 0
+  serializedVersion: 3
+  m_TransitionDuration: 0
+  m_TransitionOffset: 0
+  m_ExitTime: 0
+  m_HasExitTime: 0
+  m_HasFixedDuration: 1
+  m_InterruptionSource: 0
+  m_OrderedInterruption: 1
+  m_CanTransitionToSelf: 1
 --- !u!1101 &-2562115857846428157
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -1113,6 +1162,29 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!1107 &-2523530572305405423
+AnimatorStateMachine:
+  serializedVersion: 7
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Idle Variations
+  m_ChildStates:
+  - serializedVersion: 1
+    m_State: {fileID: 258787478426768760}
+    m_Position: {x: 100, y: -50, z: 0}
+  m_ChildStateMachines: []
+  m_AnyStateTransitions: []
+  m_EntryTransitions:
+  - {fileID: -4742109020187243456}
+  m_StateMachineTransitions: {}
+  m_StateMachineBehaviours: []
+  m_AnyStatePosition: {x: 120, y: -210, z: 0}
+  m_EntryPosition: {x: 120, y: -150, z: 0}
+  m_ExitPosition: {x: 120, y: 100, z: 0}
+  m_ParentStateMachinePosition: {x: 330, y: -210, z: 0}
+  m_DefaultState: {fileID: 258787478426768760}
 --- !u!114 &-2503401518722237895
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1167,6 +1239,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Hero.Animation.Behaviours.HeroAttackHitBehaviour
   _hitDirection: 3
   _hero: {fileID: 0}
+--- !u!1109 &-1550716895994969471
+AnimatorTransition:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_Conditions: []
+  m_DstStateMachine: {fileID: 0}
+  m_DstState: {fileID: -4685369167051591253}
+  m_Solo: 0
+  m_Mute: 0
+  m_IsExit: 0
+  serializedVersion: 1
 --- !u!1101 &-1524128976058409006
 AnimatorStateTransition:
   m_ObjectHideFlags: 1
@@ -1316,6 +1402,33 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
+--- !u!1102 &-1019706921888836700
+AnimatorState:
+  serializedVersion: 6
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: A_Idle_Flourish01_Sword - 2
+  m_Speed: 1
+  m_CycleOffset: 0
+  m_Transitions:
+  - {fileID: -816535070694860362}
+  m_StateMachineBehaviours: []
+  m_Position: {x: 50, y: 50, z: 0}
+  m_IKOnFeet: 0
+  m_WriteDefaultValues: 1
+  m_Mirror: 0
+  m_SpeedParameterActive: 0
+  m_MirrorParameterActive: 0
+  m_CycleOffsetParameterActive: 0
+  m_TimeParameterActive: 0
+  m_Motion: {fileID: 5119973695547190099, guid: 8e4420a97da5910449d9ab3bfde41051, type: 3}
+  m_Tag: 
+  m_SpeedParameter: 
+  m_MirrorParameter: 
+  m_CycleOffsetParameter: 
+  m_TimeParameter: 
 --- !u!1102 &-981737207087454774
 AnimatorState:
   serializedVersion: 6
@@ -1364,6 +1477,28 @@ AnimatorStateTransition:
   m_TransitionDuration: 0
   m_TransitionOffset: 0
   m_ExitTime: 0.25
+  m_HasExitTime: 1
+  m_HasFixedDuration: 1
+  m_InterruptionSource: 0
+  m_OrderedInterruption: 1
+  m_CanTransitionToSelf: 1
+--- !u!1101 &-816535070694860362
+AnimatorStateTransition:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_Conditions: []
+  m_DstStateMachine: {fileID: 0}
+  m_DstState: {fileID: 2233354630131687144}
+  m_Solo: 0
+  m_Mute: 0
+  m_IsExit: 0
+  serializedVersion: 3
+  m_TransitionDuration: 0.25
+  m_TransitionOffset: 0
+  m_ExitTime: 1
   m_HasExitTime: 1
   m_HasFixedDuration: 1
   m_InterruptionSource: 0
@@ -1603,6 +1738,18 @@ AnimatorController:
     m_DefaultInt: 0
     m_DefaultBool: 0
     m_Controller: {fileID: 9100000}
+  - m_Name: IdleVariant
+    m_Type: 3
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
+  - m_Name: Idle
+    m_Type: 9
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
   m_AnimatorLayers:
   - serializedVersion: 5
     m_Name: Base Layer
@@ -1629,6 +1776,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cf30f8b5667040b78a551c927697360, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Animation.Behaviours.AttackSequenceEndedBehaviour
+--- !u!1102 &258787478426768760
+AnimatorState:
+  serializedVersion: 6
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: A_POLY_IDL_Stretch_Arms_Masc
+  m_Speed: 1
+  m_CycleOffset: 0
+  m_Transitions:
+  - {fileID: 4019772770346734540}
+  m_StateMachineBehaviours: []
+  m_Position: {x: 50, y: 50, z: 0}
+  m_IKOnFeet: 0
+  m_WriteDefaultValues: 1
+  m_Mirror: 0
+  m_SpeedParameterActive: 0
+  m_MirrorParameterActive: 0
+  m_CycleOffsetParameterActive: 0
+  m_TimeParameterActive: 0
+  m_Motion: {fileID: 4630430291016367708, guid: 0efb3603514306a4189b9a85ca31128a, type: 3}
+  m_Tag: 
+  m_SpeedParameter: 
+  m_MirrorParameter: 
+  m_CycleOffsetParameter: 
+  m_TimeParameter: 
 --- !u!114 &573324826156330516
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2009,6 +2183,33 @@ AnimatorTransition:
   m_Mute: 0
   m_IsExit: 1
   serializedVersion: 1
+--- !u!1102 &2233354630131687144
+AnimatorState:
+  serializedVersion: 6
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: A_Idle_Base_Sword
+  m_Speed: 1
+  m_CycleOffset: 0
+  m_Transitions:
+  - {fileID: -3786069881886092723}
+  m_StateMachineBehaviours: []
+  m_Position: {x: 50, y: 50, z: 0}
+  m_IKOnFeet: 0
+  m_WriteDefaultValues: 1
+  m_Mirror: 0
+  m_SpeedParameterActive: 0
+  m_MirrorParameterActive: 0
+  m_CycleOffsetParameterActive: 0
+  m_TimeParameterActive: 0
+  m_Motion: {fileID: 1375766457120316241, guid: b94969b4c36c3c94284f72888ad9289d, type: 3}
+  m_Tag: 
+  m_SpeedParameter: 
+  m_MirrorParameter: 
+  m_CycleOffsetParameter: 
+  m_TimeParameter: 
 --- !u!1102 &2620069014082854480
 AnimatorState:
   serializedVersion: 6
@@ -2071,26 +2272,32 @@ AnimatorStateMachine:
     m_Position: {x: 120, y: 170, z: 0}
   - serializedVersion: 1
     m_StateMachine: {fileID: 3047926119835526785}
-    m_Position: {x: -130, y: 280, z: 0}
+    m_Position: {x: -390, y: 70, z: 0}
   - serializedVersion: 1
     m_StateMachine: {fileID: -4529679196943150929}
-    m_Position: {x: 120, y: 280, z: 0}
+    m_Position: {x: -390, y: 170, z: 0}
+  - serializedVersion: 1
+    m_StateMachine: {fileID: -2523530572305405423}
+    m_Position: {x: -390, y: 270, z: 0}
   m_AnyStateTransitions: []
   m_EntryTransitions: []
   m_StateMachineTransitions:
-  - first: {fileID: -4529679196943150929}
+  - first: {fileID: -2523530572305405423}
     second:
-    - {fileID: 1109753082337972489}
+    - {fileID: -1550716895994969471}
   - first: {fileID: 6029366146819539436}
     second:
     - {fileID: 7701703551976363961}
   - first: {fileID: 905369527243185521}
     second:
     - {fileID: 6594896300106351786}
+  - first: {fileID: -4529679196943150929}
+    second:
+    - {fileID: 1109753082337972489}
   m_StateMachineBehaviours: []
   m_AnyStatePosition: {x: -110, y: 10, z: 0}
   m_EntryPosition: {x: -110, y: 80, z: 0}
-  m_ExitPosition: {x: -120, y: 380, z: 0}
+  m_ExitPosition: {x: -110, y: 380, z: 0}
   m_ParentStateMachinePosition: {x: 800, y: 20, z: 0}
   m_DefaultState: {fileID: -4685369167051591253}
 --- !u!1101 &3034021046638837201
@@ -2158,6 +2365,28 @@ AnimatorStateMachine:
   m_ExitPosition: {x: 800, y: 120, z: 0}
   m_ParentStateMachinePosition: {x: 800, y: 20, z: 0}
   m_DefaultState: {fileID: -6467635753605052888}
+--- !u!1101 &3050697934907229145
+AnimatorStateTransition:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_Conditions: []
+  m_DstStateMachine: {fileID: 0}
+  m_DstState: {fileID: -1019706921888836700}
+  m_Solo: 0
+  m_Mute: 0
+  m_IsExit: 0
+  serializedVersion: 3
+  m_TransitionDuration: 0.25
+  m_TransitionOffset: 0
+  m_ExitTime: 0.95
+  m_HasExitTime: 1
+  m_HasFixedDuration: 1
+  m_InterruptionSource: 0
+  m_OrderedInterruption: 1
+  m_CanTransitionToSelf: 1
 --- !u!114 &3374263924461741522
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2276,6 +2505,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Hero.Animation.Behaviours.HeroAttackSequenceEndedBehaviour
   _hero: {fileID: 0}
+--- !u!1101 &4019772770346734540
+AnimatorStateTransition:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_Conditions: []
+  m_DstStateMachine: {fileID: 0}
+  m_DstState: {fileID: 0}
+  m_Solo: 0
+  m_Mute: 0
+  m_IsExit: 1
+  serializedVersion: 3
+  m_TransitionDuration: 0
+  m_TransitionOffset: 0
+  m_ExitTime: 1
+  m_HasExitTime: 1
+  m_HasFixedDuration: 1
+  m_InterruptionSource: 0
+  m_OrderedInterruption: 1
+  m_CanTransitionToSelf: 1
 --- !u!1109 &4161531879008112357
 AnimatorTransition:
   m_ObjectHideFlags: 1
@@ -2547,12 +2798,12 @@ AnimatorStateMachine:
   - {fileID: 5840225689309873205}
   - {fileID: -8541865925528408088}
   m_StateMachineTransitions:
-  - first: {fileID: -563814272925374278}
-    second:
-    - {fileID: -1443157988389294366}
   - first: {fileID: -2912848785288815893}
     second:
     - {fileID: 2196930177606712774}
+  - first: {fileID: -563814272925374278}
+    second:
+    - {fileID: -1443157988389294366}
   m_StateMachineBehaviours: []
   m_AnyStatePosition: {x: 120, y: -360, z: 0}
   m_EntryPosition: {x: 120, y: -300, z: 0}
