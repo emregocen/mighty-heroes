@@ -225,6 +225,22 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine
             Notify(new HeroHitReactionEndedSignal());
         }
 
+        /// <summary>
+        /// Forwards the victory sequence ended notification into the active state as a signal.
+        /// </summary>
+        public void NotifyVictorySequenceEnded()
+        {
+            Notify(new HeroVictorySequenceEndedSignal());
+        }
+
+        /// <summary>
+        /// Forwards the victory turn ended notification into the active state as a signal.
+        /// </summary>
+        public void NotifyVictoryTurnEnded()
+        {
+            Notify(new HeroVictoryTurnEndedSignal());
+        }
+
         // ------------------------------------------------------------------
         // EVENT HANDLERS
         // ------------------------------------------------------------------

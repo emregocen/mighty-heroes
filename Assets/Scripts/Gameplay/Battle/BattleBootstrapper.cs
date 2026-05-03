@@ -14,6 +14,8 @@ using MightyHeroes.Gameplay.Hero.StateMachine;
 using MightyHeroes.Gameplay.Puzzle;
 using MightyHeroes.Core.BattleSystem;
 using MightyHeroes.UI.Battle.Presenters;
+using MightyHeroes.Gameplay.Battle;
+using MightyHeroes.UI.Battle;
 
 namespace MightyHeroes.Core.Battle
 {
@@ -43,7 +45,12 @@ namespace MightyHeroes.Core.Battle
         [SerializeField] private TurnSystemController _turnSystemController;
         [SerializeField] private PuzzleController _puzzleController;
         [SerializeField] private BattleUIPresenter _battleUIPresenter;
+        [SerializeField] private VictoryUIController _victoryUIController;
+        [SerializeField] private DefeatUIController _defeatUIController;
+
         [SerializeField] private HeroComponent _heroComponent;
+        [SerializeField] private VictoryCameraController _victoryCameraController;
+        [SerializeField] private HeroVictoryRotator _heroVictoryRotator;
         [SerializeField] private EnemyFormationConfig[] _enemyFormation;
 
         // FIELDS — Runtime
@@ -75,6 +82,10 @@ namespace MightyHeroes.Core.Battle
             InitializeCombatSystem();
             InitializePuzzleSystem();
             InitializeBattleHud();
+            InitializeVictoryUI();
+            InitializeDefeatUI();
+            InitializeVictoryCamera();
+            InitializeVictoryRotator();
             RegisterEntityDeathListener();
         }
 
@@ -282,6 +293,63 @@ namespace MightyHeroes.Core.Battle
         }
 
         /// <summary>
+        /// Initializes the victory UI controller with the battle-scoped EventHub.
+        /// </summary>
+        private void InitializeVictoryUI()
+        {
+            if (_victoryUIController == null)
+            {
+                GameLogger.Log(LogSourceType.BattleSystem,
+                    "BattleBootstrapper: VictoryUIController reference is missing.");
+                return;
+            }
+
+            _victoryUIController.Initialize(_eventHub);
+        }
+
+        private void InitializeDefeatUI()
+        {
+            if (_defeatUIController == null)
+            {
+                GameLogger.Log(LogSourceType.BattleSystem,
+                    "BattleBootstrapper: DefeatUIController reference is missing.");
+                return;
+            }
+
+            _defeatUIController.Initialize(_eventHub);
+        }
+
+        /// <summary>
+        /// Initializes the victory camera controller with the battle-scoped EventHub.
+        /// </summary>
+        private void InitializeVictoryCamera()
+        {
+            if (_victoryCameraController == null)
+            {
+                GameLogger.Log(LogSourceType.BattleSystem,
+                    "BattleBootstrapper: VictoryCameraController reference is missing.");
+                return;
+            }
+
+            _victoryCameraController.Initialize(_eventHub);
+        }
+
+        /// <summary>
+        /// Initializes the hero victory rotator with the battle-scoped EventHub.
+        /// </summary>
+        private void InitializeVictoryRotator()
+        {
+            if (_heroVictoryRotator == null)
+            {
+                GameLogger.Log(LogSourceType.BattleSystem,
+                    "BattleBootstrapper: HeroVictoryRotator reference is missing.");
+                return;
+            }
+
+            _heroVictoryRotator.Initialize(_eventHub);
+        }
+
+        /// <summary>
         /// Registers the battle-level death listener so entity death events
         /// can update turn flow and battle completion state.
         /// </summary>
@@ -399,6 +467,7 @@ namespace MightyHeroes.Core.Battle
                     $"Hero died. EntityId={payload.EntityId}. Ending battle.");
 
                 _turnContext.EndBattle();
+                _turnStateMachine.SwitchToDefeatedState(_turnContext.AliveEnemyCount);
                 return;
             }
 

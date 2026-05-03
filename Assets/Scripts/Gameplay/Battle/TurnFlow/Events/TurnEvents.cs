@@ -63,5 +63,11 @@ namespace MightyHeroes.Battle.TurnFlow.Events
         public GameEvent<TurnBattleVictoryPayload> TurnBattleVictoryEvent =>
             Registry.GetEvent<TurnBattleVictoryPayload>();
 
+        /// <summary>
+        /// Raised when the hero dies and the battle ends in defeat.
+        /// Consumed by UI and scene transition systems.
+        /// </summary>
+        public GameEvent<TurnBattleDefeatedPayload> TurnBattleDefeatedEvent =>
+            Registry.GetEvent<TurnBattleDefeatedPayload>();
     }
 }
