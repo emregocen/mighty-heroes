@@ -9,7 +9,7 @@ namespace MightyHeroes.Gameplay.Hero.Events
     /// </summary>
     public sealed class HeroEvents : EventGroupBase
     {
-         /// <summary>
+        /// <summary>
         /// Creates the hero events group using the shared event registry.
         /// </summary>
         /// <param name="registry">Shared event registry instance.</param>
@@ -39,5 +39,20 @@ namespace MightyHeroes.Gameplay.Hero.Events
         /// </summary>
         public GameEvent<HeroAttackHitPayload> HeroAttackHitEvent =>
             Registry.GetEvent<HeroAttackHitPayload>();
+
+        /// <summary>
+        /// Raised when the hero begins the victory turn animation.
+        /// Consumed by VictoryCameraController to trigger camera close-in.
+        /// </summary>
+        public GameEvent<HeroVictoryTurnStartedPayload> HeroVictoryTurnStartedEvent =>
+            Registry.GetEvent<HeroVictoryTurnStartedPayload>();
+
+        /// <summary>
+        /// Raised when the hero enters the victory idle loop.
+        /// Consumed by Victory UI panel to trigger fade-in.
+        /// </summary>
+        public GameEvent<HeroVictoryIdleStartedPayload> HeroVictoryIdleStartedEvent =>
+            Registry.GetEvent<HeroVictoryIdleStartedPayload>();
+
     }
 }

@@ -100,6 +100,15 @@ namespace MightyHeroes.Battle.TurnFlow
             SwitchState(new TurnVictoryState(this));
         }
 
+        /// <summary>
+        /// Switches the flow to the battle defeated terminal state.
+        /// Called when the hero dies.
+        /// </summary>
+        public void SwitchToDefeatedState(int remainingEnemyCount)
+        {
+            SwitchState(new TurnDefeatedState(this, remainingEnemyCount));
+        }
+
         // PROTECTED METHODS
 
         /// <summary>
@@ -138,6 +147,12 @@ namespace MightyHeroes.Battle.TurnFlow
                 case TurnStateType.BattleVictory:
                     EventHub.TurnEvents.TurnBattleVictoryEvent.Raise(
                         new TurnBattleVictoryPayload(Context.TurnIndex));
+                    break;
+
+                case TurnStateType.BattleDefeated:
+                    var defeatedState = state as TurnDefeatedState;
+                    EventHub.TurnEvents.TurnBattleDefeatedEvent.Raise(
+                        new TurnBattleDefeatedPayload(defeatedState?.RemainingEnemyCount ?? 0));
                     break;
             }
         }

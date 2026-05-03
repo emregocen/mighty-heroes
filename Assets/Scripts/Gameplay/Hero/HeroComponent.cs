@@ -69,7 +69,7 @@ namespace MightyHeroes.Gameplay.Hero
 
         /// <summary>Animator trigger that plays the victory animation.</summary>
         private static readonly int Anim_Victory = Animator.StringToHash("Victory");
-
+    
         // FIELDS
 
         /// <summary>Static hero stats assigned via inspector. Used only to initialize runtime stats.</summary>
@@ -313,6 +313,25 @@ namespace MightyHeroes.Gameplay.Hero
             _stateMachine.NotifyAttackHitFrame(hitDirection);
         }
 
+        /// <summary>
+        /// Called by VictorySequenceEndedBehaviour when the victory animation clip finishes.
+        /// Forwards to the active state via the FSM signal system.
+        /// </summary>
+        public void NotifyVictorySequenceEnded()
+        {
+            _stateMachine.NotifyVictorySequenceEnded();
+        }
+
+        /// <summary>
+        /// Called by VictoryTurnEndedBehaviour when the turn animation clip finishes.
+        /// Forwards to the active state via the FSM signal system.
+        /// </summary>
+        public void NotifyVictoryTurnEnded()
+        {
+            GameLogger.Log(LogSourceType.Hero, "HeroComponent: NotifyVictoryTurnEnded called.");
+    
+            _stateMachine.NotifyVictoryTurnEnded();
+        }
         // PROTECTED METHODS
 
         /// <summary>Provides hero-specific stats data for base class runtime stat initialization.</summary>
