@@ -76,6 +76,7 @@ namespace MightyHeroes.Gameplay.Combat.StateMachine.Base
 
         public override void Enter()
         {
+            GameLogger.Log(LogSourceType.CombatSystem, "Enter ComboAttackState");
             CurrentStep = 1;
 
             HitFrameFiredForStep = false;

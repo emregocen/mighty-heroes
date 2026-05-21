@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using MightyHeroes.Core.Logging;
 using MightyHeroes.Gameplay.Combat.Interfaces;
 using MightyHeroes.Gameplay.Enemy;
+using UnityEngine;
 
 namespace MightyHeroes.Gameplay.Battle.Formation
 {
@@ -23,6 +25,10 @@ namespace MightyHeroes.Gameplay.Battle.Formation
     {
         // FIELDS
 
+        /// <summary>
+        /// Raised whenever the current battle target changes.
+        /// </summary>
+        public event Action<Transform> CurrentTargetTransformChanged;
         private readonly List<BattleLine> _lines = new List<BattleLine>();
         private EnemyComponent _currentTarget;
 
@@ -57,6 +63,19 @@ namespace MightyHeroes.Gameplay.Battle.Formation
         /// Null only when all enemies are defeated.
         /// </summary>
         public EnemyComponent CurrentTarget => _currentTarget;
+
+        /// <summary>
+        /// The transform used by presentation systems as the current target focus point.
+        /// </summary>
+        public Transform CurrentTargetFocus =>
+            _currentTarget != null
+                ? _currentTarget.TargetFocusPoint
+                : null;
+
+        /// <summary>
+        /// Raised when the current target focus transform changes.
+        /// </summary>
+        public event Action<Transform> CurrentTargetFocusChanged;
 
         // PUBLIC METHODS — Initialization
 
@@ -239,12 +258,15 @@ namespace MightyHeroes.Gameplay.Battle.Formation
 
         // PRIVATE METHODS
 
+        /// <summary>
+        /// Sets the current active enemy target and notifies presentation listeners.
+        /// </summary>
+        /// <param name="enemy">Enemy that becomes the active target.</param>
         private void SetTarget(EnemyComponent enemy)
         {
             _currentTarget = enemy;
-
-            GameLogger.Log(LogSourceType.BattleSystem,
-                $"BattleFormation: Target set to EntityId={enemy?.EntityId}");
+            
+            CurrentTargetFocusChanged?.Invoke(CurrentTargetFocus);
         }
 
         private void SelectDefaultTarget()

@@ -69,5 +69,13 @@ namespace MightyHeroes.Battle.TurnFlow.Events
         /// </summary>
         public GameEvent<TurnBattleDefeatedPayload> TurnBattleDefeatedEvent =>
             Registry.GetEvent<TurnBattleDefeatedPayload>();
+
+        /// <summary>
+        /// Raised when all enemies are defeated, before the victory state transition.
+        /// Consumed by HeroStateMachine to set the victory pending flag so the active
+        /// hero state can route to victory instead of retreat at sequence end.
+        /// </summary>
+        public GameEvent<AllEnemiesDefeatedPayload> AllEnemiesDefeatedEvent =>
+            Registry.GetEvent<AllEnemiesDefeatedPayload>();
     }
 }

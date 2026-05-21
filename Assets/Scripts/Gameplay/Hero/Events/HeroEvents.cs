@@ -28,14 +28,13 @@ namespace MightyHeroes.Gameplay.Hero.Events
         /// <summary>
         /// Raised when hero hit reaction animation has fully completed.
         ///
-        /// This event is critical for synchronizing
-        /// hero combo flow with enemy reactions.
+        /// This event is critical for synchronizing hero combo flow with enemy reactions.
         /// </summary>
         public GameEvent<HeroHitReactionEndedPayload> HeroHitReactionEndedEvent =>
             Registry.GetEvent<HeroHitReactionEndedPayload>();
 
         /// <summary>
-        /// 
+        /// Raised when the hero hits an enemy with an attack.
         /// </summary>
         public GameEvent<HeroAttackHitPayload> HeroAttackHitEvent =>
             Registry.GetEvent<HeroAttackHitPayload>();
@@ -53,6 +52,16 @@ namespace MightyHeroes.Gameplay.Hero.Events
         /// </summary>
         public GameEvent<HeroVictoryIdleStartedPayload> HeroVictoryIdleStartedEvent =>
             Registry.GetEvent<HeroVictoryIdleStartedPayload>();
+
+        /// <summary>
+        /// Raised when the hero starts an attack sequence.
+        /// </summary>
+        public GameEvent<HeroAttackStartedPayload> HeroAttackStartedEvent =>
+            Registry.GetEvent<HeroAttackStartedPayload>();
+
+        // HeroEvents.cs'e ekle:
+        public GameEvent<HeroAttackSequenceEndedPayload> HeroAttackSequenceEndedEvent =>
+            Registry.GetEvent<HeroAttackSequenceEndedPayload>();
 
     }
 }

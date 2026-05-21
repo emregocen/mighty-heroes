@@ -68,23 +68,19 @@ namespace MightyHeroes.Gameplay.Enemy
 
         // FIELDS
 
-        /// <summary>Static enemy stats assigned via inspector. Used only to initialize runtime stats.</summary>
+        [Header("Data")]
         [SerializeField] private EnemyStatsData _enemyStatsData;
 
-        /// <summary>Animator responsible for playing enemy animations.</summary>
+        [Header("Animation")]
         [SerializeField] private Animator _animator;
-
-        /// <summary>Receives animation events and forwards them to EnemyStateMachine as signals.</summary>
         [SerializeField] private EnemyAnimationEventProxy _animationEventProxy;
 
+        [Header("Targeting")]
+        [SerializeField] private Transform _targetFocusPoint;
+
         [Header("HUD")]
-        /// <summary>Enemy health bar presentation view.</summary>
         [SerializeField] private HealthBarView _healthBarView;
-
-        /// <summary>Enemy shield bar presentation view.</summary>
         [SerializeField] private ShieldBarView _shieldBarView;
-
-        /// <summary>Enemy action point presentation view.</summary>
         [SerializeField] private ActionPointView _actionPointView;
 
         /// <summary>Reference to the enemy state machine. Assigned by BattleBootstrapper during Initialize().</summary>
@@ -94,6 +90,9 @@ namespace MightyHeroes.Gameplay.Enemy
         private EventHub _eventHub;
 
         // PROPERTIES
+
+        /// <summary>Exposes the target focus point used by look-at and targeting systems.</summary>
+        public Transform TargetFocusPoint => _targetFocusPoint;
 
         /// <summary>Exposes the owning enemy state machine.</summary>
         public EnemyStateMachine StateMachine => _stateMachine;
@@ -254,6 +253,11 @@ namespace MightyHeroes.Gameplay.Enemy
         }
 
         // PUBLIC METHODS — Animation Event Bridge
+
+        public void NotifyAttackSequenceStarted()
+        {
+            throw new System.NotImplementedException();
+        }
 
         /// <summary>
         /// Called by EnemyHitReactionEndedBehaviour when hit reaction animation completes.

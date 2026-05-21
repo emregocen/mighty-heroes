@@ -351,6 +351,10 @@ PrefabInstance:
       propertyPath: _enemyStatsData
       value: 
       objectReference: {fileID: 11400000, guid: 5530d6831b209449a89f42f59b14a6ce, type: 2}
+    - target: {fileID: 763958437473869267, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
+      propertyPath: _targetFocusPoint
+      value: 
+      objectReference: {fileID: 1291524418}
     - target: {fileID: 1064932128938733930, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -369,7 +373,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2065391164795600621, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 2065391164795600621, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
       propertyPath: m_LocalRotation.w
@@ -454,6 +458,9 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 2065391164795600621, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1291524418}
     - targetCorrespondingSourceObject: {fileID: 1397412323705664454, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1122666985}
@@ -1345,6 +1352,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 207743576985421016, guid: 72e56784e591139469dcaeec0b81f611, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 276588420460906001, guid: 72e56784e591139469dcaeec0b81f611, type: 3}
       propertyPath: m_SizeDelta.y
       value: 100
@@ -1472,6 +1483,10 @@ PrefabInstance:
     - target: {fileID: 5966104363717840513, guid: 72e56784e591139469dcaeec0b81f611, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: -60
+      objectReference: {fileID: 0}
+    - target: {fileID: 6159264010318562606, guid: 72e56784e591139469dcaeec0b81f611, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6404006028667992988, guid: 72e56784e591139469dcaeec0b81f611, type: 3}
       propertyPath: m_Pivot.x
@@ -1666,13 +1681,28 @@ PrefabInstance:
       value: 67.55
       objectReference: {fileID: 0}
     - target: {fileID: 8550404543151122683, guid: 72e56784e591139469dcaeec0b81f611, type: 3}
+      propertyPath: m_characterSpacing
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8550404543151122683, guid: 72e56784e591139469dcaeec0b81f611, type: 3}
+      propertyPath: m_VerticalAlignment
+      value: 4096
+      objectReference: {fileID: 0}
+    - target: {fileID: 8550404543151122683, guid: 72e56784e591139469dcaeec0b81f611, type: 3}
+      propertyPath: m_HorizontalAlignment
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8550404543151122683, guid: 72e56784e591139469dcaeec0b81f611, type: 3}
       propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
       value: 1801810542
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7463732491979937541, guid: 72e56784e591139469dcaeec0b81f611, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1905160456}
   m_SourcePrefab: {fileID: 100100000, guid: 72e56784e591139469dcaeec0b81f611, type: 3}
 --- !u!224 &685924483 stripped
 RectTransform:
@@ -3062,7 +3092,7 @@ PrefabInstance:
       objectReference: {fileID: 9100000, guid: 91b0a4ac28ae144fcb4325af9b170d9b, type: 2}
     - target: {fileID: 95058168009071288, guid: c2e12a23c03102543ab990b5a676fb53, type: 3}
       propertyPath: m_ApplyRootMotion
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3080,6 +3110,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1225583223337818, guid: c2e12a23c03102543ab990b5a676fb53, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1838490853}
+    - targetCorrespondingSourceObject: {fileID: 1225583223337818, guid: c2e12a23c03102543ab990b5a676fb53, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1838490854}
   m_SourcePrefab: {fileID: 100100000, guid: c2e12a23c03102543ab990b5a676fb53, type: 3}
 --- !u!1 &1220234848
 GameObject:
@@ -3093,6 +3126,7 @@ GameObject:
   - component: {fileID: 1220234849}
   - component: {fileID: 1220234851}
   - component: {fileID: 1220234852}
+  - component: {fileID: 1220234853}
   m_Layer: 0
   m_Name: Hero
   m_TagString: Untagged
@@ -3115,6 +3149,9 @@ MonoBehaviour:
   _heroStatsData: {fileID: 11400000, guid: 6fdc3c99b9be04e049eb3d8ebbba7a9b, type: 2}
   _animator: {fileID: 1838490849}
   _animationEventProxy: {fileID: 1838490851}
+  _targetFocusPoint: {fileID: 0}
+  _attackMovementController: {fileID: 1838490854}
+  _heroTargetFocusController: {fileID: 1838490853}
   _healthBarView: {fileID: 1021692912}
   _shieldBarView: {fileID: 0}
   _actionPointView: {fileID: 4448286}
@@ -3163,6 +3200,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Hero.HeroVictoryRotator
   _turnDuration: 1.26
+--- !u!114 &1220234853
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1220234848}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28d4fd12c8e7549489f1348cb9d1d7ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Hero.Input.HeroTargetInputController
 --- !u!1 &1233976457
 GameObject:
   m_ObjectHideFlags: 0
@@ -3195,7 +3244,7 @@ MonoBehaviour:
   _battleUICanvasGroup: {fileID: 1415689108}
   _victoryCanvasGroup: {fileID: 750351449}
   _puzzleManagerTransform: {fileID: 1092054648}
-  _nextButton: {fileID: 0}
+  _nextButton: {fileID: 1905160456}
 --- !u!4 &1233976459
 Transform:
   m_ObjectHideFlags: 0
@@ -3361,6 +3410,37 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Battle.VictoryCameraController
   _victoryCamera: {fileID: 1254148567}
+--- !u!1 &1291524417
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1291524418}
+  m_Layer: 0
+  m_Name: Target Focus Point
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1291524418
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1291524417}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.7, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 234491725}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1323442351
 GameObject:
   m_ObjectHideFlags: 0
@@ -3393,7 +3473,7 @@ MonoBehaviour:
   _battleUICanvasGroup: {fileID: 1415689108}
   _defeatCanvasGroup: {fileID: 1414593511}
   _puzzleManagerTransform: {fileID: 1092054648}
-  _retryButton: {fileID: 0}
+  _retryButton: {fileID: 1483346694}
 --- !u!4 &1323442353
 Transform:
   m_ObjectHideFlags: 0
@@ -3708,6 +3788,55 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4555883491348096, guid: 071b4da7cfff18347a371c677585b749, type: 3}
   m_PrefabInstance: {fileID: 1107188365}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1483346692 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7463732491979937541, guid: 72e56784e591139469dcaeec0b81f611, type: 3}
+  m_PrefabInstance: {fileID: 2087412036}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1483346694
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1483346692}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 0}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1001 &1523348631
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3720,6 +3849,10 @@ PrefabInstance:
       propertyPath: _enemyStatsData
       value: 
       objectReference: {fileID: 11400000, guid: 34507aa8bc2bc47ffad007d1f70330ae, type: 2}
+    - target: {fileID: 763958437473869267, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
+      propertyPath: _targetFocusPoint
+      value: 
+      objectReference: {fileID: 1816215201}
     - target: {fileID: 1064932128938733930, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -3738,7 +3871,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2065391164795600621, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 2065391164795600621, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
       propertyPath: m_LocalRotation.w
@@ -3827,6 +3960,9 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 2065391164795600621, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1816215201}
     - targetCorrespondingSourceObject: {fileID: 1397412323705664454, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1528811769}
@@ -3945,19 +4081,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Core.BattleSystem.BattleBootstrapper
   _turnSystemController: {fileID: 709627123}
   _puzzleController: {fileID: 1092054649}
-  _battleUIPresenter: {fileID: 488946797}
+  _battleUIPresenter: {fileID: 0}
   _victoryUIController: {fileID: 1233976458}
   _defeatUIController: {fileID: 1323442352}
-  _heroComponent: {fileID: 1220234849}
   _victoryCameraController: {fileID: 1254148570}
+  _heroTargetInputController: {fileID: 1220234853}
+  _heroComponent: {fileID: 1220234849}
   _heroVictoryRotator: {fileID: 1220234852}
+  _heroTargetFocusController: {fileID: 1838490853}
   _enemyFormation:
   - Enemy: {fileID: 315747061}
     RowIndex: 0
     ColumnIndex: 0
   - Enemy: {fileID: 1523348633}
-    RowIndex: 1
-    ColumnIndex: 0
+    RowIndex: 0
+    ColumnIndex: 1
 --- !u!4 &1533193206
 Transform:
   m_ObjectHideFlags: 0
@@ -4520,6 +4658,37 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7c5a4f45b84b97b49afeba568d636962, type: 3}
+--- !u!1 &1816215200
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1816215201}
+  m_Layer: 0
+  m_Name: Target Focus Point
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1816215201
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1816215200}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.7, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1523348632}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1822963177
 GameObject:
   m_ObjectHideFlags: 0
@@ -4706,14 +4875,100 @@ MonoBehaviour:
   m_GameObject: {fileID: 1838490848}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6f53d1d400ce4d58ade1a46e2c74966, type: 3}
+  m_Script: {fileID: 11500000, guid: eb8c6a38d051b444498334b3f2dd990b, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Equipment.Views.CharacterWeaponAnimationEventReceiver
+  m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Hero.Presentation.HeroTargetFocusController
+  _heroRoot: {fileID: 1220234850}
+  _animator: {fileID: 1838490849}
+  _attackMovementController: {fileID: 1838490854}
+  _headWeight: 0.8
+  _torsoWeight: 0.4
+  _eyesWeight: 0
+  _clampWeight: 0.5
+  _headBlendDuration: 0.2
+  _torsoBlendDuration: 0.25
+  _torsoDelay: 0.1
+  _lookPositionSmoothTime: 0.1
+  _rootRotationDelay: 0.2
+  _rootRotationDuration: 0.24
+  _returnToPersistentFocusDelay: 0.3
+--- !u!114 &1838490854
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1838490848}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 360f4d76cdabd49e08c516166c2c65dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Hero.Movement.HeroAttackMovementController
+  _animator: {fileID: 1838490849}
+  _heroRoot: {fileID: 1220234850}
+  _animatorVisualRoot: {fileID: 1838490850}
+  _swordArmLayerName: SwordArm
+  _swordHandLayerName: SwordHand
+  _swordArmIdleWeight: 0.65
+  _swordHandIdleWeight: 1
+  _swordLayerBlendDuration: 0.12
+  _retreatSpeed: 1.8
+  _minimumRetreatDistance: 0.05
+  _retreatEase: 1
 --- !u!4 &1877987136 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1397412323705664454, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
   m_PrefabInstance: {fileID: 234491724}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1905160454 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7463732491979937541, guid: 72e56784e591139469dcaeec0b81f611, type: 3}
+  m_PrefabInstance: {fileID: 685924482}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1905160456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1905160454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 0}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1931819987
 GameObject:
   m_ObjectHideFlags: 0
@@ -5197,6 +5452,10 @@ PrefabInstance:
       value: 67.55
       objectReference: {fileID: 0}
     - target: {fileID: 8550404543151122683, guid: 72e56784e591139469dcaeec0b81f611, type: 3}
+      propertyPath: m_VerticalAlignment
+      value: 4096
+      objectReference: {fileID: 0}
+    - target: {fileID: 8550404543151122683, guid: 72e56784e591139469dcaeec0b81f611, type: 3}
       propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
       value: 1801810542
       objectReference: {fileID: 0}
@@ -5404,7 +5663,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1722165923144489846, guid: 72e56784e591139469dcaeec0b81f611, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1858222527113017816, guid: 72e56784e591139469dcaeec0b81f611, type: 3}
       propertyPath: m_SizeDelta.x
@@ -5664,11 +5923,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8550404543151122683, guid: 72e56784e591139469dcaeec0b81f611, type: 3}
       propertyPath: m_text
-      value: PERFECT
+      value: CONTINUE
       objectReference: {fileID: 0}
     - target: {fileID: 8550404543151122683, guid: 72e56784e591139469dcaeec0b81f611, type: 3}
       propertyPath: m_fontSize
       value: 67.55
+      objectReference: {fileID: 0}
+    - target: {fileID: 8550404543151122683, guid: 72e56784e591139469dcaeec0b81f611, type: 3}
+      propertyPath: m_VerticalAlignment
+      value: 4096
       objectReference: {fileID: 0}
     - target: {fileID: 8550404543151122683, guid: 72e56784e591139469dcaeec0b81f611, type: 3}
       propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
@@ -5677,7 +5940,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7463732491979937541, guid: 72e56784e591139469dcaeec0b81f611, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1483346694}
   m_SourcePrefab: {fileID: 100100000, guid: 72e56784e591139469dcaeec0b81f611, type: 3}
 --- !u!224 &2087412037 stripped
 RectTransform:

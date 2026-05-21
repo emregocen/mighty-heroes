@@ -2,6 +2,7 @@ using MightyHeroes.Core.Logging;
 using MightyHeroes.Gameplay.Common.Actions;
 using MightyHeroes.Gameplay.Hero.Actions;
 using MightyHeroes.Gameplay.Puzzle.Payloads;
+using Unity.VisualScripting;
 
 namespace MightyHeroes.Gameplay.Hero.StateMachine.States
 {
@@ -27,6 +28,7 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
             GameLogger.Log(LogSourceType.Hero, "Enter HeroReadyState");
 
             StateMachine.Hero.SetPuzzlePlayable(true);
+            StateMachine.Hero.SetCanChangeTarget(true);
 
             StateMachine.EventHub.PuzzleEvents
                 .PuzzleTilesMatchedEvent
@@ -44,6 +46,7 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
                 .PuzzleTilesMatchedEvent
                 .Unregister(OnPuzzleTilesMatched);
 
+            StateMachine.Hero.SetCanChangeTarget(false);
             StateMachine.Hero.SetPuzzlePlayable(false);
         }
 

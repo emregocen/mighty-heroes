@@ -24,6 +24,11 @@ namespace MightyHeroes.Gameplay.Animation.Interfaces
         void NotifyAttackClipEnded();
 
         /// <summary>
+        /// Called when the full attack sequence animation starts.
+        /// </summary>
+        void NotifyAttackSequenceStarted();
+
+        /// <summary>
         /// Called when the full attack sequence animation has completed.
         /// Forwards to the FSM as an attack sequence ended signal.
         /// </summary>

@@ -38,5 +38,17 @@ namespace MightyHeroes.Gameplay.Enemy.Events
         /// </summary>
         public GameEvent<EnemyHitReactionEndedPayload> EnemyHitReactionEndedEvent =>
             Registry.GetEvent<EnemyHitReactionEndedPayload>();
+
+        /// <summary>
+        /// Raised when an enemy starts an attack sequence.
+        /// </summary>
+        public GameEvent<EnemyAttackStartedPayload> EnemyAttackStartedEvent =>
+            Registry.GetEvent<EnemyAttackStartedPayload>();
+
+        /// <summary>
+        /// Raised when an enemy finishes an attack sequence.
+        /// </summary>
+        public GameEvent<EnemyAttackFinishedPayload> EnemyAttackFinishedEvent =>
+            Registry.GetEvent<EnemyAttackFinishedPayload>();
     }
 }

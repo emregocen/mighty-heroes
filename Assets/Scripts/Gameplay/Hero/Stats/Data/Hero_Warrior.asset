@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Hero_Warrior
   m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Common.Stats.HeroStatsData
   _entityKey: hero.player.warrior
-  _maxHealth: 30
+  _maxHealth: 100
   _maxShield: 0
-  _baseAttack: 10
+  _baseAttack: 25
   _baseDefense: 30
   _baseActionPoints: 4
   _comboThresholdForUltimate: 3
