@@ -1,17 +1,19 @@
-using UnityEngine;
 using MightyHeroes.Core.EventSystem;
 using MightyHeroes.Core.Logging;
-using MightyHeroes.Gameplay.Common.Entity;
-using MightyHeroes.Gameplay.Common.Stats;
+using MightyHeroes.Gameplay.Animation.Interfaces;
 using MightyHeroes.Gameplay.Combat.Interfaces;
 using MightyHeroes.Gameplay.Combat.Payloads;
 using MightyHeroes.Gameplay.Combat.Types;
+using MightyHeroes.Gameplay.Common.Entity;
+using MightyHeroes.Gameplay.Common.Stats;
+using MightyHeroes.Gameplay.Hero.Movement;
+using MightyHeroes.Gameplay.Hero.Payloads;
 using MightyHeroes.Gameplay.Hero.Presentation;
 using MightyHeroes.Gameplay.Hero.StateMachine;
 using MightyHeroes.Gameplay.Hero.Stats;
 using MightyHeroes.Gameplay.Puzzle;
 using MightyHeroes.UI.Battle.Views;
-using MightyHeroes.Gameplay.Animation.Interfaces;
+using UnityEngine;
 
 namespace MightyHeroes.Gameplay.Hero
 {
@@ -69,17 +71,31 @@ namespace MightyHeroes.Gameplay.Hero
 
         /// <summary>Animator trigger that plays the victory animation.</summary>
         private static readonly int Anim_Victory = Animator.StringToHash("Victory");
-    
+
         // FIELDS
 
+        // FIELDS
+
+        [Header("Data")]
         /// <summary>Static hero stats assigned via inspector. Used only to initialize runtime stats.</summary>
         [SerializeField] private HeroStatsData _heroStatsData;
 
+        [Header("Animation")]
         /// <summary>Animator responsible for playing hero animations.</summary>
         [SerializeField] private Animator _animator;
 
         /// <summary>Receives animation events and forwards them to HeroStateMachine as signals.</summary>
         [SerializeField] private HeroAnimationEventProxy _animationEventProxy;
+
+        [Header("Targeting")]
+        /// <summary>Focus point used by targeting and look-at systems.</summary>
+        [SerializeField] private Transform _targetFocusPoint;
+
+        [Header("Movement")]
+        [SerializeField]
+        private HeroAttackMovementController _attackMovementController;
+        [Header("Presentation")]
+        [SerializeField] private HeroTargetFocusController _heroTargetFocusController;
 
         [Header("HUD")]
         /// <summary>Hero health bar presentation view.</summary>
@@ -99,8 +115,23 @@ namespace MightyHeroes.Gameplay.Hero
 
         // PROPERTIES
 
+        /// <summary>Exposes the target focus point used by look-at and targeting systems.</summary>
+        public Transform TargetFocusPoint => _targetFocusPoint;
+
         /// <summary>Exposes the owning hero state machine.</summary>
         public HeroStateMachine StateMachine => _stateMachine;
+
+
+        /// <summary>
+        /// Exposes the attack movement controller for state-level event subscriptions.
+        /// HeroRetreatState subscribes to RetreatCompleted to know when DOTween finishes.
+        /// </summary>
+        public HeroAttackMovementController AttackMovementController => _attackMovementController;
+
+        /// <summary>
+        /// Indicates whether the player can currently change the active combat target.
+        /// </summary>
+        public bool CanChangeTarget { get; private set; }
 
         // PUBLIC METHODS — Initialization
 
@@ -120,6 +151,8 @@ namespace MightyHeroes.Gameplay.Hero
         /// <param name="entityId">Unique entity identifier assigned by BattleBootstrapper.</param>
         public void Initialize(HeroStateMachine stateMachine, int entityId)
         {
+            GameLogger.Log(LogSourceType.Hero, "HeroComponent.Initialize called.");
+
             _stateMachine = stateMachine;
             _eventHub = stateMachine.EventHub;
 
@@ -219,6 +252,8 @@ namespace MightyHeroes.Gameplay.Hero
         /// <param name="attackIntensity">Attack intensity level (also defines combo length).</param>
         public void PlayAttack(int attackVariant, int attackIntensity)
         {
+            Debug.Log("PlayAttack called");
+
             _animator.SetInteger(Anim_AttackVariant, attackVariant);
             _animator.SetInteger(Anim_AttackIntensity, attackIntensity);
             _animator.ResetTrigger(Anim_AdvanceCombo);
@@ -248,8 +283,11 @@ namespace MightyHeroes.Gameplay.Hero
         /// <summary> Plays the victory animation.
         /// Must only be called from HeroVictoryState.
         /// </summary>
+        // HeroComponent.PlayVictoryAnimation():
         public void PlayVictoryAnimation()
         {
+            _attackMovementController?.NotifyVictoryStarted();
+            _heroTargetFocusController?.NotifyVictoryStarted();
             _animator.SetTrigger(Anim_ForceFinishCombo);
             _animator.SetTrigger(Anim_Victory);
         }
@@ -278,6 +316,29 @@ namespace MightyHeroes.Gameplay.Hero
             PuzzleController.Instance.IsPlayable = isPlayable;
         }
 
+        // PUBLIC METHODS — Targeting
+
+        /// <summary>
+        /// Enables or disables player target selection input.
+        /// </summary>
+        /// <param name="canChangeTarget">
+        /// True if the player can currently change combat target.
+        /// </param>
+        public void SetCanChangeTarget(bool canChangeTarget)
+        {
+            CanChangeTarget = canChangeTarget;
+        }
+
+        /// <summary>
+        /// Cancels an in-progress retreat immediately without completing it.
+        /// Called by HeroStateMachine.OnBattleVictory before switching to VictoryState
+        /// so the DOTween tween is killed and RetreatCompleted never fires.
+        /// </summary>
+        public void CancelRetreat()
+        {
+            _attackMovementController?.CancelRetreat();
+        }
+
         // PUBLIC METHODS — Animation Event Bridge
 
         /// <summary>
@@ -298,10 +359,26 @@ namespace MightyHeroes.Gameplay.Hero
         }
 
         /// <summary>
-        /// Called by HeroAttackSequenceEndedBehaviour when the full attack sequence ends.
+        /// Called by AttackSequenceStartedBehaviour when the full attack sequence begins.
         /// </summary>
+        public void NotifyAttackSequenceStarted()
+        {
+            GameLogger.Log(LogSourceType.Hero,
+                $"NotifyAttackSequenceStarted — heroRoot={_attackMovementController?.transform.position}");
+            _attackMovementController?.NotifyAttackStarted();
+        }
+        /// <summary>
+        /// Called by AttackSequenceEndedBehaviour when the full attack sequence ends.
+        /// Starts the retreat movement via the controller, then signals the FSM to
+        /// transition to HeroRetreatState. The FSM state will subscribe to
+        /// RetreatCompleted to know when movement actually finishes.
+        /// </summary>
+
+        // HeroComponent.NotifyAttackSequenceEnded:
         public void NotifyAttackSequenceEnded()
         {
+            _attackMovementController?.NotifyAttackEnded();
+            _eventHub.HeroEvents.HeroAttackSequenceEndedEvent.Raise(new HeroAttackSequenceEndedPayload());
             _stateMachine.NotifyAttackSequenceEnded();
         }
 
@@ -329,9 +406,20 @@ namespace MightyHeroes.Gameplay.Hero
         public void NotifyVictoryTurnEnded()
         {
             GameLogger.Log(LogSourceType.Hero, "HeroComponent: NotifyVictoryTurnEnded called.");
-    
+
             _stateMachine.NotifyVictoryTurnEnded();
         }
+
+        /// <summary>
+        /// Called by HeroAttackMovementController once the hero reaches their cached
+        /// origin position. Forwards to FSM as HeroRetreatEndedSignal.
+        /// </summary>
+        private void NotifyRetreatCompleted()
+        {
+            _stateMachine.NotifyRetreatEnded();
+        }
+
+
         // PROTECTED METHODS
 
         /// <summary>Provides hero-specific stats data for base class runtime stat initialization.</summary>
@@ -371,6 +459,10 @@ namespace MightyHeroes.Gameplay.Hero
         private void RegisterEvents()
         {
             _eventHub.CombatEvents.CombatDamageIntentEvent.Register(OnDamageIntent);
+
+            // Wire movement controller event into FSM signal chain.
+            if (_attackMovementController != null)
+                _attackMovementController.RetreatCompleted += OnRetreatCompleted;
         }
 
         /// <summary>
@@ -379,6 +471,9 @@ namespace MightyHeroes.Gameplay.Hero
         private void UnregisterEvents()
         {
             _eventHub.CombatEvents.CombatDamageIntentEvent.Unregister(OnDamageIntent);
+
+            if (_attackMovementController != null)
+                _attackMovementController.RetreatCompleted -= OnRetreatCompleted;
         }
 
         /// <summary>
@@ -463,6 +558,17 @@ namespace MightyHeroes.Gameplay.Hero
             }
 
             _stateMachine.SwitchToTakingHitState(payload.HitDirection);
+        }
+
+        /// <summary>
+        /// Called by HeroAttackMovementController when the DOTween retreat reaches
+        /// the cached origin. Forwards to FSM as a signal via HeroStateMachine.
+        /// Follows the same pattern as NotifyHitReactionEnded and NotifyAttackSequenceEnded:
+        /// MonoBehaviour events never reach states directly.
+        /// </summary>
+        private void OnRetreatCompleted()
+        {
+            _stateMachine.NotifyRetreatEnded();
         }
     }
 }

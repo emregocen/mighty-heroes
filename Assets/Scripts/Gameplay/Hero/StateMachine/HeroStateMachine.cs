@@ -48,6 +48,13 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine
         private readonly HeroComponent _hero;
         private readonly HeroActionResolver _actionResolver;
 
+        /// <summary>
+        /// Set to true when AllEnemiesDefeatedEvent is received.
+        /// Read by HeroAttackState.OnSequenceEnded to skip retreat and go to victory.
+        /// Reset is not needed — battle ends after victory, FSM is disposed.
+        /// </summary>
+        private bool _isVictoryPending;
+
         // ------------------------------------------------------------------
         // PROPERTIES
         // ------------------------------------------------------------------
@@ -146,6 +153,15 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine
                 execution.ActionIntensity));
         }
 
+        /// <summary>
+        /// Transitions hero to retreat state after an attack sequence ends.
+        /// Called by HeroAttackState.OnSequenceEnded() unconditionally.
+        /// </summary>
+        public void SwitchToRetreatState()
+        {
+            SwitchState(new HeroRetreatState(this));
+        }
+
         /// <summary>Transitions hero to taking-hit state to process incoming damage.</summary>
         /// <param name="damage">Damage amount already applied via Health system.</param>
         /// <param name="direction">Direction of the incoming hit for animation purposes.</param>
@@ -241,6 +257,17 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine
             Notify(new HeroVictoryTurnEndedSignal());
         }
 
+        // HeroStateMachine.cs — BEHAVIOUR -> SIGNAL FORWARDING bölümüne ekle:
+
+        /// <summary>
+        /// Called by HeroComponent when HeroAttackMovementController's DOTween
+        /// retreat completes. Forwards as HeroRetreatEndedSignal into the active state.
+        /// </summary>
+        public void NotifyRetreatEnded()
+        {
+            Notify(new HeroRetreatEndedSignal());
+        }
+
         // ------------------------------------------------------------------
         // EVENT HANDLERS
         // ------------------------------------------------------------------
@@ -271,13 +298,13 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine
         }
 
         /// <summary>
-        /// Battle-lifetime subscription. Receives BattleVictoryEvent from EventHub
-        /// and transitions hero to terminal victory state regardless of which state is currently active.
-        /// Kept here because the event must be caught in any hero state — the timing is not predictable
-        /// from the hero FSM's perspective.
+        /// Cancels any in-progress retreat before switching to VictoryState so the
+        /// DOTween tween is killed and no stale RetreatCompleted callback fires
+        /// after the FSM has already moved to the terminal state.
         /// </summary>
         private void OnBattleVictory(TurnBattleVictoryPayload payload)
         {
+            _hero.CancelRetreat();
             SwitchToVictoryState();
         }
     }

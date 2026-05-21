@@ -531,7 +531,7 @@ AnimatorController:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Enemy_Melee_Sword
+  m_Name: AC_EnemyMeleeSword
   serializedVersion: 6
   m_AnimatorParameters:
   - m_Name: AttackVariant

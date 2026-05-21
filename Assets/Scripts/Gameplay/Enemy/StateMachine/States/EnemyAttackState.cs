@@ -105,6 +105,11 @@ namespace MightyHeroes.Gameplay.Enemy.StateMachine.States
                 LogSourceType.Enemy,
                 $"EnemyAttackState: Start attack Variant={AttackVariant}, Steps={TotalSteps}");
 
+            StateMachine.EventHub.EnemyEvents.EnemyAttackStartedEvent.Raise(
+                new EnemyAttackStartedPayload(
+                    enemyId: StateMachine.Enemy.EntityId,
+                    attackerFocusPoint: StateMachine.Enemy.TargetFocusPoint));
+
             StateMachine.Enemy.PlayAttack(AttackVariant, TotalSteps);
         }
 
@@ -169,7 +174,11 @@ namespace MightyHeroes.Gameplay.Enemy.StateMachine.States
                 StateMachine.SwitchToReadyState();
                 return;
             }
-            
+
+            StateMachine.EventHub.EnemyEvents.EnemyAttackFinishedEvent.Raise(
+                new EnemyAttackFinishedPayload(
+                    enemyId: StateMachine.Enemy.EntityId));
+
             StateMachine.SwitchToIdleState();
             StateMachine.FinishEnemyTurn();
         }

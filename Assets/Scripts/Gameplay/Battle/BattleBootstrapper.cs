@@ -1,8 +1,10 @@
 using System.Collections.Generic;
-using UnityEngine;
+using MightyHeroes.Battle.TurnFlow;
+using MightyHeroes.Battle.TurnFlow.Payloads;
+using MightyHeroes.Core.BattleSystem;
 using MightyHeroes.Core.EventSystem;
 using MightyHeroes.Core.Logging;
-using MightyHeroes.Battle.TurnFlow;
+using MightyHeroes.Gameplay.Battle;
 using MightyHeroes.Gameplay.Battle.Formation;
 using MightyHeroes.Gameplay.Combat;
 using MightyHeroes.Gameplay.Enemy.AI;
@@ -10,12 +12,14 @@ using MightyHeroes.Gameplay.Enemy.StateMachine;
 using MightyHeroes.Gameplay.Health.Payloads;
 using MightyHeroes.Gameplay.Hero;
 using MightyHeroes.Gameplay.Hero.Actions;
+using MightyHeroes.Gameplay.Hero.Input;
+using MightyHeroes.Gameplay.Hero.Payloads;
+using MightyHeroes.Gameplay.Hero.Presentation;
 using MightyHeroes.Gameplay.Hero.StateMachine;
 using MightyHeroes.Gameplay.Puzzle;
-using MightyHeroes.Core.BattleSystem;
-using MightyHeroes.UI.Battle.Presenters;
-using MightyHeroes.Gameplay.Battle;
 using MightyHeroes.UI.Battle;
+using MightyHeroes.UI.Battle.Presenters;
+using UnityEngine;
 
 namespace MightyHeroes.Core.Battle
 {
@@ -42,15 +46,27 @@ namespace MightyHeroes.Core.Battle
     {
         // FIELDS — Inspector
 
+        [Header("Systems")]
         [SerializeField] private TurnSystemController _turnSystemController;
         [SerializeField] private PuzzleController _puzzleController;
+
+        [Header("UI")]
         [SerializeField] private BattleUIPresenter _battleUIPresenter;
         [SerializeField] private VictoryUIController _victoryUIController;
         [SerializeField] private DefeatUIController _defeatUIController;
 
-        [SerializeField] private HeroComponent _heroComponent;
+        [Header("Camera")]
         [SerializeField] private VictoryCameraController _victoryCameraController;
+
+        [Header("Input")]
+        [SerializeField] private HeroTargetInputController _heroTargetInputController;
+
+        [Header("Hero")]
+        [SerializeField] private HeroComponent _heroComponent;
         [SerializeField] private HeroVictoryRotator _heroVictoryRotator;
+        [SerializeField] private HeroTargetFocusController _heroTargetFocusController;
+
+        [Header("Enemy Formation")]
         [SerializeField] private EnemyFormationConfig[] _enemyFormation;
 
         // FIELDS — Runtime
@@ -62,6 +78,7 @@ namespace MightyHeroes.Core.Battle
         private BattleFormation _battleFormation;
         private CombatSystem _combatSystem;
         private BattleIdGenerator _idGenerator;
+        private bool _allEnemiesDefeatedPending;
 
         private readonly List<EnemyStateMachine> _enemyStateMachines = new List<EnemyStateMachine>();
 
@@ -78,6 +95,8 @@ namespace MightyHeroes.Core.Battle
             CreateBattleFormation();
             InitializeHero();
             InitializeEnemies();
+            InitializeTargetInput();
+            InitializeHeroTargetFocus();
             InitializeTurnSystem();
             InitializeCombatSystem();
             InitializePuzzleSystem();
@@ -214,6 +233,41 @@ namespace MightyHeroes.Core.Battle
             }
 
             _battleFormation.Initialize(formationEntries);
+        }
+
+        /// <summary>
+        /// Initializes hero target selection input.
+        /// </summary>
+        private void InitializeTargetInput()
+        {
+            if (_heroTargetInputController == null)
+            {
+                GameLogger.Log(LogSourceType.BattleSystem,
+                    "BattleBootstrapper.InitializeTargetInput skipped: HeroTargetInputController reference is missing.");
+                return;
+            }
+
+            _heroTargetInputController.Initialize(
+                _battleFormation,
+                _heroComponent);
+        }
+
+        /// <summary>
+        /// Initializes hero target facing presentation controller.
+        /// </summary>
+        private void InitializeHeroTargetFocus()
+        {
+            if (_heroTargetFocusController == null)
+            {
+                GameLogger.Log(LogSourceType.BattleSystem,
+                    "BattleBootstrapper.InitializeHeroTargetFocus skipped: HeroTargetFocusController reference is missing.");
+                return;
+            }
+
+            _heroTargetFocusController.Initialize(_battleFormation, _eventHub);
+
+            GameLogger.Log(LogSourceType.BattleSystem,
+                "BattleBootstrapper.InitializeHeroTargetFocus completed.");
         }
 
         /// <summary>
@@ -356,18 +410,18 @@ namespace MightyHeroes.Core.Battle
         private void RegisterEntityDeathListener()
         {
             _eventHub.HealthEvents.EntityDiedEvent.Register(OnEntityDied);
+            _eventHub.HeroEvents.HeroAttackSequenceEndedEvent.Register(OnHeroAttackSequenceEnded);
         }
 
-        // PRIVATE METHODS — Dispose
-
         /// <summary>
-        /// Unregisters the battle-level death listener during teardown
-        /// to prevent callbacks after destruction.
+        /// Unregisters the battle-level death listener to prevent callbacks after the battle ends
         /// </summary>
         private void UnregisterEntityDeathListener()
         {
             _eventHub?.HealthEvents.EntityDiedEvent.Unregister(OnEntityDied);
+            _eventHub?.HeroEvents.HeroAttackSequenceEndedEvent.Unregister(OnHeroAttackSequenceEnded);
         }
+
 
         /// <summary>
         /// Disposes the CombatSystem and clears its runtime reference.
@@ -485,8 +539,6 @@ namespace MightyHeroes.Core.Battle
             if (!isEnemy)
                 return;
 
-            // Notify formation before updating turn context
-            // so target reselection happens while alive count is still accurate.
             _battleFormation.NotifyEnemyDefeated(payload.EntityId);
             _turnContext.UnregisterEnemy();
 
@@ -495,10 +547,30 @@ namespace MightyHeroes.Core.Battle
 
             if (_turnContext.AliveEnemyCount <= 0)
             {
-                GameLogger.Log(LogSourceType.BattleSystem, "All enemies defeated. Ending battle.");
                 _turnContext.EndBattle();
-                _turnStateMachine.SwitchToVictoryState();
+                _allEnemiesDefeatedPending = true;
+                // AllEnemiesDefeatedEvent raise etme
             }
+        }
+
+        /// <summary>
+        /// Called when HeroAttackState signals that the attack sequence ended cleanly
+        /// and all enemies were already defeated. At this point the call stack has
+        /// fully unwound so it is safe to trigger the victory state transition.
+        /// </summary>
+        private void OnAllEnemiesDefeated(AllEnemiesDefeatedPayload payload)
+        {
+            //_turnStateMachine.SwitchToVictoryState();
+        }
+
+        private void OnHeroAttackSequenceEnded(HeroAttackSequenceEndedPayload payload)
+        {
+            if (!_allEnemiesDefeatedPending)
+                return;
+
+            _allEnemiesDefeatedPending = false;
+            _eventHub.TurnEvents.AllEnemiesDefeatedEvent
+                .Raise(new AllEnemiesDefeatedPayload(_turnStateMachine.Context.TurnIndex));
         }
     }
 }

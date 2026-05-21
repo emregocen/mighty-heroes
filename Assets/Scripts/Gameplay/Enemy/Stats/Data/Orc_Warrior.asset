@@ -15,6 +15,6 @@ MonoBehaviour:
   _entityKey: enemy.orc.warrior
   _maxHealth: 50
   _maxShield: 0
-  _baseAttack: 3
+  _baseAttack: 5
   _baseDefense: 40
   _baseActionPoints: 1
