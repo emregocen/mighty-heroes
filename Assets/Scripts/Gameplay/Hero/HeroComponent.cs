@@ -252,8 +252,6 @@ namespace MightyHeroes.Gameplay.Hero
         /// <param name="attackIntensity">Attack intensity level (also defines combo length).</param>
         public void PlayAttack(int attackVariant, int attackIntensity)
         {
-            Debug.Log("PlayAttack called");
-
             _animator.SetInteger(Anim_AttackVariant, attackVariant);
             _animator.SetInteger(Anim_AttackIntensity, attackIntensity);
             _animator.ResetTrigger(Anim_AdvanceCombo);

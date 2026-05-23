@@ -94,10 +94,6 @@ namespace MightyHeroes.Gameplay.Hero.Presentation
 
         private void Awake()
         {
-            GameLogger.Log(LogSourceType.Hero,
-    $"HeroTargetFocusController.Awake — gameObject={gameObject.name} parent={transform.parent?.name}");
-
-
             if (_animator == null)
                 _animator = GetComponent<Animator>();
 

@@ -36,7 +36,6 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
         /// Checked in OnSequenceEnded to skip retreat and go directly to victory.
         /// </summary>
         private bool _isVictoryPending;
-        private int _victoryTurnIndex;
 
         // CONSTRUCTOR
 
@@ -204,14 +203,11 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
         /// Sets the pending flag — actual victory transition is deferred to
         /// OnSequenceEnded so the attack call stack can unwind cleanly first.
         /// </summary>
-        // OnAllEnemiesDefeated güncelle:
-
         private void OnAllEnemiesDefeated(AllEnemiesDefeatedPayload payload)
         {
             GameLogger.Log(LogSourceType.Hero, "HeroAttackState - OnAllEnemiesDefeated received.");
 
             _isVictoryPending = true;
-            _victoryTurnIndex = payload.TurnIndex;
         }
     }
 }

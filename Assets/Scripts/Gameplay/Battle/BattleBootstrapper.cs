@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using MightyHeroes.Battle.TurnFlow;
 using MightyHeroes.Battle.TurnFlow.Payloads;
-using MightyHeroes.Core.BattleSystem;
 using MightyHeroes.Core.EventSystem;
 using MightyHeroes.Core.Logging;
 using MightyHeroes.Gameplay.Battle;
@@ -549,18 +548,7 @@ namespace MightyHeroes.Core.Battle
             {
                 _turnContext.EndBattle();
                 _allEnemiesDefeatedPending = true;
-                // AllEnemiesDefeatedEvent raise etme
             }
-        }
-
-        /// <summary>
-        /// Called when HeroAttackState signals that the attack sequence ended cleanly
-        /// and all enemies were already defeated. At this point the call stack has
-        /// fully unwound so it is safe to trigger the victory state transition.
-        /// </summary>
-        private void OnAllEnemiesDefeated(AllEnemiesDefeatedPayload payload)
-        {
-            //_turnStateMachine.SwitchToVictoryState();
         }
 
         private void OnHeroAttackSequenceEnded(HeroAttackSequenceEndedPayload payload)

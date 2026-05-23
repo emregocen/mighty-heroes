@@ -150,12 +150,12 @@ namespace MightyHeroes.Gameplay.Hero.Movement
             StartRetreat();
         }
 
-public void NotifyVictoryStarted()
-{
-    KillSwordTweens();
-    SetLayerWeight(_swordArmLayerIndex, 0f);
-    SetLayerWeight(_swordHandLayerIndex, 0f);
-}
+        public void NotifyVictoryStarted()
+        {
+            KillSwordTweens();
+            SetLayerWeight(_swordArmLayerIndex, 0f);
+            SetLayerWeight(_swordHandLayerIndex, 0f);
+        }
 
         /// <summary>
         /// Immediately cancels an in-progress retreat without raising RetreatCompleted.
@@ -190,10 +190,6 @@ public void NotifyVictoryStarted()
 
             float distance = Vector3.Distance(_heroRoot.position, _capturedStartPosition);
 
-GameLogger.Log(LogSourceType.Hero, 
-        $"StartRetreat ENTRY — heroRoot={_heroRoot?.position} origin={_capturedStartPosition} distance={(_heroRoot != null ? Vector3.Distance(_heroRoot.position, _capturedStartPosition) : -1f)}");
-    
-
             if (distance <= _minimumRetreatDistance)
             {
                 CompleteRetreat();
@@ -213,26 +209,26 @@ GameLogger.Log(LogSourceType.Hero,
                 .SetEase(_retreatEase)
                 .OnComplete(CompleteRetreat);
 
-            GameLogger.Log(LogSourceType.Hero, $"StartRetreat — DOTween started, duration={duration}");
+            GameLogger.Log(LogSourceType.Hero,
+                $"HeroAttackMovementController.StartRetreat distance={distance:F2} duration={duration:F2}");
         }
 
         /// <summary>
         /// Finalizes retreat: resets state, restores animator and visual root,
         /// then raises RetreatCompleted for HeroComponent to forward into the FSM.
         /// </summary>
-private void CompleteRetreat()
-{
-    GameLogger.Log(LogSourceType.Hero, 
-        $"CompleteRetreat — subscriber count={RetreatCompleted?.GetInvocationList().Length ?? 0}");
-    
-    IsRetreating = false;
-    SetAnimatorRetreat(false);
-    EnableIdleSwordPose();
-    ResetAnimatorVisualRoot();
-    _retreatTween = null;
+        private void CompleteRetreat()
+        {
+            IsRetreating = false;
+            SetAnimatorRetreat(false);
+            EnableIdleSwordPose();
+            ResetAnimatorVisualRoot();
+            _retreatTween = null;
 
-    RetreatCompleted?.Invoke();
-}
+            GameLogger.Log(LogSourceType.Hero, "HeroAttackMovementController.CompleteRetreat");
+
+            RetreatCompleted?.Invoke();
+        }
 
         /// <summary>Sets the IsRetreating animator bool parameter.</summary>
         /// <param name="isRetreating">True to play retreat animation clip.</param>
@@ -303,8 +299,6 @@ private void CompleteRetreat()
         {
             if (_animator == null || layerIndex < 0)
                 return;
-
-            //_animator.SetLayerWeight(layerIndex, weight);
         }
 
         /// <summary>Caches the initial local transform of the animator visual root for later reset.</summary>

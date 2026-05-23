@@ -1,5 +1,4 @@
-
-namespace MightyHeroes.Core.BattleSystem
+namespace MightyHeroes.Core.Battle
 {
     /// <summary>
     /// Generates unique entity identifiers within a single battle scope.
@@ -10,7 +9,11 @@ namespace MightyHeroes.Core.BattleSystem
     /// </summary>
     public sealed class BattleIdGenerator
     {
+        // FIELDS
+
         private int _nextId = 1;
+
+        // PUBLIC METHODS
 
         /// <summary>
         /// Generates the next unique entity identifier.

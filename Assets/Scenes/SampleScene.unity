@@ -445,15 +445,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5069404754867028534, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: 5069404754867028534, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5069404754867028534, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
       propertyPath: m_AnchorMin.x
-      value: 0
+      value: 0.8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2394,6 +2394,7 @@ GameObject:
   - component: {fileID: 963194227}
   - component: {fileID: 963194226}
   - component: {fileID: 963194229}
+  - component: {fileID: 963194230}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -2507,6 +2508,23 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
   CustomBlends: {fileID: 0}
+--- !u!114 &963194230
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 963194225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8708b797014f24f35b015dd7d60fdfb9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Hero.Camera.HeroCameraRig
+  _heroTransform: {fileID: 1220234850}
+  _localOffset: {x: 0.6, y: 1.8, z: -3.5}
+  _lookAtOffset: {x: 0, y: 1.4, z: 0}
+  _followSpeed: 10
+  _rotationSpeed: 8
 --- !u!1 &1021180726
 GameObject:
   m_ObjectHideFlags: 0
@@ -3127,6 +3145,7 @@ GameObject:
   - component: {fileID: 1220234851}
   - component: {fileID: 1220234852}
   - component: {fileID: 1220234853}
+  - component: {fileID: 1220234854}
   m_Layer: 0
   m_Name: Hero
   m_TagString: Untagged
@@ -3212,6 +3231,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28d4fd12c8e7549489f1348cb9d1d7ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Hero.Input.HeroTargetInputController
+--- !u!114 &1220234854
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1220234848}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8708b797014f24f35b015dd7d60fdfb9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Hero.Camera.HeroCameraRig
+  _heroTransform: {fileID: 1220234850}
+  _localOffset: {x: 0.6, y: 1.8, z: -3.5}
+  _lookAtOffset: {x: 0, y: 1.4, z: 0}
+  _followSpeed: 10
+  _rotationSpeed: 8
 --- !u!1 &1233976457
 GameObject:
   m_ObjectHideFlags: 0
@@ -3947,15 +3983,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5069404754867028534, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: 5069404754867028534, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5069404754867028534, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
       propertyPath: m_AnchorMin.x
-      value: 0
+      value: 0.8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4081,7 +4117,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Core.BattleSystem.BattleBootstrapper
   _turnSystemController: {fileID: 709627123}
   _puzzleController: {fileID: 1092054649}
-  _battleUIPresenter: {fileID: 0}
+  _battleUIPresenter: {fileID: 488946797}
   _victoryUIController: {fileID: 1233976458}
   _defeatUIController: {fileID: 1323442352}
   _victoryCameraController: {fileID: 1254148570}

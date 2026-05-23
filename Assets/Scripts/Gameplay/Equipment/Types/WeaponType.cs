@@ -1,4 +1,4 @@
-namespace Gameplay.Equipment.Types
+namespace MightyHeroes.Gameplay.Equipment.Types
 {
     /// <summary>
     /// Defines the category of a weapon.
