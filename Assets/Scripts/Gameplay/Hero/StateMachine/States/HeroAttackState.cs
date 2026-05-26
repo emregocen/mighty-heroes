@@ -203,7 +203,7 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
         /// Sets the pending flag — actual victory transition is deferred to
         /// OnSequenceEnded so the attack call stack can unwind cleanly first.
         /// </summary>
-        private void OnAllEnemiesDefeated(AllEnemiesDefeatedPayload payload)
+        private void OnAllEnemiesDefeated(TurnAllEnemiesDefeatedPayload payload)
         {
             GameLogger.Log(LogSourceType.Hero, "HeroAttackState - OnAllEnemiesDefeated received.");
 

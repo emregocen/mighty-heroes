@@ -75,7 +75,7 @@ namespace MightyHeroes.Battle.TurnFlow.Events
         /// Consumed by HeroStateMachine to set the victory pending flag so the active
         /// hero state can route to victory instead of retreat at sequence end.
         /// </summary>
-        public GameEvent<AllEnemiesDefeatedPayload> AllEnemiesDefeatedEvent =>
-            Registry.GetEvent<AllEnemiesDefeatedPayload>();
+        public GameEvent<TurnAllEnemiesDefeatedPayload> AllEnemiesDefeatedEvent =>
+            Registry.GetEvent<TurnAllEnemiesDefeatedPayload>();
     }
 }
