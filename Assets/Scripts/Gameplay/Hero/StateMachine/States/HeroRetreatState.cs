@@ -72,7 +72,7 @@ private void OnRetreatEnded()
     StateMachine.SwitchToReadyState();
 }
 
-private void OnAllEnemiesDefeated(AllEnemiesDefeatedPayload payload)
+private void OnAllEnemiesDefeated(TurnAllEnemiesDefeatedPayload payload)
 {
     GameLogger.Log(LogSourceType.Hero, "HeroRetreatState: All enemies defeated, switching to victory.");
     StateMachine.Hero.CancelRetreat();

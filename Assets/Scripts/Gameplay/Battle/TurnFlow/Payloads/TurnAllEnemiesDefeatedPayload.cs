@@ -7,14 +7,14 @@ namespace MightyHeroes.Battle.TurnFlow.Payloads
     /// Carries TurnIndex so HeroAttackState can raise TurnBattleVictoryPayload
     /// with the correct turn data once the attack sequence ends cleanly.
     /// </summary>
-    public sealed class AllEnemiesDefeatedPayload
+    public sealed class TurnAllEnemiesDefeatedPayload
     {
         /// <summary>Turn index at the moment the last enemy was defeated.</summary>
         public int TurnIndex { get; }
 
         /// <summary>Creates a new AllEnemiesDefeatedPayload.</summary>
         /// <param name="turnIndex">Turn index when the last enemy was defeated.</param>
-        public AllEnemiesDefeatedPayload(int turnIndex)
+        public TurnAllEnemiesDefeatedPayload(int turnIndex)
         {
             TurnIndex = turnIndex;
         }

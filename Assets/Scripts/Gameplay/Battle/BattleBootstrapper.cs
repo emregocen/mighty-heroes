@@ -1,7 +1,6 @@
 using System.Collections.Generic;
+using MightyHeroes.Battle.BattleTimer;
 using MightyHeroes.Battle.TurnFlow;
-using MightyHeroes.Battle.TurnFlow.Payloads;
-using MightyHeroes.Core.BattleSystem;
 using MightyHeroes.Core.EventSystem;
 using MightyHeroes.Core.Logging;
 using MightyHeroes.Gameplay.Battle;
@@ -9,16 +8,15 @@ using MightyHeroes.Gameplay.Battle.Formation;
 using MightyHeroes.Gameplay.Combat;
 using MightyHeroes.Gameplay.Enemy.AI;
 using MightyHeroes.Gameplay.Enemy.StateMachine;
-using MightyHeroes.Gameplay.Health.Payloads;
 using MightyHeroes.Gameplay.Hero;
 using MightyHeroes.Gameplay.Hero.Actions;
 using MightyHeroes.Gameplay.Hero.Input;
-using MightyHeroes.Gameplay.Hero.Payloads;
 using MightyHeroes.Gameplay.Hero.Presentation;
 using MightyHeroes.Gameplay.Hero.StateMachine;
 using MightyHeroes.Gameplay.Puzzle;
 using MightyHeroes.UI.Battle;
 using MightyHeroes.UI.Battle.Presenters;
+using MightyHeroes.UI.Battle.Views;
 using UnityEngine;
 
 namespace MightyHeroes.Core.Battle
@@ -29,18 +27,22 @@ namespace MightyHeroes.Core.Battle
     /// Responsibilities:
     /// - Creates and wires all battle-lifetime services.
     /// - Initializes BattleFormation with formation layout from Inspector config.
-    /// - Listens to EntityDiedEvent to keep TurnContext and BattleFormation in sync.
+    /// - Hands battle-end orchestration (entity death, timer expiry, victory/defeat
+    ///   transitions) to BattleFlowController. Bootstrapper itself owns no runtime
+    ///   gameplay decisions.
     /// - Disposes all systems on scene destroy to prevent memory leaks.
     ///
     /// Initialization order (Awake):
-    /// 1. EventHub       — must exist before any subscriber
-    /// 2. BattleFormation — created before hero so HeroStateMachine can receive reference
-    /// 3. Hero           — requires BattleFormation for IsTargetAlive check
-    /// 4. Enemies        — initialized and placed into formation
-    /// 5. TurnSystem     — needs IFormation from BattleFormation
-    /// 6. CombatSystem   — needs IBattleField from BattleFormation
-    /// 7. PuzzleSystem   — receives EventHub reference
-    /// 8. Death listener — registered last to avoid callbacks during setup
+    /// 1. EventHub               — must exist before any subscriber
+    /// 2. BattleFormation        — created before hero so HeroStateMachine can receive reference
+    /// 3. Hero                   — requires BattleFormation for IsTargetAlive check
+    /// 4. Enemies                — initialized and placed into formation
+    /// 5. TurnSystem             — needs IFormation from BattleFormation
+    /// 6. CombatSystem           — needs IBattleField from BattleFormation
+    /// 7. PuzzleSystem           — receives EventHub reference
+    /// 8. HUD / UI controllers   — receive EventHub for subscriptions
+    /// 9. BattleTimer            — optional, only if BattleTimerConfig is assigned
+    /// 10. BattleFlowController  — created last so it sees a fully wired EventHub
     /// </summary>
     public sealed class BattleBootstrapper : MonoBehaviour
     {
@@ -69,6 +71,13 @@ namespace MightyHeroes.Core.Battle
         [Header("Enemy Formation")]
         [SerializeField] private EnemyFormationConfig[] _enemyFormation;
 
+        [Header("Battle Timer")]
+        [Tooltip("Optional. When empty, no timer is created for this battle.")]
+        [SerializeField] private BattleTimerConfig _battleTimerConfig;
+
+        [Tooltip("UI view that renders the remaining seconds. Required only if a timer config is set.")]
+        [SerializeField] private BattleTimerView _battleTimerView;
+
         // FIELDS — Runtime
 
         private EventHub _eventHub;
@@ -78,7 +87,11 @@ namespace MightyHeroes.Core.Battle
         private BattleFormation _battleFormation;
         private CombatSystem _combatSystem;
         private BattleIdGenerator _idGenerator;
-        private bool _allEnemiesDefeatedPending;
+
+        private BattleTimer _battleTimer;
+        private BattleTimerRunner _battleTimerRunner;
+        private BattleTimerPresenter _battleTimerPresenter;
+        private BattleFlowController _battleFlowController;
 
         private readonly List<EnemyStateMachine> _enemyStateMachines = new List<EnemyStateMachine>();
 
@@ -105,7 +118,8 @@ namespace MightyHeroes.Core.Battle
             InitializeDefeatUI();
             InitializeVictoryCamera();
             InitializeVictoryRotator();
-            RegisterEntityDeathListener();
+            InitializeBattleTimer();
+            InitializeBattleFlowController();
         }
 
         private void Start()
@@ -122,7 +136,8 @@ namespace MightyHeroes.Core.Battle
 
         private void OnDestroy()
         {
-            UnregisterEntityDeathListener();
+            DisposeBattleFlowController();
+            DisposeBattleTimer();
             DisposeCombatSystem();
             DisposeEnemyComponents();
             DisposeEnemyStateMachines();
@@ -176,9 +191,6 @@ namespace MightyHeroes.Core.Battle
                 _heroComponent,
                 heroActionResolver);
 
-            // Initialize binds the state machine, assigns EntityId, sets up health and event subscriptions.
-            // StartStateMachine is called separately so the bootstrapper owns the full boot sequence
-            // for all entity types uniformly: create FSM → Initialize → StartStateMachine.
             _heroComponent.Initialize(_heroStateMachine, _idGenerator.Generate());
             _heroComponent.StartStateMachine();
 
@@ -217,8 +229,6 @@ namespace MightyHeroes.Core.Battle
                     actionResolver,
                     _heroComponent.EntityId);
 
-                // Initialize binds the state machine, assigns EntityId, sets up health and event subscriptions.
-                // StartStateMachine is called separately — same boot pattern as hero.
                 config.Enemy.Initialize(enemyStateMachine, _idGenerator.Generate());
                 config.Enemy.StartStateMachine();
 
@@ -235,9 +245,7 @@ namespace MightyHeroes.Core.Battle
             _battleFormation.Initialize(formationEntries);
         }
 
-        /// <summary>
-        /// Initializes hero target selection input.
-        /// </summary>
+        /// <summary>Initializes hero target selection input.</summary>
         private void InitializeTargetInput()
         {
             if (_heroTargetInputController == null)
@@ -247,14 +255,10 @@ namespace MightyHeroes.Core.Battle
                 return;
             }
 
-            _heroTargetInputController.Initialize(
-                _battleFormation,
-                _heroComponent);
+            _heroTargetInputController.Initialize(_battleFormation, _heroComponent);
         }
 
-        /// <summary>
-        /// Initializes hero target facing presentation controller.
-        /// </summary>
+        /// <summary>Initializes hero target facing presentation controller.</summary>
         private void InitializeHeroTargetFocus()
         {
             if (_heroTargetFocusController == null)
@@ -283,8 +287,6 @@ namespace MightyHeroes.Core.Battle
                 return;
             }
 
-            // BattleFormation implements IFormation — TurnEnemyState uses Lines
-            // for front-to-back ordered enemy sequencing.
             _turnStateMachine = new TurnStateMachine(
                 _eventHub,
                 _turnContext,
@@ -309,9 +311,6 @@ namespace MightyHeroes.Core.Battle
                 return;
             }
 
-            // BattleFormation implements IBattleField — CombatSystem uses
-            // GetCurrentTarget for hero attack resolution and FindEnemyById
-            // for enemy attack routing.
             _combatSystem = new CombatSystem(
                 _eventHub,
                 new CombatResolver(),
@@ -346,9 +345,7 @@ namespace MightyHeroes.Core.Battle
             _battleUIPresenter.Initialize(_eventHub);
         }
 
-        /// <summary>
-        /// Initializes the victory UI controller with the battle-scoped EventHub.
-        /// </summary>
+        /// <summary>Initializes the victory UI controller with the battle-scoped EventHub.</summary>
         private void InitializeVictoryUI()
         {
             if (_victoryUIController == null)
@@ -361,6 +358,7 @@ namespace MightyHeroes.Core.Battle
             _victoryUIController.Initialize(_eventHub);
         }
 
+        /// <summary>Initializes the defeat UI controller with the battle-scoped EventHub.</summary>
         private void InitializeDefeatUI()
         {
             if (_defeatUIController == null)
@@ -373,9 +371,7 @@ namespace MightyHeroes.Core.Battle
             _defeatUIController.Initialize(_eventHub);
         }
 
-        /// <summary>
-        /// Initializes the victory camera controller with the battle-scoped EventHub.
-        /// </summary>
+        /// <summary>Initializes the victory camera controller with the battle-scoped EventHub.</summary>
         private void InitializeVictoryCamera()
         {
             if (_victoryCameraController == null)
@@ -388,9 +384,7 @@ namespace MightyHeroes.Core.Battle
             _victoryCameraController.Initialize(_eventHub);
         }
 
-        /// <summary>
-        /// Initializes the hero victory rotator with the battle-scoped EventHub.
-        /// </summary>
+        /// <summary>Initializes the hero victory rotator with the battle-scoped EventHub.</summary>
         private void InitializeVictoryRotator()
         {
             if (_heroVictoryRotator == null)
@@ -404,28 +398,101 @@ namespace MightyHeroes.Core.Battle
         }
 
         /// <summary>
-        /// Registers the battle-level death listener so entity death events
-        /// can update turn flow and battle completion state.
+        /// Creates the battle timer and its runner if a config is assigned.
+        /// When no config is assigned, no timer system is instantiated and the
+        /// view is hidden if present. The timer is created in idle state and
+        /// will start on the first puzzle match.
         /// </summary>
-        private void RegisterEntityDeathListener()
+        private void InitializeBattleTimer()
         {
-            _eventHub.HealthEvents.EntityDiedEvent.Register(OnEntityDied);
-            _eventHub.HeroEvents.HeroAttackSequenceEndedEvent.Register(OnHeroAttackSequenceEnded);
+            if (_battleTimerConfig == null)
+            {
+                if (_battleTimerView != null)
+                    _battleTimerView.Hide();
+
+                GameLogger.Log(LogSourceType.BattleSystem,
+                    "BattleBootstrapper.InitializeBattleTimer: no config assigned, timer disabled.");
+                return;
+            }
+
+            _battleTimer = new BattleTimer(_eventHub, _battleTimerConfig);
+
+            GameObject runnerObject = new GameObject("[BattleTimerRunner]");
+            runnerObject.transform.SetParent(transform, worldPositionStays: false);
+            _battleTimerRunner = runnerObject.AddComponent<BattleTimerRunner>();
+            _battleTimerRunner.Bind(_battleTimer);
+
+            if (_battleTimerView != null)
+            {
+                _battleTimerPresenter = new BattleTimerPresenter(
+                    _eventHub,
+                    _battleTimerView,
+                    _battleTimer.RemainingSeconds);
+            }
+            else
+            {
+                GameLogger.Log(LogSourceType.BattleSystem,
+                    "BattleBootstrapper.InitializeBattleTimer: config present but view reference is missing.");
+            }
+
+            GameLogger.Log(LogSourceType.BattleSystem,
+                $"BattleTimer initialized. Duration={_battleTimerConfig.DurationSeconds}");
         }
 
         /// <summary>
-        /// Unregisters the battle-level death listener to prevent callbacks after the battle ends
+        /// Creates the BattleFlowController which owns entity-death and timer-expiry
+        /// orchestration. Must be created after TurnStateMachine, BattleFormation,
+        /// BattleTimer (if any) and HeroComponent are all wired.
         /// </summary>
-        private void UnregisterEntityDeathListener()
+        private void InitializeBattleFlowController()
         {
-            _eventHub?.HealthEvents.EntityDiedEvent.Unregister(OnEntityDied);
-            _eventHub?.HeroEvents.HeroAttackSequenceEndedEvent.Unregister(OnHeroAttackSequenceEnded);
+            _battleFlowController = new BattleFlowController(
+                _eventHub,
+                _turnContext,
+                _turnStateMachine,
+                _battleFormation,
+                _heroComponent,
+                _battleTimer);
+
+            GameLogger.Log(LogSourceType.BattleSystem, "BattleFlowController initialized.");
         }
 
+        // PRIVATE METHODS — Disposal
+
+        /// <summary>Disposes the BattleFlowController to unregister its event handlers.</summary>
+        private void DisposeBattleFlowController()
+        {
+            if (_battleFlowController == null)
+                return;
+
+            _battleFlowController.Dispose();
+            _battleFlowController = null;
+
+            GameLogger.Log(LogSourceType.BattleSystem, "BattleFlowController disposed.");
+        }
 
         /// <summary>
-        /// Disposes the CombatSystem and clears its runtime reference.
+        /// Disposes the battle timer, its presenter, and destroys the runner GameObject.
+        /// Safe to call when no timer was created.
         /// </summary>
+        private void DisposeBattleTimer()
+        {
+            _battleTimerPresenter?.Dispose();
+            _battleTimerPresenter = null;
+
+            _battleTimer?.Dispose();
+            _battleTimer = null;
+
+            if (_battleTimerRunner != null)
+            {
+                Destroy(_battleTimerRunner.gameObject);
+                _battleTimerRunner = null;
+            }
+
+            GameLogger.Log(LogSourceType.BattleSystem, "BattleTimer disposed.");
+        }
+
+        /// <summary>Disposes the CombatSystem and clears its runtime reference.</summary>
         private void DisposeCombatSystem()
         {
             if (_combatSystem == null)
@@ -437,9 +504,7 @@ namespace MightyHeroes.Core.Battle
             GameLogger.Log(LogSourceType.BattleSystem, "CombatSystem disposed.");
         }
 
-        /// <summary>
-        /// Disposes all created enemy state machines and clears the runtime collection.
-        /// </summary>
+        /// <summary>Disposes all created enemy state machines and clears the runtime collection.</summary>
         private void DisposeEnemyStateMachines()
         {
             foreach (EnemyStateMachine esm in _enemyStateMachines)
@@ -450,9 +515,7 @@ namespace MightyHeroes.Core.Battle
             GameLogger.Log(LogSourceType.BattleSystem, "All enemy state machines disposed.");
         }
 
-        /// <summary>
-        /// Disposes the hero state machine and clears its runtime reference.
-        /// </summary>
+        /// <summary>Disposes the hero state machine and clears its runtime reference.</summary>
         private void DisposeHeroStateMachine()
         {
             if (_heroStateMachine == null)
@@ -495,82 +558,6 @@ namespace MightyHeroes.Core.Battle
             }
 
             GameLogger.Log(LogSourceType.BattleSystem, "All enemy components disposed.");
-        }
-
-        // EVENT HANDLERS
-
-        /// <summary>
-        /// Called when any entity dies during battle.
-        ///
-        /// Enemy death:
-        /// 1. Notify BattleFormation — reselects target if the dead enemy was selected.
-        /// 2. Decrement TurnContext alive count.
-        /// 3. End battle if no alive enemies remain.
-        ///
-        /// Hero death:
-        /// End battle immediately.
-        /// </summary>
-        private void OnEntityDied(EntityDiedPayload payload)
-        {
-            if (_turnContext == null)
-                return;
-
-            if (_heroComponent != null && payload.EntityId == _heroComponent.EntityId)
-            {
-                GameLogger.Log(LogSourceType.BattleSystem,
-                    $"Hero died. EntityId={payload.EntityId}. Ending battle.");
-
-                _turnContext.EndBattle();
-                _turnStateMachine.SwitchToDefeatedState(_turnContext.AliveEnemyCount);
-                return;
-            }
-
-            bool isEnemy = false;
-
-            foreach (EnemyFormationConfig config in _enemyFormation)
-            {
-                if (config.Enemy != null && config.Enemy.EntityId == payload.EntityId)
-                {
-                    isEnemy = true;
-                    break;
-                }
-            }
-
-            if (!isEnemy)
-                return;
-
-            _battleFormation.NotifyEnemyDefeated(payload.EntityId);
-            _turnContext.UnregisterEnemy();
-
-            GameLogger.Log(LogSourceType.BattleSystem,
-                $"Enemy died. EntityId={payload.EntityId} AliveCount={_turnContext.AliveEnemyCount}");
-
-            if (_turnContext.AliveEnemyCount <= 0)
-            {
-                _turnContext.EndBattle();
-                _allEnemiesDefeatedPending = true;
-                // AllEnemiesDefeatedEvent raise etme
-            }
-        }
-
-        /// <summary>
-        /// Called when HeroAttackState signals that the attack sequence ended cleanly
-        /// and all enemies were already defeated. At this point the call stack has
-        /// fully unwound so it is safe to trigger the victory state transition.
-        /// </summary>
-        private void OnAllEnemiesDefeated(AllEnemiesDefeatedPayload payload)
-        {
-            //_turnStateMachine.SwitchToVictoryState();
-        }
-
-        private void OnHeroAttackSequenceEnded(HeroAttackSequenceEndedPayload payload)
-        {
-            if (!_allEnemiesDefeatedPending)
-                return;
-
-            _allEnemiesDefeatedPending = false;
-            _eventHub.TurnEvents.AllEnemiesDefeatedEvent
-                .Raise(new AllEnemiesDefeatedPayload(_turnStateMachine.Context.TurnIndex));
         }
     }
 }

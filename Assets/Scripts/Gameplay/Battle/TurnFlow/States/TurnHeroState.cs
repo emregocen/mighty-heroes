@@ -81,7 +81,7 @@ namespace MightyHeroes.Battle.TurnFlow.States
         /// This event is raised by HeroAttackState.OnSequenceEnded after the
         /// attack call stack has fully unwound — safe to transition here.
         /// </summary>
-        private void OnAllEnemiesDefeated(AllEnemiesDefeatedPayload payload)
+        private void OnAllEnemiesDefeated(TurnAllEnemiesDefeatedPayload payload)
         {
             GameLogger.Log(LogSourceType.TurnSystem,
                 "AllEnemiesDefeated received in TurnHeroState. Switching to victory.");

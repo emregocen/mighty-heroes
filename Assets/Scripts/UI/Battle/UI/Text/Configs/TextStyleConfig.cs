@@ -5,7 +5,7 @@ using UnityEngine;
 /// Holds reusable TextMeshPro style configuration data.
 /// Used for consistent UI text styling across the project.
 /// </summary>
-[CreateAssetMenu(menuName = "MightyHeroes/UI/Text Style Config")]
+[CreateAssetMenu(menuName = "Mighty Heroes/UI/Text Style Config")]
 public sealed class TextStyleConfig : ScriptableObject
 {
     // 1) TEXT COLORS

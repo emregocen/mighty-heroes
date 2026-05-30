@@ -1,9 +1,10 @@
+using MightyHeroes.Battle.BattleTimer.Events;
 using MightyHeroes.Battle.TurnFlow.Events;
-using MightyHeroes.Gameplay.Puzzle.Events;
-using MightyHeroes.Gameplay.Hero.Events;
+using MightyHeroes.Gameplay.Combat.Events;
 using MightyHeroes.Gameplay.Enemy.Events;
 using MightyHeroes.Gameplay.Health.Events;
-using MightyHeroes.Gameplay.Combat.Events;
+using MightyHeroes.Gameplay.Hero.Events;
+using MightyHeroes.Gameplay.Puzzle.Events;
 
 namespace MightyHeroes.Core.EventSystem
 {
@@ -57,6 +58,12 @@ namespace MightyHeroes.Core.EventSystem
         public CombatEvents CombatEvents { get; }
 
         /// <summary>
+        /// Provides access to all battle-timer-related events.
+        /// Used to publish timer start, tick, stop and expiry to UI and flow control.
+        /// </summary>
+        public BattleTimerEvents BattleTimerEvents { get; }
+
+        /// <summary>
         /// Creates the global event hub and initializes all event groups.
         /// </summary>
         public EventHub()
@@ -75,11 +82,14 @@ namespace MightyHeroes.Core.EventSystem
             // Enemy lifecycle and gameplay events
             EnemyEvents = new EnemyEvents(_registry);
 
-            // Healty system events
+            // Health system events
             HealthEvents = new HealthEvents(_registry);
 
             // Combat resolution events
             CombatEvents = new CombatEvents(_registry);
+
+            // Battle timer events
+            BattleTimerEvents = new BattleTimerEvents(_registry);
         }
 
         /// <summary>

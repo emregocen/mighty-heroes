@@ -48,13 +48,6 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine
         private readonly HeroComponent _hero;
         private readonly HeroActionResolver _actionResolver;
 
-        /// <summary>
-        /// Set to true when AllEnemiesDefeatedEvent is received.
-        /// Read by HeroAttackState.OnSequenceEnded to skip retreat and go to victory.
-        /// Reset is not needed — battle ends after victory, FSM is disposed.
-        /// </summary>
-        private bool _isVictoryPending;
-
         // ------------------------------------------------------------------
         // PROPERTIES
         // ------------------------------------------------------------------
