@@ -1,5 +1,36 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &672260315587150274
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5857294554319720997}
+  m_Layer: 0
+  m_Name: Target Focus Point
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5857294554319720997
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 672260315587150274}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.7, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2065391164795600621}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &894996771361820372
 GameObject:
   m_ObjectHideFlags: 0
@@ -138,6 +169,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2065391164795600621}
   - component: {fileID: 763958437473869267}
+  - component: {fileID: 5864153714178975477}
   m_Layer: 0
   m_Name: Orc Warrior
   m_TagString: Enemy
@@ -160,6 +192,7 @@ Transform:
   m_Children:
   - {fileID: 43448752158031341}
   - {fileID: 5481086808058647312}
+  - {fileID: 5857294554319720997}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!114 &763958437473869267
@@ -174,12 +207,72 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4947dcbbaefb14c608f26eef06ce7324, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Enemy.EnemyComponent
-  _enemyStatsData: {fileID: 0}
+  _enemyStatsData: {fileID: 11400000, guid: 34507aa8bc2bc47ffad007d1f70330ae, type: 2}
   _animator: {fileID: 1306095302407086294}
   _animationEventProxy: {fileID: 3554981646279751228}
+  _targetFocusPoint: {fileID: 5857294554319720997}
   _healthBarView: {fileID: 2256001335267900904}
   _shieldBarView: {fileID: 0}
   _actionPointView: {fileID: 3567486773639168546}
+--- !u!114 &5864153714178975477
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3304950686886907432}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4efef7a08216746459095c28ba426e25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Equipment.Views.CharacterWeaponView
+  _weaponSocket: {fileID: 2964138532775437724}
+  _defaultWeapon: {fileID: 11400000, guid: 47fa313ceaeaf4f2596a38d4238500d1, type: 2}
+--- !u!1 &4020443688630764940
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2964138532775437724}
+  - component: {fileID: 1974307163763925794}
+  m_Layer: 0
+  m_Name: Prop_R_Socket
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2964138532775437724
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4020443688630764940}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.26478738, y: 0.34983802, z: 0.7151153, w: -0.54416096}
+  m_LocalPosition: {x: 0.00000005592895, y: -0.0000003088039, z: 0.0000004422216}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7613831710603750157}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1974307163763925794
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4020443688630764940}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04570063543744548b5cc95cea8bbff6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Synty.Tools.SyntyPropBoneTool.PropBone
+  _wasSpawnedBySyntyTool: 1
 --- !u!1 &4071372268340103846
 GameObject:
   m_ObjectHideFlags: 0
@@ -406,6 +499,52 @@ MonoBehaviour:
   m_ChildScaleWidth: 1
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!1 &7429048559118635285
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7613831710603750157}
+  - component: {fileID: 8634046056043761842}
+  m_Layer: 0
+  m_Name: Prop_R
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7613831710603750157
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7429048559118635285}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2964138532775437724}
+  m_Father: {fileID: 1397412323705664454}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8634046056043761842
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7429048559118635285}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04570063543744548b5cc95cea8bbff6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Synty.Tools.SyntyPropBoneTool.PropBone
+  _wasSpawnedBySyntyTool: 1
 --- !u!1 &7620301359448513589
 GameObject:
   m_ObjectHideFlags: 0
@@ -508,15 +647,26 @@ PrefabInstance:
       objectReference: {fileID: 9100000, guid: 759bec5df3e7349bd843261497fab009, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 4743577955424826, guid: 0d42bc61d684259409d481c6f5dd5d5c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7613831710603750157}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1293356793197548, guid: 0d42bc61d684259409d481c6f5dd5d5c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3554981646279751228}
+    - targetCorrespondingSourceObject: {fileID: 1293356793197548, guid: 0d42bc61d684259409d481c6f5dd5d5c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6079744388527889386}
   m_SourcePrefab: {fileID: 100100000, guid: 0d42bc61d684259409d481c6f5dd5d5c, type: 3}
 --- !u!95 &1306095302407086294 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 95824196730489130, guid: 0d42bc61d684259409d481c6f5dd5d5c, type: 3}
+  m_PrefabInstance: {fileID: 1401817232543443452}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1397412323705664454 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4743577955424826, guid: 0d42bc61d684259409d481c6f5dd5d5c, type: 3}
   m_PrefabInstance: {fileID: 1401817232543443452}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &1397766157396942266 stripped
@@ -541,6 +691,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 145bcb64274e472482d7c4c1c5ccf869, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Enemy.Presentation.EnemyAnimationEventProxy
+--- !u!114 &6079744388527889386
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1400858170778982928}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6fab5212c04fb442799fa9f3f33247ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Synty.Tools.SyntyPropBoneTool.PropBoneBinder
+  animator: {fileID: 1306095302407086294}
+  propBoneConfig: {fileID: 11400000, guid: 6b6b2cbd560674639bda985c1741edd4, type: 2}
+  updateType: 2
+  updateInEditMode: 1
+  rebindOnAwake: 0
+  _propBoneBindings:
+  - bone: {fileID: 7613831710603750157}
+    socket: {fileID: 2964138532775437724}
+    rotationOffset: {x: 347.75015, y: 309.00076, z: 260.39807}
+    scale: 1.4546219
 --- !u!1001 &4914691222878147658
 PrefabInstance:
   m_ObjectHideFlags: 0
