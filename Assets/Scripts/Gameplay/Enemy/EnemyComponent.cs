@@ -252,8 +252,24 @@ namespace MightyHeroes.Gameplay.Enemy
             _actionPointView?.SetTurnActive(isActive);
         }
 
+        /// <summary>
+        /// Re-applies initial HUD values. Called from BattleBootstrapper.Start to
+        /// guarantee all view Awake() calls have completed before values are pushed.
+        /// </summary>
+        public void RefreshHud()
+        {
+            RefreshHealthView(false);
+            RefreshShieldView(false);
+            RefreshActionPointView();
+            SetActionPointViewTurnActive(false);
+        }
+
         // PUBLIC METHODS — Animation Event Bridge
 
+        /// <summary>
+        /// Called by EnemyAttackState's animation event behaviours when the attack sequence starts.
+        /// </summary>
+        /// <exception cref="System.NotImplementedException"></exception>
         public void NotifyAttackSequenceStarted()
         {
             throw new System.NotImplementedException();

@@ -302,6 +302,18 @@ namespace MightyHeroes.Gameplay.Hero
             _actionPointView?.SetTurnActive(isActive);
         }
 
+        /// <summary>
+        /// Re-applies initial HUD values. Called from BattleBootstrapper.Start to
+        /// guarantee all view Awake() calls have completed before values are pushed.
+        /// </summary>
+        public void RefreshHud()
+        {
+            RefreshHealthView(false);
+            RefreshShieldView(false);
+            RefreshActionPointView();
+            SetActionPointViewTurnActive(false);
+        }
+        
         // PUBLIC METHODS — Puzzle
 
         /// <summary>
@@ -365,14 +377,13 @@ namespace MightyHeroes.Gameplay.Hero
                 $"NotifyAttackSequenceStarted — heroRoot={_attackMovementController?.transform.position}");
             _attackMovementController?.NotifyAttackStarted();
         }
+        
         /// <summary>
         /// Called by AttackSequenceEndedBehaviour when the full attack sequence ends.
         /// Starts the retreat movement via the controller, then signals the FSM to
         /// transition to HeroRetreatState. The FSM state will subscribe to
         /// RetreatCompleted to know when movement actually finishes.
         /// </summary>
-
-        // HeroComponent.NotifyAttackSequenceEnded:
         public void NotifyAttackSequenceEnded()
         {
             _attackMovementController?.NotifyAttackEnded();

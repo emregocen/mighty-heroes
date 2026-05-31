@@ -122,7 +122,7 @@ namespace MightyHeroes.Core.Battle
             InitializeBattleFlowController();
         }
 
-        private void Start()
+private void Start()
         {
             if (_turnStateMachine == null)
             {
@@ -130,6 +130,8 @@ namespace MightyHeroes.Core.Battle
                     "BattleBootstrapper.Start aborted: TurnStateMachine is null.");
                 return;
             }
+
+            RefreshAllEntityHuds();
 
             _turnStateMachine.Start();
         }
@@ -147,6 +149,24 @@ namespace MightyHeroes.Core.Battle
             GameLogger.Log(LogSourceType.BattleSystem, "BattleBootstrapper.OnDestroy complete.");
         }
 
+        /// <summary>
+        /// Re-pushes initial HUD values for all entities after all MonoBehaviour
+        /// Awake() calls have completed. Prevents HealthBarView.Awake's ResetView
+        /// from overwriting values set during Bootstrapper.Awake initialization.
+        /// </summary>
+        private void RefreshAllEntityHuds()
+        {
+            _heroComponent?.RefreshHud();
+
+            if (_enemyFormation == null)
+                return;
+
+            foreach (EnemyFormationConfig config in _enemyFormation)
+            {
+                config.Enemy?.RefreshHud();
+            }
+        }
+        
         // PRIVATE METHODS — Initialization
 
         /// <summary>
