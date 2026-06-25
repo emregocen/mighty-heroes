@@ -48,8 +48,8 @@ namespace MightyHeroes.Battle.BattleTimer
         // CONSTRUCTOR
 
         /// <summary>
-        /// Constructs the timer in idle state. It will not start ticking until
-        /// the first PuzzleTilesMatchedEvent is received.
+        /// Constructs the timer. If StartImmediately is set in the config, the timer
+        /// begins ticking right away. Otherwise it waits for the first PuzzleTilesMatchedEvent.
         /// </summary>
         public BattleTimer(EventHub eventHub, BattleTimerConfig config)
         {
@@ -58,7 +58,10 @@ namespace MightyHeroes.Battle.BattleTimer
             _remainingSecondsExact = config.DurationSeconds;
             _lastBroadcastSeconds = CeilToInt(_remainingSecondsExact);
 
-            _eventHub.PuzzleEvents.PuzzleTilesMatchedEvent.Register(OnFirstPuzzleMatched);
+            if (config.StartImmediately)
+                StartInternal();
+            else
+                _eventHub.PuzzleEvents.PuzzleTilesMatchedEvent.Register(OnFirstPuzzleMatched);
         }
 
         // PUBLIC METHODS
@@ -72,7 +75,9 @@ namespace MightyHeroes.Battle.BattleTimer
             if (_isDisposed)
                 return;
 
-            _eventHub.PuzzleEvents.PuzzleTilesMatchedEvent.Unregister(OnFirstPuzzleMatched);
+            if (!_config.StartImmediately)
+                _eventHub.PuzzleEvents.PuzzleTilesMatchedEvent.Unregister(OnFirstPuzzleMatched);
+
             _isDisposed = true;
         }
 

@@ -1,12 +1,5 @@
 fileFormatVersion: 2
 guid: 68a29e70ae95f6a4195bf0fcbb538019
-AssetOrigin:
-  serializedVersion: 1
-  productId: 291806
-  packageName: Synty ANIMATION - Sword Combat
-  packageVersion: 1.0.1
-  assetPath: Assets/__Download/Synty/AnimationSwordCombat/Meshes/PolygonSyntyCharacter.fbx
-  uploadId: 686788
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -20,7 +13,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: M_COSTUME
-    second: {fileID: 2100000, guid: 06bc155156d4ea9479bd33baf24b5d6a, type: 2}
+    second: {fileID: 2100000, guid: 3ffc7184f3a5f944181f0b785a495c73, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -33,6 +26,8 @@ ModelImporter:
     optimizeGameObjects: 0
     removeConstantScaleCurves: 0
     motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
@@ -728,3 +723,10 @@ ModelImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 291806
+  packageName: Synty ANIMATION - Sword Combat
+  packageVersion: 1.0.1
+  assetPath: Assets/__Download/Synty/AnimationSwordCombat/Meshes/PolygonSyntyCharacter.fbx
+  uploadId: 686788

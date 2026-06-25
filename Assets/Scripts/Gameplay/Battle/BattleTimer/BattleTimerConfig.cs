@@ -15,7 +15,7 @@ namespace MightyHeroes.Battle.BattleTimer
     /// </summary>
     [CreateAssetMenu(
         fileName = "BattleTimerConfig",
-        menuName = "Mighty Heroes/Battle/Battle Timer Config")]
+        menuName = "MightyHeroes/Battle/Battle Timer Config")]
     public sealed class BattleTimerConfig : ScriptableObject
     {
         // FIELDS
@@ -24,15 +24,26 @@ namespace MightyHeroes.Battle.BattleTimer
         [Tooltip("Total seconds the hero has to defeat all enemies once the timer starts.")]
         [SerializeField, Min(1f)] private float _durationSeconds = 60f;
 
+        [Header("Start Behaviour")]
+        [Tooltip("When enabled, the timer is visible and counting down from the moment the " +
+                 "battle begins, without waiting for the hero's first puzzle match.")]
+        [SerializeField] private bool _startImmediately;
+
         [Header("Warning")]
-        [Tooltip("When remaining seconds drop to or below this value, the view enters warning mode " +
-                 "(color change and scale pulse). Set to 0 to disable warning visuals.")]
+        [Tooltip("When remaining seconds drop to or below this value, the view enters warning " +
+                 "mode (color change and scale pulse). Set to 0 to disable warning visuals.")]
         [SerializeField, Min(0f)] private float _warningThresholdSeconds = 10f;
 
         // PROPERTIES
 
         /// <summary>Total countdown duration in seconds.</summary>
         public float DurationSeconds => _durationSeconds;
+
+        /// <summary>
+        /// When true, the timer starts ticking immediately when the battle begins
+        /// rather than waiting for the hero's first puzzle match.
+        /// </summary>
+        public bool StartImmediately => _startImmediately;
 
         /// <summary>Threshold at which the view should switch to warning visuals.</summary>
         public float WarningThresholdSeconds => _warningThresholdSeconds;

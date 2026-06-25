@@ -20,7 +20,7 @@ namespace MightyHeroes.Gameplay.Hero
         // FIELDS
         [SerializeField]
         [Tooltip("Must match the duration of the VictoryTurn animation clip.")]
-        private float _turnDuration = 1.26f;
+        private float _turnDuration = 1.25f;
 
         private EventHub _eventHub;
         private Coroutine _rotationCoroutine;

@@ -1,5 +1,3 @@
-// Assets/Gameplay/Enemy/StateMachine/States/EnemyPreReadyState.cs
-
 using DG.Tweening;
 using MightyHeroes.Core.Logging;
 
@@ -9,6 +7,7 @@ namespace MightyHeroes.Gameplay.Enemy.StateMachine.States
     /// Pre-action delay state entered immediately after TurnEnemyStartedEvent.
     ///
     /// Responsibilities:
+    /// - Resets enemy action points so the player sees full pips before the attack.
     /// - Activates the AP view so the player sees the restored pips before the attack.
     /// - Waits for a short delay before transitioning to ReadyState.
     /// - Cancels the delay cleanly on Exit so no stale callbacks fire if the
@@ -49,13 +48,14 @@ namespace MightyHeroes.Gameplay.Enemy.StateMachine.States
         // PUBLIC METHODS
 
         /// <summary>
-        /// Activates the AP view and starts the pre-action delay.
+        /// Resets AP, activates the AP view and starts the pre-action delay.
         /// </summary>
         public override void Enter()
         {
             GameLogger.Log(LogSourceType.Enemy,
                 $"Enemy[{StateMachine.Enemy.EntityId}] PreReady: waiting {PreReadyDelay}s before action.");
 
+            StateMachine.Enemy.ResetActionPoints();
             StateMachine.Enemy.SetActionPointViewTurnActive(true);
 
             _delayTween = DOVirtual.DelayedCall(
