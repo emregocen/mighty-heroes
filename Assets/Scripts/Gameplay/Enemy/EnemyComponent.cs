@@ -272,7 +272,7 @@ namespace MightyHeroes.Gameplay.Enemy
         /// <exception cref="System.NotImplementedException"></exception>
         public void NotifyAttackSequenceStarted()
         {
-            throw new System.NotImplementedException();
+            GameLogger.Log(LogSourceType.Enemy, "EnemyComponent.NotifyAttackSequenceStarted");
         }
 
         /// <summary>
