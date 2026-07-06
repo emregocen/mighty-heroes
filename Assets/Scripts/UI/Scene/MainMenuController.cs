@@ -26,7 +26,7 @@ namespace MightyHeroes.UI.MainMenu
                     "MainMenuController: Play button reference is missing.");
                 return;
             }
-
+            GameLogger.Log(LogSourceType.UI, "MainMenuController: Play button reference found, wiring up click event.");
             _playButton.onClick.AddListener(OnPlayButtonClicked);
         }
 
@@ -47,7 +47,7 @@ namespace MightyHeroes.UI.MainMenu
                 UnityEngine.SceneManagement.SceneManager.LoadScene(SceneNames.Battle);
                 return;
             }
-
+            GameLogger.Log(LogSourceType.UI, "MainMenuController: Play button clicked, transitioning to battle scene.");
             SceneTransitionController.Instance.LoadScene(SceneNames.Battle);
         }
     }
