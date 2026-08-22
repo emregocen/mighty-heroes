@@ -6,6 +6,7 @@ namespace MightyHeroes.Battle.TurnFlow.Types
     public enum TurnStateType
     {
         None,
+        TurnIntro,
         TurnStart,
         TurnHero,
         TurnCompanion,

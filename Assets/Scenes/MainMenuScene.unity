@@ -17878,7 +17878,7 @@ Transform:
   m_GameObject: {fileID: 153281675}
   serializedVersion: 2
   m_LocalRotation: {x: 0.12607859, y: -0.2566048, z: 0.03378265, w: 0.9576622}
-  m_LocalPosition: {x: 4, y: -3, z: 30.5}
+  m_LocalPosition: {x: 4, y: -3, z: 63}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -24377,15 +24377,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7294154425121220710, guid: d9237026601db42e48ce109bddd9520e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 2.6
+      value: 2.75
       objectReference: {fileID: 0}
     - target: {fileID: 7294154425121220710, guid: d9237026601db42e48ce109bddd9520e, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -4.84
+      value: -4.8
       objectReference: {fileID: 0}
     - target: {fileID: 7294154425121220710, guid: d9237026601db42e48ce109bddd9520e, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 32.9
+      value: 65
       objectReference: {fileID: 0}
     - target: {fileID: 7294154425121220710, guid: d9237026601db42e48ce109bddd9520e, type: 3}
       propertyPath: m_LocalRotation.w
@@ -165483,9 +165483,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.UI.MainMenu.MenuHeroController
   _animator: {fileID: 786166549}
-  _allowedVariants: 01000000020000000500000006000000
-  _minSwitchInterval: 8
-  _maxSwitchInterval: 15
+  _allowedVariants: 010000000100000001000000020000000500000006000000
+  _minSwitchInterval: 6
+  _maxSwitchInterval: 9
 --- !u!1001 &1387328645
 PrefabInstance:
   m_ObjectHideFlags: 0

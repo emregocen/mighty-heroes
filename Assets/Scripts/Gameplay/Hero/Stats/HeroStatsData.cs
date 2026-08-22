@@ -9,7 +9,7 @@ namespace MightyHeroes.Gameplay.Hero.Stats
     /// </summary>
     [CreateAssetMenu(
         fileName = "HeroStatsData",
-        menuName = "Gameplay/Stats/Hero Stats")]
+        menuName = "Mighty Heroes/Gameplay/Stats/Hero Stats")]
     public sealed class HeroStatsData : EntityStatsData
     {
         // 1) FIELDS

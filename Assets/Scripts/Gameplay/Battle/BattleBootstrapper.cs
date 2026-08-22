@@ -5,6 +5,7 @@ using MightyHeroes.Core.EventSystem;
 using MightyHeroes.Core.Logging;
 using MightyHeroes.Gameplay.Battle;
 using MightyHeroes.Gameplay.Battle.Formation;
+using MightyHeroes.Gameplay.Battle.Intro;
 using MightyHeroes.Gameplay.Combat;
 using MightyHeroes.Gameplay.Enemy.AI;
 using MightyHeroes.Gameplay.Enemy.StateMachine;
@@ -78,6 +79,11 @@ namespace MightyHeroes.Core.Battle
         [Tooltip("UI view that renders the remaining seconds. Required only if a timer config is set.")]
         [SerializeField] private BattleTimerView _battleTimerView;
 
+        [Header("Intro")]
+        [Tooltip("Optional. When empty, battle starts immediately.")]
+        [SerializeField] private BattleIntroConfig _battleIntroConfig;
+        [SerializeField] private BattleIntroController _battleIntroController;
+
         // FIELDS — Runtime
 
         private EventHub _eventHub;
@@ -110,6 +116,7 @@ namespace MightyHeroes.Core.Battle
             InitializeEnemies();
             InitializeTargetInput();
             InitializeHeroTargetFocus();
+            InitializeBattleIntro();
             InitializeTurnSystem();
             InitializeCombatSystem();
             InitializePuzzleSystem();
@@ -122,7 +129,7 @@ namespace MightyHeroes.Core.Battle
             InitializeBattleFlowController();
         }
 
-private void Start()
+        private void Start()
         {
             if (_turnStateMachine == null)
             {
@@ -134,6 +141,20 @@ private void Start()
             RefreshAllEntityHuds();
 
             _turnStateMachine.Start();
+
+            if (_battleIntroController != null)
+            {
+                _battleIntroController.Play(onComplete: () =>
+                {
+                    _turnStateMachine.SwitchToStartState();
+                    _battleTimer?.NotifyIntroCompleted();
+                });
+            }
+            else
+            {
+                _turnStateMachine.SwitchToStartState();
+                _battleTimer?.NotifyIntroCompleted();
+            }
         }
 
         private void OnDestroy()
@@ -166,7 +187,7 @@ private void Start()
                 config.Enemy?.RefreshHud();
             }
         }
-        
+
         // PRIVATE METHODS — Initialization
 
         /// <summary>
@@ -292,6 +313,28 @@ private void Start()
 
             GameLogger.Log(LogSourceType.BattleSystem,
                 "BattleBootstrapper.InitializeHeroTargetFocus completed.");
+        }
+
+        /// <summary>
+        /// Initializes the battle intro controller with the config if assigned.
+        /// When no config is assigned, the controller will skip the intro sequence
+        /// immediately when Play is called from Start.
+        /// </summary>
+        private void InitializeBattleIntro()
+        {
+            if (_battleIntroController == null)
+            {
+                GameLogger.Log(LogSourceType.BattleSystem,
+                    "BattleBootstrapper.InitializeBattleIntro: no controller assigned, skipping.");
+                return;
+            }
+
+            _battleIntroController.Initialize(_battleIntroConfig);
+
+            GameLogger.Log(LogSourceType.BattleSystem,
+                _battleIntroConfig != null
+                    ? $"BattleIntro initialized."
+                    : "BattleIntro initialized with no config — will skip on Play.");
         }
 
         /// <summary>

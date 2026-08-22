@@ -15,7 +15,7 @@ namespace MightyHeroes.Battle.BattleTimer
     /// </summary>
     [CreateAssetMenu(
         fileName = "BattleTimerConfig",
-        menuName = "MightyHeroes/Battle/Battle Timer Config")]
+        menuName = "Mighty Heroes/Battle/Battle Timer Config")]
     public sealed class BattleTimerConfig : ScriptableObject
     {
         // FIELDS

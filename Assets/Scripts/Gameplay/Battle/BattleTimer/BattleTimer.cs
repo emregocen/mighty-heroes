@@ -30,6 +30,7 @@ namespace MightyHeroes.Battle.BattleTimer
         private bool _isRunning;
         private bool _isExpired;
         private bool _isDisposed;
+        private bool _isIntroComplete;
 
         // PROPERTIES
 
@@ -48,8 +49,8 @@ namespace MightyHeroes.Battle.BattleTimer
         // CONSTRUCTOR
 
         /// <summary>
-        /// Constructs the timer. If StartImmediately is set in the config, the timer
-        /// begins ticking right away. Otherwise it waits for the first PuzzleTilesMatchedEvent.
+        /// Constructs the timer. If StartImmediately is set in the config, the timer begins ticking right away.
+        /// Otherwise it waits for the first PuzzleTilesMatchedEvent.
         /// </summary>
         public BattleTimer(EventHub eventHub, BattleTimerConfig config)
         {
@@ -57,13 +58,7 @@ namespace MightyHeroes.Battle.BattleTimer
             _config = config;
             _remainingSecondsExact = config.DurationSeconds;
             _lastBroadcastSeconds = CeilToInt(_remainingSecondsExact);
-
-            if (config.StartImmediately)
-                StartInternal();
-            else
-                _eventHub.PuzzleEvents.PuzzleTilesMatchedEvent.Register(OnFirstPuzzleMatched);
         }
-
         // PUBLIC METHODS
 
         /// <summary>
@@ -75,9 +70,7 @@ namespace MightyHeroes.Battle.BattleTimer
             if (_isDisposed)
                 return;
 
-            if (!_config.StartImmediately)
-                _eventHub.PuzzleEvents.PuzzleTilesMatchedEvent.Unregister(OnFirstPuzzleMatched);
-
+            _eventHub.PuzzleEvents.PuzzleTilesMatchedEvent.Unregister(OnFirstPuzzleMatched);
             _isDisposed = true;
         }
 
@@ -166,6 +159,23 @@ namespace MightyHeroes.Battle.BattleTimer
 
             GameLogger.Log(LogSourceType.BattleSystem,
                 $"BattleTimer.AddTime added={extraSeconds:F1} newRemaining={_remainingSecondsExact:F1}");
+        }
+
+        /// <summary>
+        /// Called by BattleBootstrapper once the intro sequence finishes.
+        /// Arms the timer's start trigger — either immediately (StartImmediately)
+        /// or on the first puzzle match, whichever the config specifies.
+        /// </summary>
+        public void NotifyIntroCompleted()
+        {
+            if (_config.StartImmediately)
+            {
+                StartInternal();
+            }
+            else
+            {
+                _eventHub.PuzzleEvents.PuzzleTilesMatchedEvent.Register(OnFirstPuzzleMatched);
+            }
         }
 
         // PRIVATE METHODS
