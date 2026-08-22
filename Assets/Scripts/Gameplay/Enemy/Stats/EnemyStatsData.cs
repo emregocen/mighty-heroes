@@ -14,7 +14,7 @@ namespace MightyHeroes.Gameplay.Enemy.Stats
     /// </summary>
     [CreateAssetMenu(
         fileName = "EnemyStatsData",
-        menuName = "Gameplay/Stats/Enemy Stats")]
+        menuName = "Mighty Heroes/Gameplay/Stats/Enemy Stats")]
     public sealed class EnemyStatsData : EntityStatsData
     {
 

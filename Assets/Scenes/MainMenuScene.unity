@@ -5430,7 +5430,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &45707123
 RectTransform:
   m_ObjectHideFlags: 0
@@ -17878,7 +17878,7 @@ Transform:
   m_GameObject: {fileID: 153281675}
   serializedVersion: 2
   m_LocalRotation: {x: 0.12607859, y: -0.2566048, z: 0.03378265, w: 0.9576622}
-  m_LocalPosition: {x: 4, y: -3, z: 30.5}
+  m_LocalPosition: {x: 4, y: -3, z: 63}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -24377,15 +24377,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7294154425121220710, guid: d9237026601db42e48ce109bddd9520e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 2.6
+      value: 2.75
       objectReference: {fileID: 0}
     - target: {fileID: 7294154425121220710, guid: d9237026601db42e48ce109bddd9520e, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -4.84
+      value: -4.8
       objectReference: {fileID: 0}
     - target: {fileID: 7294154425121220710, guid: d9237026601db42e48ce109bddd9520e, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 32.9
+      value: 65
       objectReference: {fileID: 0}
     - target: {fileID: 7294154425121220710, guid: d9237026601db42e48ce109bddd9520e, type: 3}
       propertyPath: m_LocalRotation.w
@@ -165483,9 +165483,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.UI.MainMenu.MenuHeroController
   _animator: {fileID: 786166549}
-  _allowedVariants: 01000000020000000500000006000000
-  _minSwitchInterval: 8
-  _maxSwitchInterval: 15
+  _allowedVariants: 010000000100000001000000020000000500000006000000
+  _minSwitchInterval: 6
+  _maxSwitchInterval: 9
 --- !u!1001 &1387328645
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -175143,6 +175143,7 @@ GameObject:
   - component: {fileID: 1472961295}
   - component: {fileID: 1472961297}
   - component: {fileID: 1472961296}
+  - component: {fileID: 1472961298}
   m_Layer: 5
   m_Name: SPR_Frame
   m_TagString: Untagged
@@ -175166,9 +175167,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 60, y: 0}
-  m_SizeDelta: {x: 120, y: 0}
-  m_Pivot: {x: 1, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 119.99999, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1472961296
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -175207,6 +175208,27 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1472961294}
   m_CullTransparentMesh: 1
+--- !u!114 &1472961298
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1472961294}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34697c98b51484e1eb5deb876293f26e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIGlowPulse
+  glowRect: {fileID: 0}
+  glowImage: {fileID: 0}
+  minScale: 0.975
+  maxScale: 1.025
+  pulseSpeed: 7
+  minAlpha: 0.9
+  maxAlpha: 1
+  rotate: 0
+  rotationSpeed: 25
 --- !u!1001 &1473249301
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -205718,6 +205740,7 @@ GameObject:
   - component: {fileID: 1724861654}
   - component: {fileID: 1724861653}
   - component: {fileID: 1724861652}
+  - component: {fileID: 1724861655}
   m_Layer: 5
   m_Name: Button
   m_TagString: Untagged
@@ -205830,6 +205853,27 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1724861650}
   m_CullTransparentMesh: 1
+--- !u!114 &1724861655
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1724861650}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34697c98b51484e1eb5deb876293f26e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIGlowPulse
+  glowRect: {fileID: 0}
+  glowImage: {fileID: 0}
+  minScale: 0.95
+  maxScale: 1.05
+  pulseSpeed: 5
+  minAlpha: 1
+  maxAlpha: 1
+  rotate: 0
+  rotationSpeed: 25
 --- !u!1001 &1725673407
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -12,6 +12,12 @@ namespace MightyHeroes.Battle.TurnFlow
     /// State machine responsible for controlling the turn flow.
     /// Acts as the single authority for switching between turn phases.
     ///
+    /// Starts in TurnIntroState and waits there until BattleBootstrapper calls
+    /// SwitchToStartState — either immediately (no intro configured) or after
+    /// BattleIntroController's sequence completes. This state machine has no
+    /// knowledge of the intro system; the bootstrapper owns that connection
+    /// because it already holds direct references to both sides.
+    ///
     /// Enemy ordering is delegated to IFormationQuery so formation layout
     /// determines turn sequence — front line acts before back line.
     /// </summary>
@@ -56,12 +62,13 @@ namespace MightyHeroes.Battle.TurnFlow
         // PUBLIC METHODS
 
         /// <summary>
-        /// Starts the turn state machine.
+        /// Starts the turn state machine in TurnIntroState.
         /// Must be called exactly once at battle start.
+        /// The machine waits in TurnIntroState until SwitchToStartState is called externally.
         /// </summary>
         public void Start()
         {
-            Start(new TurnStartState(this));
+            Start(new TurnIntroState(this));
         }
 
         /// <summary>Switches the flow to the beginning of a new turn.</summary>
@@ -114,6 +121,8 @@ namespace MightyHeroes.Battle.TurnFlow
         /// <summary>
         /// Called after a turn state has fully entered.
         /// Publishes semantic turn events for external systems.
+        /// Intro is intentionally excluded — it is a boot-sequence concern,
+        /// not a turn-flow event other systems need to react to.
         /// </summary>
         /// <param name="state">State that has just entered.</param>
         protected override void OnStateEntered(IState state)

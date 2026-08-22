@@ -299,6 +299,8 @@ namespace MightyHeroes.Gameplay.Hero.Movement
         {
             if (_animator == null || layerIndex < 0)
                 return;
+
+            // _animator.SetLayerWeight(layerIndex, weight);
         }
 
         /// <summary>Caches the initial local transform of the animator visual root for later reset.</summary>

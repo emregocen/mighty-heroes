@@ -14,7 +14,7 @@ namespace MightyHeroes.Gameplay.Companion.Stats
     /// </summary>
     [CreateAssetMenu(
         fileName = "CompanionStatsData",
-        menuName = "Gameplay/Stats/Companion Stats")]
+        menuName = "Mighty Heroes/Gameplay/Stats/Companion Stats")]
     public sealed class CompanionStatsData : EntityStatsData
     {
 
