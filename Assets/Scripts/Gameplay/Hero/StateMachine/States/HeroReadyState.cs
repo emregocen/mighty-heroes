@@ -2,27 +2,22 @@ using MightyHeroes.Core.Logging;
 using MightyHeroes.Gameplay.Common.Actions;
 using MightyHeroes.Gameplay.Hero.Actions;
 using MightyHeroes.Gameplay.Puzzle.Payloads;
-using Unity.VisualScripting;
 
 namespace MightyHeroes.Gameplay.Hero.StateMachine.States
 {
     /// <summary>
     /// State where the hero is ready to receive puzzle input.
-    /// Puzzle results are resolved into hero actions.
+    /// Puzzle results are resolved into hero actions and routed to the
+    /// matching state. Unmapped ActionTypes resolve to None and are ignored —
+    /// the hero simply stays in this state waiting for another match.
     /// </summary>
     public sealed class HeroReadyState : HeroBaseState
     {
-        /// <summary>
-        /// Creates a new hero ready state.
-        /// </summary>
         public HeroReadyState(HeroStateMachine stateMachine)
             : base(stateMachine)
         {
         }
 
-        /// <summary>
-        /// Enables puzzle input and subscribes to puzzle events.
-        /// </summary>
         public override void Enter()
         {
             GameLogger.Log(LogSourceType.Hero, "Enter HeroReadyState");
@@ -35,9 +30,6 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
                 .Register(OnPuzzleTilesMatched);
         }
 
-        /// <summary>
-        /// Disables puzzle input and unsubscribes from puzzle events.
-        /// </summary>
         public override void Exit()
         {
             GameLogger.Log(LogSourceType.Hero, "Exit HeroReadyState");
@@ -50,18 +42,24 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
             StateMachine.Hero.SetPuzzlePlayable(false);
         }
 
-        /// <summary>
-        /// Resolves puzzle results into hero actions and triggers state transitions.
-        /// </summary>
         private void OnPuzzleTilesMatched(PuzzleTilesMatchedPayload payload)
         {
-            HeroActionExecution execution =
-                StateMachine.ActionResolver.Resolve(payload);
+            HeroActionExecution execution = StateMachine.ActionResolver.Resolve(payload);
 
-            if (execution.ActionType != ActionType.Attack)
-                return;
+            switch (execution.ActionType)
+            {
+                case ActionType.Attack:
+                    StateMachine.SwitchToAttackState(execution);
+                    break;
 
-            StateMachine.SwitchToAttackState(execution);
+                case ActionType.Heal:
+                    StateMachine.SwitchToHealState(execution);
+                    break;
+
+                default:
+                    // None / unmapped — no AP spent, stay in ready state.
+                    break;
+            }
         }
     }
 }

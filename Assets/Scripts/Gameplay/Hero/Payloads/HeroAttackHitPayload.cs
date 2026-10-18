@@ -15,7 +15,7 @@ namespace MightyHeroes.Gameplay.Hero.Payloads
     /// </summary>
     public sealed class HeroAttackHitPayload
     {
-        // 1) PROPERTIES
+        // PROPERTIES
 
         /// <summary>
         /// Correlation id for the whole combo attack sequence.
@@ -37,12 +37,6 @@ namespace MightyHeroes.Gameplay.Hero.Payloads
 
         /// <summary>
         /// Intensity level used by combat to calculate damage.
-        ///
-        /// You can interpret this in two ways (choose ONE and be consistent):
-        /// - "Total intensity" of the whole combo (e.g., 3 for a 3-hit combo)
-        /// - "Current step intensity" (e.g., stepIndex)
-        ///
-        /// I recommend keeping it as "TotalIntensity" and letting combat scale per step if needed.
         /// </summary>
         public int AttackIntensity { get; }
 
@@ -53,6 +47,12 @@ namespace MightyHeroes.Gameplay.Hero.Payloads
         public HitDirection HitDirection { get; }
 
         /// <summary>
+        /// Damage type for this attack sequence, resolved from the matched
+        /// tile's ActionType (Attack → Physical, MagicAttack → Magical).
+        /// </summary>
+        public DamageType DamageType { get; }
+
+        /// <summary>
         /// Creates a new hero attack hit payload.
         /// </summary>
         public HeroAttackHitPayload(
@@ -60,13 +60,15 @@ namespace MightyHeroes.Gameplay.Hero.Payloads
             int stepIndex,
             int totalSteps,
             int attackIntensity,
-            HitDirection hitDirection)
+            HitDirection hitDirection,
+            DamageType damageType)
         {
             AttackId = attackId;
             StepIndex = stepIndex;
             TotalSteps = totalSteps;
             AttackIntensity = attackIntensity;
             HitDirection = hitDirection;
+            DamageType = damageType;
         }
     }
 }

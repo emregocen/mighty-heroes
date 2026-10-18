@@ -138,11 +138,12 @@ namespace MightyHeroes.Gameplay.Combat
                     targetEntityId: target.EntityId,
                     attackerEntityId: attacker.EntityId,
                     damageAmount: damage,
-                    damageType: DamageType.Physical,
+                    damageType: payload.DamageType,
                     hitDirection: payload.HitDirection,
                     stepIndex: payload.StepIndex,
                     totalSteps: payload.TotalSteps));
         }
+
         private void OnEnemyAttackHit(EnemyAttackHitPayload payload)
         {
             if (_isDisposed)

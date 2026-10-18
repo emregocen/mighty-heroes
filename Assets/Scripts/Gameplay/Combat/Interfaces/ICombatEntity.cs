@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace MightyHeroes.Gameplay.Combat.Interfaces
 {
     /// <summary>
@@ -15,5 +17,11 @@ namespace MightyHeroes.Gameplay.Combat.Interfaces
         /// Indicates whether the entity is alive.
         /// </summary>
         bool IsAlive { get; }
+
+        /// <summary>
+        /// World-space position of this entity, used for spawning floating text,
+        /// targeting VFX, and other position-dependent presentation.
+        /// </summary>
+        Vector3 Position { get; }
     }
 }

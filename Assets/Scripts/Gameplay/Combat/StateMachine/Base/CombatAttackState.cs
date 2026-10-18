@@ -31,6 +31,14 @@ namespace MightyHeroes.Gameplay.Combat.StateMachine.Base
         protected readonly int AttackVariant;
         protected readonly int TotalSteps;
 
+        /// <summary>
+        /// Damage type applied by this attack sequence. Carried from the
+        /// puzzle tile that triggered the action (physical or magical) so
+        /// subclasses can forward it into their hit payloads without
+        /// duplicating a whole state per damage type.
+        /// </summary>
+        protected readonly DamageType DamageType;
+
         protected int CurrentStep;
 
         /// <summary>
@@ -63,11 +71,13 @@ namespace MightyHeroes.Gameplay.Combat.StateMachine.Base
         protected ComboAttackState(
             TStateMachine stateMachine,
             int attackVariant,
-            int attackIntensity)
+            int attackIntensity,
+            DamageType damageType)
         {
             StateMachine = stateMachine;
             AttackVariant = attackVariant;
             TotalSteps = attackIntensity < 1 ? 1 : attackIntensity;
+            DamageType = damageType;
         }
 
         // ------------------------------------------------------------------

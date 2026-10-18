@@ -6,6 +6,7 @@ using MightyHeroes.Gameplay.Combat.Payloads;
 using MightyHeroes.Gameplay.Combat.Types;
 using MightyHeroes.Gameplay.Common.Entity;
 using MightyHeroes.Gameplay.Common.Stats;
+using MightyHeroes.Gameplay.Health.Presentation;
 using MightyHeroes.Gameplay.Hero.Movement;
 using MightyHeroes.Gameplay.Hero.Payloads;
 using MightyHeroes.Gameplay.Hero.Presentation;
@@ -72,6 +73,12 @@ namespace MightyHeroes.Gameplay.Hero
         /// <summary>Animator trigger that plays the victory animation.</summary>
         private static readonly int Anim_Victory = Animator.StringToHash("Victory");
 
+        /// <summary>Animator int parameter selecting the heal animation variant.</summary>
+        private static readonly int Anim_HealVariant = Animator.StringToHash("HealVariant");
+
+        /// <summary>Animator trigger that starts the heal animation.</summary>
+        private static readonly int Anim_DoHeal = Animator.StringToHash("Heal");
+
         // FIELDS
 
         // FIELDS
@@ -96,6 +103,8 @@ namespace MightyHeroes.Gameplay.Hero
         private HeroAttackMovementController _attackMovementController;
         [Header("Presentation")]
         [SerializeField] private HeroTargetFocusController _heroTargetFocusController;
+        /// <summary>Plays the heal particle effect when this hero receives a heal effect request.</summary>
+        [SerializeField] private HealEffectView _healEffectView;
 
         [Header("HUD")]
         /// <summary>Hero health bar presentation view.</summary>
@@ -158,6 +167,8 @@ namespace MightyHeroes.Gameplay.Hero
 
             base.Initialize(entityId);
             base.InitializeHealth(_eventHub, _heroStatsData.MaxHealth, _heroStatsData.MaxShield);
+            
+            _healEffectView?.Initialize(_eventHub, EntityId);
 
             RegisterEvents();
             InitializeHud();
@@ -290,6 +301,30 @@ namespace MightyHeroes.Gameplay.Hero
             _animator.SetTrigger(Anim_Victory);
         }
 
+        /// <summary>
+        /// Starts the heal animation and fades LookAt IK out so the heal clip
+        /// is not bent toward the current target.
+        /// Must only be called from a State (HeroHealState).
+        /// </summary>
+        /// <param name="healVariant">Heal animation variant index.</param>
+        public void PlayHeal(int healVariant)
+        {
+            _heroTargetFocusController?.NotifyHealStarted();
+            _animator.SetInteger(Anim_HealVariant, healVariant);
+            _animator.SetTrigger(Anim_DoHeal);
+        }
+
+        /// <summary>
+        /// Applies self-heal to the hero's own health and refreshes the health bar.
+        /// Must only be called from a State (HeroHealState).
+        /// </summary>
+        /// <param name="amount">Heal amount to apply.</param>
+        public void ApplyHeal(int amount)
+        {
+            Health.Heal(amount, sourceEntityId: EntityId);
+            RefreshHealthView(true);
+        }
+
         // PUBLIC METHODS — HUD
 
         /// <summary>
@@ -313,7 +348,7 @@ namespace MightyHeroes.Gameplay.Hero
             RefreshActionPointView();
             SetActionPointViewTurnActive(false);
         }
-        
+
         // PUBLIC METHODS — Puzzle
 
         /// <summary>
@@ -377,7 +412,7 @@ namespace MightyHeroes.Gameplay.Hero
                 $"NotifyAttackSequenceStarted — heroRoot={_attackMovementController?.transform.position}");
             _attackMovementController?.NotifyAttackStarted();
         }
-        
+
         /// <summary>
         /// Called by AttackSequenceEndedBehaviour when the full attack sequence ends.
         /// Starts the retreat movement via the controller, then signals the FSM to
@@ -428,6 +463,15 @@ namespace MightyHeroes.Gameplay.Hero
             _stateMachine.NotifyRetreatEnded();
         }
 
+        /// <summary>
+        /// Called by HealSequenceEndedBehaviour when the heal animation clip finishes.
+        /// Restores LookAt IK, then forwards to the FSM as a signal only.
+        /// </summary>
+        public void NotifyHealSequenceEnded()
+        {
+            _heroTargetFocusController?.NotifyHealEnded();
+            _stateMachine.NotifyHealSequenceEnded();
+        }
 
         // PROTECTED METHODS
 

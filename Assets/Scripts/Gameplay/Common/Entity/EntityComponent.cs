@@ -37,7 +37,7 @@ namespace MightyHeroes.Gameplay.Common.Entity
         /// Current health value used by combat systems and UI.
         /// </summary>
         public int CurrentHealth => _health != null ? _health.CurrentHealth : _runtimeStats != null ? _runtimeStats.CurrentHealth : 0;
-        
+
         /// <summary>
         /// Current action points value sed by combat system
         /// </summary>
@@ -63,6 +63,9 @@ namespace MightyHeroes.Gameplay.Common.Entity
         /// </summary>
         public EntityRuntimeStats RuntimeStats => _runtimeStats;
 
+        /// <summary>World-space position of this entity, for floating text and similar presentation needs.</summary>
+        public Vector3 Position => transform.position;
+        
         protected virtual void Awake()
         {
             InitializeRuntimeStats();

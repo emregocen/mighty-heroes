@@ -309,6 +309,15 @@ namespace MightyHeroes.Gameplay.Enemy
             _stateMachine.NotifyAttackHitFrame(hitDirection);
         }
 
+        /// <summary>
+        /// Called when the heal animation sequence has completed.
+        /// Currently a no-op for enemies — enemies have no heal action in the
+        /// current demo scope. Kept to satisfy IAnimationSignalReceiver and as the
+        /// future hook for enemy self-heal or ally-heal abilities.
+        /// </summary>
+        public void NotifyHealSequenceEnded()
+        {
+        }
         // PROTECTED METHODS
 
         /// <summary>Provides enemy-specific stats data for base class runtime stat initialization.</summary>

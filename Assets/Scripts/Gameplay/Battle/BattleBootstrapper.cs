@@ -9,6 +9,7 @@ using MightyHeroes.Gameplay.Battle.Intro;
 using MightyHeroes.Gameplay.Combat;
 using MightyHeroes.Gameplay.Enemy.AI;
 using MightyHeroes.Gameplay.Enemy.StateMachine;
+using MightyHeroes.Gameplay.FloatingText;
 using MightyHeroes.Gameplay.Hero;
 using MightyHeroes.Gameplay.Hero.Actions;
 using MightyHeroes.Gameplay.Hero.Input;
@@ -84,6 +85,14 @@ namespace MightyHeroes.Core.Battle
         [SerializeField] private BattleIntroConfig _battleIntroConfig;
         [SerializeField] private BattleIntroController _battleIntroController;
 
+        [Header("Floating Text")]
+        [SerializeField] private FloatingTextConfig _floatingTextConfig;
+        [SerializeField] private FloatingTextWorldView _floatingTextWorldPrefab;
+        [SerializeField] private Transform _floatingTextWorldParent;
+        [SerializeField] private FloatingTextScreenView _floatingTextScreenPrefab;
+        [SerializeField] private Transform _floatingTextScreenParent;
+        [SerializeField] private float _floatingTextHeightOffset = 1.6f;
+
         // FIELDS — Runtime
 
         private EventHub _eventHub;
@@ -100,6 +109,9 @@ namespace MightyHeroes.Core.Battle
         private BattleFlowController _battleFlowController;
 
         private readonly List<EnemyStateMachine> _enemyStateMachines = new List<EnemyStateMachine>();
+
+        private FloatingTextService _floatingTextService;
+        private FloatingTextPresenter _floatingTextPresenter;
 
         // UNITY CALLBACKS
 
@@ -126,6 +138,7 @@ namespace MightyHeroes.Core.Battle
             InitializeVictoryCamera();
             InitializeVictoryRotator();
             InitializeBattleTimer();
+            InitializeFloatingText();
             InitializeBattleFlowController();
         }
 
@@ -160,6 +173,7 @@ namespace MightyHeroes.Core.Battle
         private void OnDestroy()
         {
             DisposeBattleFlowController();
+            DisposeFloatingText();
             DisposeBattleTimer();
             DisposeCombatSystem();
             DisposeEnemyComponents();
@@ -520,6 +534,34 @@ namespace MightyHeroes.Core.Battle
             GameLogger.Log(LogSourceType.BattleSystem, "BattleFlowController initialized.");
         }
 
+        /// <summary>
+        /// Initializes the floating text service and presenter. Both prefabs
+        /// and the config must be assigned for this to activate — if any is
+        /// missing, floating text is silently disabled for this battle.
+        /// </summary>
+private void InitializeFloatingText()
+{
+    if (_floatingTextConfig == null || _floatingTextWorldPrefab == null || _floatingTextScreenPrefab == null)
+    {
+        GameLogger.Log(LogSourceType.BattleSystem,
+            "BattleBootstrapper.InitializeFloatingText: missing config or prefab, skipping.");
+        return;
+    }
+
+    _floatingTextService = new FloatingTextService(
+        _floatingTextConfig,
+        _floatingTextWorldPrefab,
+        _floatingTextWorldParent,
+        _floatingTextScreenPrefab,
+        _floatingTextScreenParent);
+
+    var anchorProvider = new BattleFormationAnchorProvider(_heroComponent, _battleFormation, _floatingTextHeightOffset);
+
+    _floatingTextPresenter = new FloatingTextPresenter(_eventHub, _floatingTextService, anchorProvider);
+
+    GameLogger.Log(LogSourceType.BattleSystem, "FloatingText initialized.");
+}
+
         // PRIVATE METHODS — Disposal
 
         /// <summary>Disposes the BattleFlowController to unregister its event handlers.</summary>
@@ -621,6 +663,13 @@ namespace MightyHeroes.Core.Battle
             }
 
             GameLogger.Log(LogSourceType.BattleSystem, "All enemy components disposed.");
+        }
+
+        private void DisposeFloatingText()
+        {
+            _floatingTextPresenter?.Dispose();
+            _floatingTextPresenter = null;
+            _floatingTextService = null;
         }
     }
 }
