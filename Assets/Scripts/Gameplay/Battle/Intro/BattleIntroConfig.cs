@@ -11,7 +11,7 @@ namespace MightyHeroes.Gameplay.Battle.Intro
     /// </summary>
     [CreateAssetMenu(
         fileName = "BattleIntroConfig",
-        menuName = "MightyHeroes/Battle/Battle Intro Config")]
+        menuName = "Mighty Heroes/Battle/Battle Intro Config")]
     public sealed class BattleIntroConfig : ScriptableObject
     {
         // FIELDS

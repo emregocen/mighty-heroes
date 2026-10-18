@@ -1,5 +1,3 @@
-// Gameplay/Hero/StateMachine/States/HeroAttackState.cs
-
 using MightyHeroes.Battle.TurnFlow.Payloads;
 using MightyHeroes.Core.Logging;
 using MightyHeroes.Core.StateMachine.Signals;
@@ -20,6 +18,11 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
     /// - Raises HeroAttackHit events for each hit frame so CombatSystem can resolve damage.
     /// - Subscribes to AllEnemiesDefeatedEvent while active to set _isVictoryPending.
     /// - Decides whether to retreat or go directly to victory at sequence end.
+    ///
+    /// DamageType is carried from the resolved HeroActionExecution (set by the
+    /// matched tile's ActionType — Attack or MagicAttack) through the base class
+    /// and forwarded into HeroAttackHitPayload. This single state handles both
+    /// physical and magical attacks; only the damage type differs.
     ///
     /// Victory pending pattern:
     /// AllEnemiesDefeatedEvent can fire mid-combo (inside the hit frame call stack).
@@ -42,8 +45,8 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
         /// <summary>
         /// Creates a new hero attack state for the given combo configuration.
         /// </summary>
-        public HeroAttackState(HeroStateMachine stateMachine, int attackVariant, int attackIntensity)
-            : base(stateMachine, attackVariant, attackIntensity)
+        public HeroAttackState(HeroStateMachine stateMachine, int attackVariant, int attackIntensity, DamageType damageType)
+            : base(stateMachine, attackVariant, attackIntensity, damageType)
         {
         }
 
@@ -129,7 +132,7 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
         protected override void PlayAttackAnimation()
         {
             GameLogger.Log(LogSourceType.Hero,
-                $"HeroAttackState: Start attack Variant={AttackVariant}, Steps={TotalSteps}");
+                $"HeroAttackState: Start attack Variant={AttackVariant}, Steps={TotalSteps}, DamageType={DamageType}");
 
             StateMachine.Hero.PlayAttack(AttackVariant, TotalSteps);
         }
@@ -151,7 +154,8 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
         }
 
         /// <summary>
-        /// Raises HeroAttackHit event at the authored hit frame.
+        /// Raises HeroAttackHit event at the authored hit frame, carrying this
+        /// sequence's DamageType so CombatSystem applies the correct damage type.
         /// </summary>
         protected override void RaiseAttackHit(int step, int totalSteps, HitDirection direction)
         {
@@ -161,7 +165,8 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
                     stepIndex: step,
                     totalSteps: totalSteps,
                     attackIntensity: totalSteps,
-                    hitDirection: direction));
+                    hitDirection: direction,
+                    damageType: DamageType));
         }
 
         /// <summary>

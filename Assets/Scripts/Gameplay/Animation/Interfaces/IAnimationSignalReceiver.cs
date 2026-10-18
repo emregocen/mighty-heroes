@@ -39,5 +39,11 @@ namespace MightyHeroes.Gameplay.Animation.Interfaces
         /// Forwards to the FSM as a hit reaction ended signal.
         /// </summary>
         void NotifyHitReactionEnded();
+
+        /// <summary>
+        /// Called when the heal animation sequence has completed.
+        /// Forwards to the FSM as a heal sequence ended signal.
+        /// </summary>
+        void NotifyHealSequenceEnded();
     }
 }

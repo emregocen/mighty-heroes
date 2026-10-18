@@ -32,7 +32,7 @@ namespace MightyHeroes.Gameplay.Hero.Movement
         [SerializeField] private string _swordHandLayerName = "SwordHand";
         [SerializeField] private float _swordArmIdleWeight = 0.65f;
         [SerializeField] private float _swordHandIdleWeight = 1f;
-        [SerializeField] private float _swordLayerBlendDuration = 0.12f;
+        [SerializeField] private float _swordLayerBlendDuration = 0.1f;
 
         [Header("Retreat")]
         [SerializeField] private float _retreatSpeed = 1.8f;
@@ -157,6 +157,26 @@ namespace MightyHeroes.Gameplay.Hero.Movement
             SetLayerWeight(_swordHandLayerIndex, 0f);
         }
 
+        /// <summary>
+        /// Called when a heal animation starts.
+        /// Blends the sword idle override layers down to zero so the heal clip
+        /// is not distorted by the sword pose. Does not touch root motion or
+        /// retreat state, since heal has no movement phase.
+        /// </summary>
+        public void NotifyHealStarted()
+        {
+            DisableIdleSwordPose();
+        }
+
+        /// <summary>
+        /// Called when a heal animation ends.
+        /// Blends the sword idle override layers back up to their idle weights.
+        /// </summary>
+        public void NotifyHealEnded()
+        { 
+            EnableIdleSwordPose();
+        }
+        
         /// <summary>
         /// Immediately cancels an in-progress retreat without raising RetreatCompleted.
         /// Called when battle ends during retreat so the FSM can transition to

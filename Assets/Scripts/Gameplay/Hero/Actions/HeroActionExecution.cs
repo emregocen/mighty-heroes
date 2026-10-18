@@ -1,4 +1,4 @@
-
+using MightyHeroes.Gameplay.Combat.Types;
 using MightyHeroes.Gameplay.Common.Actions;
 
 namespace MightyHeroes.Gameplay.Hero.Actions
@@ -9,47 +9,32 @@ namespace MightyHeroes.Gameplay.Hero.Actions
     /// </summary>
     public sealed class HeroActionExecution
     {
-        /// <summary>
-        /// Gets the resolved action type.
-        /// </summary>
         public ActionType ActionType { get; }
-
-        /// <summary>
-        /// Gets the attack variant selection value.
-        /// Meaning is defined by the animator controller.
-        /// </summary>
-        public int AttackVariant { get; }
-
-        /// <summary>
-        /// Gets how much intensity attack should be executed for this action.
-        /// </summary>
+        public int Variant { get; }
         public int ActionIntensity { get; }
+        public DamageType DamageType { get; }
 
-        private HeroActionExecution(ActionType actionType, int attackVariant, int actionIntensity)
+        private HeroActionExecution(ActionType actionType, int variant, int actionIntensity, DamageType damageType)
         {
             ActionType = actionType;
-            AttackVariant = attackVariant;
+            Variant = variant;
             ActionIntensity = actionIntensity;
+            DamageType = damageType;
         }
 
-        /// <summary>
-        /// Creates an empty execution result.
-        /// </summary>
-        /// <returns>A no-op action execution.</returns>
         public static HeroActionExecution None()
         {
-            return new HeroActionExecution(ActionType.None, 0, 0);
+            return new HeroActionExecution(ActionType.None, 0, 0, DamageType.Physical);
         }
 
-        /// <summary>
-        /// Creates an attack execution result.
-        /// </summary>
-        /// <param name="attackVariant">Attack variant value.</param>
-        /// <param name="actionIntensity">Total action intensity.</param>
-        /// <returns>An attack action execution.</returns>
-        public static HeroActionExecution Attack(int attackVariant, int actionIntensity)
+        public static HeroActionExecution Attack(int attackVariant, int actionIntensity, DamageType damageType)
         {
-            return new HeroActionExecution(ActionType.Attack, attackVariant, actionIntensity);
+            return new HeroActionExecution(ActionType.Attack, attackVariant, actionIntensity, damageType);
+        }
+
+        public static HeroActionExecution Heal(int healVariant, int actionIntensity)
+        {
+            return new HeroActionExecution(ActionType.Heal, healVariant, actionIntensity, DamageType.Physical);
         }
     }
 }

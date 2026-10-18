@@ -40,7 +40,7 @@ namespace MightyHeroes.Gameplay.Enemy.StateMachine.States
             EnemyStateMachine stateMachine,
             int attackVariant,
             int attackIntensity)
-            : base(stateMachine, attackVariant, attackIntensity)
+            : base(stateMachine, attackVariant, attackIntensity, DamageType.Physical)
         {
         }
 

@@ -5,39 +5,29 @@ namespace MightyHeroes.Gameplay.Common.Actions
     /// </summary>
     public enum ActionType
     {
-        /// <summary>
-        /// Indicates there is no actionable hero action.
-        /// </summary>
+        /// <summary>Indicates there is no actionable hero action.</summary>
         None = 0,
 
-        /// <summary>
-        /// Indicates an attack action.
-        /// </summary>
+        /// <summary>Indicates a physical attack action.</summary>
         Attack = 1,
 
-        /// <summary>
-        /// Indicates a buff action.
-        /// </summary>
-        Buff = 2,
+        /// <summary>Indicates a magical attack action.</summary>
+        MagicAttack = 2,
 
-        /// <summary>
-        /// Indicates a heal action.
-        /// </summary>
-        Heal = 3,
+        /// <summary>Indicates a buff action.</summary>
+        Buff = 3,
 
-        /// <summary>
-        /// Indicates a defense action.
-        /// </summary>
-        Defense = 4,
+        /// <summary>Indicates a heal action.</summary>
+        Heal = 4,
 
-        /// <summary>
-        /// Indicates a special action.
-        /// </summary>
-        Special = 5,
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        Skip=6
+        /// <summary>Indicates a defense action.</summary>
+        Defense = 5,
+
+        /// <summary>Indicates a special action.</summary>
+        Special = 6,
+
+        /// <summary>Indicates no action should be taken for this match.</summary>
+        Skip = 7
+
     }
 }

@@ -43,6 +43,9 @@ namespace MightyHeroes.Gameplay.Hero.Presentation
         [Header("Return Focus")]
         [SerializeField] private float _returnToPersistentFocusDelay = 0.18f;
 
+        [Header("Look At Suppression")]
+        [SerializeField] private float _lookAtSuppressBlendDuration = 0.15f;
+
         private BattleFormation _battleFormation;
         private EventHub _eventHub;
 
@@ -55,6 +58,7 @@ namespace MightyHeroes.Gameplay.Hero.Presentation
 
         private float _currentHeadWeight;
         private float _currentTorsoWeight;
+        private float _lookAtWeightScale = 1f;
 
         private bool _hasLookPosition;
         private bool _wasRetreating;
@@ -63,6 +67,8 @@ namespace MightyHeroes.Gameplay.Hero.Presentation
         private Sequence _lookAtSequence;
         private Tween _rootRotationTween;
         private Tween _returnFocusTween;
+        private Tween _lookAtScaleTween;
+
 
         // PROPERTIES
 
@@ -143,6 +149,7 @@ namespace MightyHeroes.Gameplay.Hero.Presentation
             _lookAtSequence?.Kill();
             _rootRotationTween?.Kill();
             _returnFocusTween?.Kill();
+            _lookAtScaleTween?.Kill();
         }
 
         // PUBLIC METHODS
@@ -323,6 +330,8 @@ namespace MightyHeroes.Gameplay.Hero.Presentation
 
         /// <summary>
         /// Applies Animator humanoid LookAt IK toward the smoothed target focus position.
+        /// Final weights are scaled by the suppression scale so actions such as 
+        /// heal can fade the IK out without losing the underlying focus state.
         /// </summary>
         private void UpdateLookAtIk()
         {
@@ -332,16 +341,16 @@ namespace MightyHeroes.Gameplay.Hero.Presentation
                 ref _lookPositionVelocity,
                 _lookPositionSmoothTime);
 
-            float totalWeight = Mathf.Max(
-                _currentHeadWeight,
-                _currentTorsoWeight);
+            float headWeight = _currentHeadWeight * _lookAtWeightScale;
+            float torsoWeight = _currentTorsoWeight * _lookAtWeightScale;
+            float totalWeight = Mathf.Max(headWeight, torsoWeight);
 
             _animator.SetLookAtPosition(_currentLookPosition);
 
             _animator.SetLookAtWeight(
                 totalWeight,
-                _currentTorsoWeight,
-                _currentHeadWeight,
+                torsoWeight,
+                headWeight,
                 _eyesWeight,
                 _clampWeight);
         }
@@ -410,6 +419,21 @@ namespace MightyHeroes.Gameplay.Hero.Presentation
                 FocusTarget(ActiveTargetFocus);
         }
 
+        /// <summary>
+        /// Tweens the LookAt suppression scale to the target value.
+        /// </summary>
+        /// <param name="targetScale">0 fully suppresses IK, 1 restores it.</param>
+        private void BlendLookAtScale(float targetScale)
+        {
+            _lookAtScaleTween?.Kill();
+
+            _lookAtScaleTween = DOTween.To(
+                () => _lookAtWeightScale,
+                value => _lookAtWeightScale = value,
+                targetScale,
+                _lookAtSuppressBlendDuration);
+        }
+        
         public void NotifyVictoryStarted()
         {
             _lookAtSequence?.Kill();
@@ -419,6 +443,23 @@ namespace MightyHeroes.Gameplay.Hero.Presentation
             _currentHeadWeight = 0f;
             _currentTorsoWeight = 0f;
             _currentTargetFocus = null;
+        }
+                /// <summary>
+        /// Called when a heal animation starts.
+        /// Fades LookAt IK out so the heal clip is not bent toward the target.
+        /// </summary>
+        public void NotifyHealStarted()
+        {
+            BlendLookAtScale(0f);
+        }
+
+        /// <summary>
+        /// Called when a heal animation ends.
+        /// Fades LookAt IK back in toward the current focus target.
+        /// </summary>
+        public void NotifyHealEnded()
+        {
+            BlendLookAtScale(1f);
         }
     }
 }

@@ -22,7 +22,7 @@ namespace MightyHeroes.Gameplay.Hero.Presentation
         /// Owning hero state machine.
         /// </summary>
         private HeroStateMachine _stateMachine;
-        
+
         /// <summary>
         /// Initializes the proxy with the active hero state machine.
         /// Must be called by HeroComponent during setup.
@@ -43,8 +43,18 @@ namespace MightyHeroes.Gameplay.Hero.Presentation
         /// </param>
         public void AnimationEvent_AttackHitFrame(int hitDirection)
         {
-            GameLogger.Log(LogSourceType.Hero, "Hero hit frame event called: " + hitDirection );
+            GameLogger.Log(LogSourceType.Hero, "Hero hit frame event called: " + hitDirection);
             _stateMachine.NotifyAttackHitFrame((HitDirection)hitDirection);
+        }
+
+        /// <summary>
+        /// Called by an animation event at the frame of the heal animation where
+        /// the heal particle effect should start.
+        /// </summary>
+        public void AnimationEvent_HealEffectFrame()
+        {
+            GameLogger.Log(LogSourceType.Hero, "Hero heal effect frame event called.");
+            _stateMachine.NotifyHealEffectFrame();
         }
     }
 }

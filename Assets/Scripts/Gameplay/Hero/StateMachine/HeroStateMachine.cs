@@ -142,8 +142,9 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine
         {
             SwitchState(new HeroAttackState(
                 this,
-                execution.AttackVariant,
-                execution.ActionIntensity));
+                execution.Variant,
+                execution.ActionIntensity,
+                execution.DamageType));
         }
 
         /// <summary>
@@ -181,6 +182,13 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine
         public void SwitchToVictoryState()
         {
             SwitchState(new HeroVictoryState(this));
+        }
+
+        /// <summary>Transitions hero to heal state with the resolved action data.</summary>
+        /// <param name="execution">Action execution data resolved from puzzle match.</param>
+        public void SwitchToHealState(HeroActionExecution execution)
+        {
+            SwitchState(new HeroHealState(this, execution.Variant, execution.ActionIntensity));
         }
 
         /// <summary>
@@ -261,6 +269,24 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine
             Notify(new HeroRetreatEndedSignal());
         }
 
+        /// <summary>
+        /// Called by HeroHealSequenceEndedBehaviour when the heal animation clip
+        /// finishes. Forwards as HeroHealSequenceEndedSignal into the active state.
+        /// </summary>
+        public void NotifyHealSequenceEnded()
+        {
+            Notify(new HeroHealSequenceEndedSignal());
+        }
+
+        /// <summary>
+        /// Called by HeroAnimationEventProxy at the authored heal effect frame.
+        /// Forwards as HeroHealEffectFrameSignal into the active state.
+        /// </summary>
+        public void NotifyHealEffectFrame()
+        {
+            Notify(new HeroHealEffectFrameSignal());
+        }
+        
         // ------------------------------------------------------------------
         // EVENT HANDLERS
         // ------------------------------------------------------------------
