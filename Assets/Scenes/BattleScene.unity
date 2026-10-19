@@ -106207,6 +106207,9 @@ MonoBehaviour:
   _heroIntroStartPoint: {fileID: 2091139324}
   _heroBattlePosition: {fileID: 978500576}
   _heroAnimator: {fileID: 1596662745}
+  _tauntLowerBodyLayerName: TauntLowerBody
+  _lowerBodyLockBlendInDuration: 0.1
+  _lowerBodyLockBlendOutDuration: 0.15
   _swordProp: {fileID: 1073657069}
   _puzzleRect: {fileID: 1149437048}
   _puzzleCanvasGroup: {fileID: 1149437049}

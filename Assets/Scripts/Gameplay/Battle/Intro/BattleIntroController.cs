@@ -22,10 +22,12 @@ namespace MightyHeroes.Gameplay.Battle.Intro
     ///     parallel, and since the orbit rig reads the hero's live position every
     ///     frame, the hero stays centered throughout regardless of which
     ///     animation is still running.
-    ///  4. Hero plays taunt at TauntPose. If the taunt runs longer than
-    ///     SlowOrbitDuration, the camera simply holds at TauntPose (the orbit
-    ///     tween has already completed) until the taunt animation signals it
-    ///     has ended (via IIntroSignalReceiver), plus TauntPostHoldDuration.
+    ///  4. Hero plays taunt at TauntPose. While the taunt plays, the lower body
+    ///     layer is blended in so the legs hold the idle pose and do not slide.
+    ///     If the taunt runs longer than SlowOrbitDuration, the camera simply
+    ///     holds at TauntPose (the orbit tween has already completed) until the
+    ///     taunt animation signals it has ended (via IIntroSignalReceiver),
+    ///     plus TauntPostHoldDuration.
     ///  5. Camera fast-orbits from its current pose (forced to TauntPose in case
     ///     the slow orbit was still running) to EnemyRevealPose over FastOrbitDuration.
     ///  6. Swap to CM_BattleCamera, sword re-enabled, puzzle revealed.
@@ -73,6 +75,12 @@ namespace MightyHeroes.Gameplay.Battle.Intro
         [SerializeField] private Transform _heroBattlePosition;
         [SerializeField] private Animator _heroAnimator;
 
+        [Header("Hero Taunt Lower Body Lock")]
+        [Tooltip("Animator layer that holds the idle pose for the legs. Weight is driven by code.")]
+        [SerializeField] private string _tauntLowerBodyLayerName = "TauntLowerBody";
+        [SerializeField] private float _lowerBodyLockBlendInDuration = 0.1f;
+        [SerializeField] private float _lowerBodyLockBlendOutDuration = 0.15f;
+
         [Header("Hero Sword")]
         [SerializeField] private GameObject _swordProp;
 
@@ -92,17 +100,22 @@ namespace MightyHeroes.Gameplay.Battle.Intro
         private Vector2 _puzzleShownPosition;
         private bool _tauntEnded;
         private Coroutine _introCoroutine;
+        private int _tauntLowerBodyLayerIndex = -1;
+        private Tween _lowerBodyLockTween;
 
         // UNITY CALLBACKS
 
         private void Awake()
         {
             IntroSignalRegistry.Register(this);
+            CacheTauntLowerBodyLayerIndex();
         }
 
         private void OnDestroy()
         {
             IntroSignalRegistry.Unregister(this);
+
+            _lowerBodyLockTween?.Kill();
 
             if (_introCoroutine != null)
                 StopCoroutine(_introCoroutine);
@@ -318,21 +331,71 @@ namespace MightyHeroes.Gameplay.Battle.Intro
             _heroAnimator.SetBool(AnimIsLocomotion, false);
         }
 
+        /// <summary>
+        /// Blends the lower body lock layer in, then triggers the taunt on the base layer.
+        /// </summary>
         private void StartTaunt()
         {
             if (_heroAnimator == null)
                 return;
 
+            BlendLowerBodyLock(1f, _lowerBodyLockBlendInDuration);
+
             _heroAnimator.SetInteger(AnimTauntVariant, 1);
             _heroAnimator.SetTrigger(AnimTaunt);
         }
 
+        /// <summary>
+        /// Ends the taunt and releases the lower body lock layer so battle animations
+        /// control the legs again.
+        /// </summary>
         private void EndTaunt()
         {
             if (_heroAnimator == null)
                 return;
 
             _heroAnimator.SetInteger(AnimTauntVariant, 0);
+
+            BlendLowerBodyLock(0f, _lowerBodyLockBlendOutDuration);
+        }
+
+        /// <summary>
+        /// Caches the lower body lock layer index and makes sure it starts with zero weight.
+        /// </summary>
+        private void CacheTauntLowerBodyLayerIndex()
+        {
+            if (_heroAnimator == null)
+                return;
+
+            _tauntLowerBodyLayerIndex = _heroAnimator.GetLayerIndex(_tauntLowerBodyLayerName);
+
+            if (_tauntLowerBodyLayerIndex < 0)
+            {
+                GameLogger.Log(LogSourceType.BattleSystem,
+                    $"BattleIntroController: animator layer '{_tauntLowerBodyLayerName}' not found.");
+                return;
+            }
+
+            _heroAnimator.SetLayerWeight(_tauntLowerBodyLayerIndex, 0f);
+        }
+
+        /// <summary>
+        /// Tweens the lower body lock layer weight to the target value.
+        /// </summary>
+        /// <param name="targetWeight">Target layer weight.</param>
+        /// <param name="duration">Blend duration in seconds.</param>
+        private void BlendLowerBodyLock(float targetWeight, float duration)
+        {
+            if (_heroAnimator == null || _tauntLowerBodyLayerIndex < 0)
+                return;
+
+            _lowerBodyLockTween?.Kill();
+
+            _lowerBodyLockTween = DOTween.To(
+                () => _heroAnimator.GetLayerWeight(_tauntLowerBodyLayerIndex),
+                value => _heroAnimator.SetLayerWeight(_tauntLowerBodyLayerIndex, value),
+                targetWeight,
+                duration);
         }
 
         // PRIVATE METHODS — Cameras, puzzle, sword
