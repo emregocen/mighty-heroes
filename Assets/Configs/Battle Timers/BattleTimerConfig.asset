@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbb6595870a474ad593c187daa976de0, type: 3}
   m_Name: BattleTimerConfig
   m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Battle.BattleTimer.BattleTimerConfig
-  _durationSeconds: 60
+  _durationSeconds: 90
   _startImmediately: 1
   _warningThresholdSeconds: 10
