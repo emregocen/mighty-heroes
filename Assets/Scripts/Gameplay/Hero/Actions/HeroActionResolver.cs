@@ -9,21 +9,43 @@ namespace MightyHeroes.Gameplay.Hero.Actions
     /// Resolves puzzle results into executable hero actions.
     ///
     /// ActionType comes pre-assigned from the puzzle's tile configuration
-    /// (designer-set per grid element type in the puzzle grid asset). Attack
-    /// and MagicAttack are both attack actions with different DamageType —
-    /// the distinction lives entirely in ActionType, not in tile color, so
-    /// a designer can reassign which color means what purely in the puzzle
-    /// config without any code change here.
+    /// (designer-set per grid element type in the Inspector). Attack and
+    /// MagicAttack are both attack actions with different DamageType, so a
+    /// designer can reassign which color means what without any code change.
     ///
-    /// ActionTypes with no implemented system yet (Buff, Defense, Special,
-    /// Skip, None) resolve to HeroActionExecution.None() — no AP is spent
+    /// Match count is converted into an action tier (1..3) via ActionTierData.
+    /// The tier is carried as HeroActionExecution.ActionIntensity: for attacks
+    /// it equals the combo step count, for support actions it selects the
+    /// per-tier effect value.
+    ///
+    /// ActionTypes with no implemented system yet (Buff, Shield, Special,
+    /// Skip, None) resolve to HeroActionExecution.None(); no AP is spent
     /// and no animation plays for those matches.
     /// </summary>
-    public sealed class HeroActionResolver
-        : ActionResolverBase<PuzzleTilesMatchedPayload, HeroActionExecution>
+    public sealed class HeroActionResolver : ActionResolverBase<PuzzleTilesMatchedPayload, HeroActionExecution>
     {
+        // FIELDS
+
+        private readonly ActionTierData _tierData;
+
+        // CONSTRUCTOR
+
+        /// <summary>
+        /// Creates a hero action resolver bound to the given tier configuration.
+        /// </summary>
+        /// <param name="tierData">Match count thresholds and per-tier values. Must not be null.</param>
+        public HeroActionResolver(ActionTierData tierData)
+        {
+            _tierData = tierData;
+        }
+
         // PUBLIC METHODS
 
+        /// <summary>
+        /// Resolves a puzzle match into a hero action execution.
+        /// </summary>
+        /// <param name="payload">Matched tiles payload raised by the puzzle.</param>
+        /// <returns>Resolved hero action, or None when the match has no handler.</returns>
         public override HeroActionExecution Resolve(PuzzleTilesMatchedPayload payload)
         {
             if (payload == null)
@@ -49,32 +71,33 @@ namespace MightyHeroes.Gameplay.Hero.Actions
 
         // PRIVATE METHODS
 
+        /// <summary>Resolves an attack execution; tier becomes the combo step count.</summary>
         private HeroActionExecution ResolveAttack(PuzzleTilesMatchedPayload payload, DamageType damageType)
         {
             int attackVariant = ResolveAttackVariant(payload);
-            int attackIntensity = ResolveIntensity(payload.MatchCount);
+            int tier = ResolveTier(payload.MatchCount, _tierData);
 
             GameLogger.Log(LogSourceType.Hero,
-                $"HeroActionResolver: Attack MatchCount={payload.MatchCount} Intensity={attackIntensity} DamageType={damageType}");
+                $"HeroActionResolver: Attack MatchCount={payload.MatchCount} Tier={tier} DamageType={damageType}");
 
-            return HeroActionExecution.Attack(attackVariant, attackIntensity, damageType);
+            return HeroActionExecution.Attack(attackVariant, tier, damageType);
         }
 
+        /// <summary>Resolves a heal execution for the tier of the given match.</summary>
         private HeroActionExecution ResolveHeal(PuzzleTilesMatchedPayload payload)
         {
             int healVariant = ResolveHealVariant(payload);
-            int healIntensity = ResolveIntensity(payload.MatchCount);
+            int tier = ResolveTier(payload.MatchCount, _tierData);
 
             GameLogger.Log(LogSourceType.Hero,
-                $"HeroActionResolver: Heal MatchCount={payload.MatchCount} Intensity={healIntensity}");
+                $"HeroActionResolver: Heal MatchCount={payload.MatchCount} Tier={tier}");
 
-            return HeroActionExecution.Heal(healVariant, healIntensity);
+            return HeroActionExecution.Heal(healVariant, tier);
         }
 
         /// <summary>
         /// Temporary rule: single default attack animation regardless of DamageType.
-        /// Can later depend on weapon, class, buffs, etc. — DamageType itself
-        /// already selects Physical vs Magical VFX/animation branch downstream.
+        /// Can later depend on weapon, class, buffs, etc.
         /// </summary>
         private int ResolveAttackVariant(PuzzleTilesMatchedPayload payload)
         {

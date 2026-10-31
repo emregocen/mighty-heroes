@@ -20,8 +20,8 @@ namespace MightyHeroes.Gameplay.Common.Actions
         /// <summary>Indicates a heal action.</summary>
         Heal = 4,
 
-        /// <summary>Indicates a defense action.</summary>
-        Defense = 5,
+        /// <summary>Indicates a shield action that grants absorb shield to the hero.</summary>
+        Shield = 5,
 
         /// <summary>Indicates a special action.</summary>
         Special = 6,

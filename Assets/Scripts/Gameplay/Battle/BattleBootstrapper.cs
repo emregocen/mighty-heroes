@@ -7,6 +7,7 @@ using MightyHeroes.Gameplay.Battle;
 using MightyHeroes.Gameplay.Battle.Formation;
 using MightyHeroes.Gameplay.Battle.Intro;
 using MightyHeroes.Gameplay.Combat;
+using MightyHeroes.Gameplay.Common.Actions;
 using MightyHeroes.Gameplay.Enemy.AI;
 using MightyHeroes.Gameplay.Enemy.StateMachine;
 using MightyHeroes.Gameplay.FloatingText;
@@ -69,6 +70,7 @@ namespace MightyHeroes.Core.Battle
         [SerializeField] private HeroComponent _heroComponent;
         [SerializeField] private HeroVictoryRotator _heroVictoryRotator;
         [SerializeField] private HeroTargetFocusController _heroTargetFocusController;
+        [SerializeField] private ActionTierData _actionTierData;
 
         [Header("Enemy Formation")]
         [SerializeField] private EnemyFormationConfig[] _enemyFormation;
@@ -239,7 +241,14 @@ namespace MightyHeroes.Core.Battle
                 return;
             }
 
-            HeroActionResolver heroActionResolver = new HeroActionResolver();
+            if (_actionTierData == null)
+            {
+                GameLogger.Log(LogSourceType.BattleSystem,
+                    "BattleBootstrapper.InitializeHero: ActionTierData reference is missing.");
+                return;
+            }
+
+            HeroActionResolver heroActionResolver = new HeroActionResolver(_actionTierData);
 
             _heroStateMachine = new HeroStateMachine(
                 _eventHub,
