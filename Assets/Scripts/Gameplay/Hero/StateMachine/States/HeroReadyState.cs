@@ -53,7 +53,7 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
                     break;
 
                 case ActionType.Heal:
-                    StateMachine.SwitchToHealState(execution);
+                    StateMachine.SwitchToSupportState(execution);
                     break;
 
                 default:

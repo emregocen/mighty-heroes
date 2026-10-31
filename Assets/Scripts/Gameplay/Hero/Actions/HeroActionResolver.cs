@@ -15,8 +15,9 @@ namespace MightyHeroes.Gameplay.Hero.Actions
     ///
     /// Match count is converted into an action tier (1..3) via ActionTierData.
     /// The tier is carried as HeroActionExecution.ActionIntensity: for attacks
-    /// it equals the combo step count, for support actions it selects the
-    /// per-tier effect value.
+    /// it equals the combo step count. For support actions the tier selects
+    /// the per-tier effect value, resolved here into EffectValue so states
+    /// never read balance data directly.
     ///
     /// ActionTypes with no implemented system yet (Buff, Shield, Special,
     /// Skip, None) resolve to HeroActionExecution.None(); no AP is spent
@@ -83,16 +84,38 @@ namespace MightyHeroes.Gameplay.Hero.Actions
             return HeroActionExecution.Attack(attackVariant, tier, damageType);
         }
 
-        /// <summary>Resolves a heal execution for the tier of the given match.</summary>
+        /// <summary>Resolves a heal execution with the heal amount of the match tier.</summary>
         private HeroActionExecution ResolveHeal(PuzzleTilesMatchedPayload payload)
         {
             int healVariant = ResolveHealVariant(payload);
             int tier = ResolveTier(payload.MatchCount, _tierData);
+            int healAmount = GetTierValue(_tierData.HealAmounts, tier);
 
             GameLogger.Log(LogSourceType.Hero,
-                $"HeroActionResolver: Heal MatchCount={payload.MatchCount} Tier={tier}");
+                $"HeroActionResolver: Heal MatchCount={payload.MatchCount} Tier={tier} Amount={healAmount}");
 
-            return HeroActionExecution.Heal(healVariant, tier);
+            return HeroActionExecution.Support(ActionType.Heal, healVariant, tier, healAmount);
+        }
+
+        /// <summary>
+        /// Returns the per-tier value for the given tier (index tier - 1).
+        /// Clamps to the last entry if the array is shorter than expected
+        /// (ActionTierData.OnValidate already warns about this in the Editor).
+        /// </summary>
+        private int GetTierValue(int[] values, int tier)
+        {
+            if (values == null || values.Length == 0)
+                return 0;
+
+            int index = tier - 1;
+
+            if (index < 0)
+                index = 0;
+
+            if (index >= values.Length)
+                index = values.Length - 1;
+
+            return values[index];
         }
 
         /// <summary>

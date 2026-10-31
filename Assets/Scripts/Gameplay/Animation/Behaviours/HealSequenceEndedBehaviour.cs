@@ -7,7 +7,7 @@ namespace MightyHeroes.Gameplay.Animation.Behaviours
     /// <summary>
     /// Animator state behaviour attached to the Heal animation state.
     /// Notifies HeroComponent when the heal animation clip finishes so the
-    /// FSM can transition out of HeroHealState.
+    /// FSM can transition out of HeroSupportState.
     ///
     /// Heal is hero-only in the current demo scope, so this talks to
     /// HeroComponent directly instead of going through IAnimationSignalReceiver

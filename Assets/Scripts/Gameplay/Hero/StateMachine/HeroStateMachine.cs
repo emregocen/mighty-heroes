@@ -184,11 +184,13 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine
             SwitchState(new HeroVictoryState(this));
         }
 
-        /// <summary>Transitions hero to heal state with the resolved action data.</summary>
+        /// <summary>
+        /// Transitions hero to support state (Heal, Shield, Buff) with the resolved action data.
+        /// </summary>
         /// <param name="execution">Action execution data resolved from puzzle match.</param>
-        public void SwitchToHealState(HeroActionExecution execution)
+        public void SwitchToSupportState(HeroActionExecution execution)
         {
-            SwitchState(new HeroHealState(this, execution.Variant, execution.ActionIntensity));
+            SwitchState(new HeroSupportState(this, execution.ActionType, execution.Variant, execution.EffectValue));
         }
 
         /// <summary>
@@ -258,8 +260,6 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine
             Notify(new HeroVictoryTurnEndedSignal());
         }
 
-        // HeroStateMachine.cs — BEHAVIOUR -> SIGNAL FORWARDING bölümüne ekle:
-
         /// <summary>
         /// Called by HeroComponent when HeroAttackMovementController's DOTween
         /// retreat completes. Forwards as HeroRetreatEndedSignal into the active state.
@@ -270,7 +270,7 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine
         }
 
         /// <summary>
-        /// Called by HeroHealSequenceEndedBehaviour when the heal animation clip
+        /// Called by HealSequenceEndedBehaviour when the heal (support) animation clip
         /// finishes. Forwards as HeroHealSequenceEndedSignal into the active state.
         /// </summary>
         public void NotifyHealSequenceEnded()
