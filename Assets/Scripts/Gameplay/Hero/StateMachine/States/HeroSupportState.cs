@@ -8,7 +8,7 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
 {
     /// <summary>
     /// Active state for single-step, self-targeted support actions driven by
-    /// puzzle matches (Heal and Shield; Buff follows in the next step).
+    /// puzzle matches (Heal, Shield, Buff).
     ///
     /// Unlike HeroAttackState there is no combo progression and no target
     /// selection. One AP is consumed on Enter, the support animation plays,
@@ -117,6 +117,10 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
 
                 case ActionType.Shield:
                     StateMachine.Hero.ApplyShield(_effectValue);
+                    break;
+
+                case ActionType.Buff:
+                    StateMachine.Hero.ApplyAttackBuff(_effectValue);
                     break;
 
                 default:

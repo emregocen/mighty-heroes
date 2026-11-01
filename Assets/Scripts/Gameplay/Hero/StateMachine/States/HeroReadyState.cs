@@ -54,6 +54,7 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
 
                 case ActionType.Heal:
                 case ActionType.Shield:
+                case ActionType.Buff:
                     StateMachine.SwitchToSupportState(execution);
                     break;
 

@@ -1,3 +1,5 @@
+using MightyHeroes.Gameplay.Combat.Modifiers;
+
 namespace MightyHeroes.Gameplay.Combat.Interfaces
 {
     /// <summary>
@@ -5,6 +7,9 @@ namespace MightyHeroes.Gameplay.Combat.Interfaces
     /// </summary>
     public interface ICombatAttacker : ICombatEntity
     {
-
+        /// <summary>
+        /// Runtime combat modifiers applied to this attacker's outgoing damage.
+        /// </summary>
+        CombatModifiers Modifiers { get; }
     }
 }

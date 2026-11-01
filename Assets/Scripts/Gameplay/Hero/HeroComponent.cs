@@ -338,6 +338,26 @@ namespace MightyHeroes.Gameplay.Hero
             RefreshShieldView(true);
         }
 
+        /// <summary>
+        /// Grants a pending attack buff that boosts every hit of the next attack
+        /// sequence. A lower buff never replaces a higher pending one.
+        /// Must only be called from a State (HeroSupportState).
+        /// </summary>
+        /// <param name="percent">Attack bonus percent (25 = +25%).</param>
+        public void ApplyAttackBuff(int percent)
+        {
+            Modifiers.GrantAttackBuff(percent, sourceEntityId: EntityId);
+        }
+
+        /// <summary>
+        /// Consumes the pending attack buff after an attack sequence has used it.
+        /// Must only be called from a State (HeroAttackState).
+        /// </summary>
+        public void ConsumeAttackBuff()
+        {
+            Modifiers.ConsumeAttackBuff();
+        }
+
         // PUBLIC METHODS — HUD
 
         /// <summary>
