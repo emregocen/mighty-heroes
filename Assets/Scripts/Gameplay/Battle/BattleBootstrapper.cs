@@ -114,6 +114,7 @@ namespace MightyHeroes.Core.Battle
 
         private FloatingTextService _floatingTextService;
         private FloatingTextPresenter _floatingTextPresenter;
+        private StatusIconPresenter _statusIconPresenter;
 
         // UNITY CALLBACKS
 
@@ -141,6 +142,7 @@ namespace MightyHeroes.Core.Battle
             InitializeVictoryRotator();
             InitializeBattleTimer();
             InitializeFloatingText();
+            InitializeStatusIcons();
             InitializeBattleFlowController();
         }
 
@@ -176,6 +178,7 @@ namespace MightyHeroes.Core.Battle
         {
             DisposeBattleFlowController();
             DisposeFloatingText();
+            DisposeStatusIcons();
             DisposeBattleTimer();
             DisposeCombatSystem();
             DisposeEnemyComponents();
@@ -571,6 +574,28 @@ private void InitializeFloatingText()
     GameLogger.Log(LogSourceType.BattleSystem, "FloatingText initialized.");
 }
 
+        /// <summary>
+        /// Creates the status icon presenter and registers the hero and every
+        /// formation enemy. Entities without a StatusIconBarView are skipped.
+        /// Must run after InitializeHero and InitializeEnemies so entity ids exist.
+        /// </summary>
+        private void InitializeStatusIcons()
+        {
+            _statusIconPresenter = new StatusIconPresenter(_eventHub);
+
+            if (_heroComponent != null)
+                _statusIconPresenter.RegisterView(_heroComponent.EntityId, _heroComponent.StatusIconBarView);
+
+            if (_enemyFormation == null)
+                return;
+
+            foreach (EnemyFormationConfig config in _enemyFormation)
+            {
+                if (config.Enemy != null)
+                    _statusIconPresenter.RegisterView(config.Enemy.EntityId, config.Enemy.StatusIconBarView);
+            }
+        }
+
         // PRIVATE METHODS — Disposal
 
         /// <summary>Disposes the BattleFlowController to unregister its event handlers.</summary>
@@ -679,6 +704,13 @@ private void InitializeFloatingText()
             _floatingTextPresenter?.Dispose();
             _floatingTextPresenter = null;
             _floatingTextService = null;
+        }
+
+        /// <summary>Disposes the status icon presenter to unregister its event handlers.</summary>
+        private void DisposeStatusIcons()
+        {
+            _statusIconPresenter?.Dispose();
+            _statusIconPresenter = null;
         }
     }
 }

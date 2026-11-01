@@ -113,6 +113,9 @@ namespace MightyHeroes.Gameplay.Hero
         /// <summary>Hero shield bar presentation view.</summary>
         [SerializeField] private ShieldBarView _shieldBarView;
 
+        /// <summary>Hero status icon row (attack buff). Driven by StatusIconPresenter.</summary>
+        [SerializeField] private StatusIconBarView _statusIconBarView;
+
         /// <summary>Hero action point presentation view.</summary>
         [SerializeField] private ActionPointView _actionPointView;
 
@@ -129,6 +132,9 @@ namespace MightyHeroes.Gameplay.Hero
 
         /// <summary>Exposes the owning hero state machine.</summary>
         public HeroStateMachine StateMachine => _stateMachine;
+
+        /// <summary>Status icon view for StatusIconPresenter registration. Can be null.</summary>
+        public StatusIconBarView StatusIconBarView => _statusIconBarView;
 
 
         /// <summary>

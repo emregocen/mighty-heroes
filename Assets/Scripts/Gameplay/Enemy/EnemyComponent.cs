@@ -83,6 +83,9 @@ namespace MightyHeroes.Gameplay.Enemy
         [SerializeField] private ShieldBarView _shieldBarView;
         [SerializeField] private ActionPointView _actionPointView;
 
+        /// <summary>Enemy status icon row (attack buff). Driven by StatusIconPresenter. Optional.</summary>
+        [SerializeField] private StatusIconBarView _statusIconBarView;
+
         /// <summary>Reference to the enemy state machine. Assigned by BattleBootstrapper during Initialize().</summary>
         private EnemyStateMachine _stateMachine;
 
@@ -96,6 +99,9 @@ namespace MightyHeroes.Gameplay.Enemy
 
         /// <summary>Exposes the owning enemy state machine.</summary>
         public EnemyStateMachine StateMachine => _stateMachine;
+
+        /// <summary>Status icon view for StatusIconPresenter registration. Can be null.</summary>
+        public StatusIconBarView StatusIconBarView => _statusIconBarView;
 
         // PUBLIC METHODS — Initialization
 
