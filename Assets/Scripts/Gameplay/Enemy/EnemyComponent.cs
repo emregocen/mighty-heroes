@@ -381,6 +381,9 @@ namespace MightyHeroes.Gameplay.Enemy
 
         /// <summary>
         /// Refreshes the shield bar view from the current runtime shield state.
+        /// The bar stays visible for the whole battle whenever the entity has
+        /// shield capacity (MaxShield > 0), showing an empty slider at 0 shield.
+        /// Entities without shield capacity keep the bar hidden.
         /// </summary>
         /// <param name="animate">Whether the presentation should animate the change.</param>
         private void RefreshShieldView(bool animate)
@@ -389,7 +392,7 @@ namespace MightyHeroes.Gameplay.Enemy
                 return;
 
             _shieldBarView.SetValue(Health.CurrentShield, Health.MaxShield, animate);
-            _shieldBarView.SetVisible(Health.MaxShield > 0 && Health.CurrentShield > 0);
+            _shieldBarView.SetVisible(Health.MaxShield > 0);
         }
 
         /// <summary>
