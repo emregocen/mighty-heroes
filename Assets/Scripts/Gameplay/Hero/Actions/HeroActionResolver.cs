@@ -19,7 +19,7 @@ namespace MightyHeroes.Gameplay.Hero.Actions
     /// the per-tier effect value, resolved here into EffectValue so states
     /// never read balance data directly.
     ///
-    /// ActionTypes with no implemented system yet (Buff, Shield, Special,
+    /// ActionTypes with no implemented system yet (Buff, Special,
     /// Skip, None) resolve to HeroActionExecution.None(); no AP is spent
     /// and no animation plays for those matches.
     /// </summary>
@@ -61,7 +61,10 @@ namespace MightyHeroes.Gameplay.Hero.Actions
                     return ResolveAttack(payload, DamageType.Magical);
 
                 case ActionType.Heal:
-                    return ResolveHeal(payload);
+                    return ResolveSupport(payload, ActionType.Heal, _tierData.HealAmounts);
+
+                case ActionType.Shield:
+                    return ResolveSupport(payload, ActionType.Shield, _tierData.ShieldAmounts);
 
                 default:
                     GameLogger.Log(LogSourceType.Hero,
@@ -84,17 +87,23 @@ namespace MightyHeroes.Gameplay.Hero.Actions
             return HeroActionExecution.Attack(attackVariant, tier, damageType);
         }
 
-        /// <summary>Resolves a heal execution with the heal amount of the match tier.</summary>
-        private HeroActionExecution ResolveHeal(PuzzleTilesMatchedPayload payload)
+        /// <summary>
+        /// Resolves a self-targeted support execution whose effect value is
+        /// picked from the given per-tier array for the match tier.
+        /// </summary>
+        /// <param name="payload">Matched tiles payload.</param>
+        /// <param name="supportType">Support action type (Heal, Shield, Buff).</param>
+        /// <param name="tierValues">Per-tier effect values from ActionTierData.</param>
+        private HeroActionExecution ResolveSupport(PuzzleTilesMatchedPayload payload, ActionType supportType, int[] tierValues)
         {
-            int healVariant = ResolveHealVariant(payload);
+            int supportVariant = ResolveSupportVariant(payload);
             int tier = ResolveTier(payload.MatchCount, _tierData);
-            int healAmount = GetTierValue(_tierData.HealAmounts, tier);
+            int effectValue = GetTierValue(tierValues, tier);
 
             GameLogger.Log(LogSourceType.Hero,
-                $"HeroActionResolver: Heal MatchCount={payload.MatchCount} Tier={tier} Amount={healAmount}");
+                $"HeroActionResolver: {supportType} MatchCount={payload.MatchCount} Tier={tier} Value={effectValue}");
 
-            return HeroActionExecution.Support(ActionType.Heal, healVariant, tier, healAmount);
+            return HeroActionExecution.Support(supportType, supportVariant, tier, effectValue);
         }
 
         /// <summary>
@@ -127,8 +136,8 @@ namespace MightyHeroes.Gameplay.Hero.Actions
             return 1;
         }
 
-        /// <summary>Temporary rule: single default heal animation.</summary>
-        private int ResolveHealVariant(PuzzleTilesMatchedPayload payload)
+        /// <summary>Temporary rule: single default support (heal) animation for all support types.</summary>
+        private int ResolveSupportVariant(PuzzleTilesMatchedPayload payload)
         {
             return 1;
         }

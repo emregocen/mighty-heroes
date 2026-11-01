@@ -326,6 +326,18 @@ namespace MightyHeroes.Gameplay.Hero
             RefreshHealthView(true);
         }
 
+        /// <summary>
+        /// Grants absorb shield to the hero (capped by MaxShield) and refreshes the shield bar.
+        /// Shield persists until depleted by incoming damage.
+        /// Must only be called from a State (HeroSupportState).
+        /// </summary>
+        /// <param name="amount">Shield amount to grant.</param>
+        public void ApplyShield(int amount)
+        {
+            Health.AddShield(amount, sourceEntityId: EntityId);
+            RefreshShieldView(true);
+        }
+
         // PUBLIC METHODS — HUD
 
         /// <summary>
