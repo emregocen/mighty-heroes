@@ -54,6 +54,15 @@ namespace MightyHeroes.Gameplay.FloatingText
             PlayWorldStacked(entityId, FloatingTextType.Damage, worldPosition, amount.ToString());
         }
 
+        /// <summary>
+        /// Shows the damage absorbed by shield above worldPosition, stacked per entityId.
+        /// Uses the Absorbed style (shield color) so it reads differently from health damage.
+        /// </summary>
+        public void ShowAbsorbed(int entityId, Vector3 worldPosition, int amount)
+        {
+            PlayWorldStacked(entityId, FloatingTextType.Absorbed, worldPosition, $"-{amount}");
+        }
+
         /// <summary>Shows a heal number above worldPosition, stacked per entityId.</summary>
         public void ShowHeal(int entityId, Vector3 worldPosition, int amount)
         {

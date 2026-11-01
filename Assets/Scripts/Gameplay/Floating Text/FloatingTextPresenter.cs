@@ -81,22 +81,29 @@ namespace MightyHeroes.Gameplay.FloatingText
         // EVENT HANDLERS
 
         /// <summary>
-        /// Shows the damage number using AppliedToHealth (post-shield, the
-        /// amount that actually came off health — matches what the health bar
-        /// visibly loses). Also records pre-hit health and this hit's health
-        /// damage so a subsequent death can be checked for overkill.
+        /// Shows the hit split by where it landed, so every hit produces feedback:
+        /// - AbsorbedByShield > 0 : shield-colored number (Absorbed type).
+        /// - AppliedToHealth > 0  : regular damage number (matches what the health
+        ///   bar visibly loses), plus overkill bookkeeping for a following death.
+        /// A hit partially absorbed shows both numbers, stacked.
         /// </summary>
-private void OnDamageApplied(DamageAppliedPayload payload)
-{
-    if (payload.AppliedToHealth <= 0)
-        return;
+        private void OnDamageApplied(DamageAppliedPayload payload)
+        {
+            if (payload.AbsorbedByShield <= 0 && payload.AppliedToHealth <= 0)
+                return;
 
-    Vector3 anchor = _anchorProvider.GetAnchorPosition(payload.TargetEntityId);
-    _service.ShowDamage(payload.TargetEntityId, anchor, payload.AppliedToHealth);
+            Vector3 anchor = _anchorProvider.GetAnchorPosition(payload.TargetEntityId);
 
-    _healthBeforeLastHit[payload.TargetEntityId] = payload.HealthBefore;
-    _lastHealthDamage[payload.TargetEntityId] = payload.AppliedToHealth;
-}
+            if (payload.AbsorbedByShield > 0)
+                _service.ShowAbsorbed(payload.TargetEntityId, anchor, payload.AbsorbedByShield);
+
+            if (payload.AppliedToHealth <= 0)
+                return;
+
+            _service.ShowDamage(payload.TargetEntityId, anchor, payload.AppliedToHealth);
+            _healthBeforeLastHit[payload.TargetEntityId] = payload.HealthBefore;
+            _lastHealthDamage[payload.TargetEntityId] = payload.AppliedToHealth;
+        }
 
         /// <summary>
         /// Shows a heal number when a health increase with reason Heal is

@@ -12,5 +12,6 @@ namespace MightyHeroes.Gameplay.FloatingText.Types
         KnockOut = 2,
         Overkill = 3,
         Combo = 4,
+        Absorbed = 5,
     }
 }
