@@ -304,7 +304,8 @@ namespace MightyHeroes.Gameplay.Hero
         /// <summary>
         /// Starts the heal animation and fades LookAt IK out so the heal clip
         /// is not bent toward the current target.
-        /// Must only be called from a State (HeroHealState).
+        /// Shared by all support actions until dedicated clips exist.
+        /// Must only be called from a State (HeroSupportState).
         /// </summary>
         /// <param name="healVariant">Heal animation variant index.</param>
         public void PlayHeal(int healVariant)
@@ -316,13 +317,25 @@ namespace MightyHeroes.Gameplay.Hero
 
         /// <summary>
         /// Applies self-heal to the hero's own health and refreshes the health bar.
-        /// Must only be called from a State (HeroHealState).
+        /// Must only be called from a State (HeroSupportState).
         /// </summary>
         /// <param name="amount">Heal amount to apply.</param>
         public void ApplyHeal(int amount)
         {
             Health.Heal(amount, sourceEntityId: EntityId);
             RefreshHealthView(true);
+        }
+
+        /// <summary>
+        /// Grants absorb shield to the hero (capped by MaxShield) and refreshes the shield bar.
+        /// Shield persists until depleted by incoming damage.
+        /// Must only be called from a State (HeroSupportState).
+        /// </summary>
+        /// <param name="amount">Shield amount to grant.</param>
+        public void ApplyShield(int amount)
+        {
+            Health.AddShield(amount, sourceEntityId: EntityId);
+            RefreshShieldView(true);
         }
 
         // PUBLIC METHODS — HUD
