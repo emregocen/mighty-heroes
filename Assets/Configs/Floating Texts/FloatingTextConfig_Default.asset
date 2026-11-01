@@ -80,3 +80,25 @@ MonoBehaviour:
     StartScale: 0.5
     PunchInDuration: 0.12
     FadeStartFraction: 0.6
+  - Type: 6
+    Style: {fileID: 11400000, guid: 69271d4e70c44429a0f04be26b30c82a, type: 2}
+    FontSize: 3
+    FontStyle: 1
+    Lifetime: 1
+    RiseDistance: 0.6
+    RandomTiltDegrees: 5
+    RandomOffsetRadius: 0.1
+    StartScale: 0.5
+    PunchInDuration: 0.12
+    FadeStartFraction: 0.6
+  - Type: 7
+    Style: {fileID: 11400000, guid: c595c3a542ba4a5d969c1af5bba57140, type: 2}
+    FontSize: 3
+    FontStyle: 1
+    Lifetime: 1.2
+    RiseDistance: 0.6
+    RandomTiltDegrees: 0
+    RandomOffsetRadius: 0.05
+    StartScale: 0.4
+    PunchInDuration: 0.15
+    FadeStartFraction: 0.7

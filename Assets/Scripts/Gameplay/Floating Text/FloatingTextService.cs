@@ -63,6 +63,18 @@ namespace MightyHeroes.Gameplay.FloatingText
             PlayWorldStacked(entityId, FloatingTextType.Absorbed, worldPosition, $"-{amount}");
         }
 
+        /// <summary>Shows shield gained in battle ("+N", shield color) above worldPosition, stacked per entityId.</summary>
+        public void ShowShieldGain(int entityId, Vector3 worldPosition, int amount)
+        {
+            PlayWorldStacked(entityId, FloatingTextType.ShieldGain, worldPosition, $"+{amount}");
+        }
+
+        /// <summary>Shows a granted attack buff ("ATK +N%") above worldPosition, stacked per entityId.</summary>
+        public void ShowAttackBuff(int entityId, Vector3 worldPosition, int percent)
+        {
+            PlayWorldStacked(entityId, FloatingTextType.AttackBuff, worldPosition, $"ATK +{percent}%");
+        }
+
         /// <summary>Shows a heal number above worldPosition, stacked per entityId.</summary>
         public void ShowHeal(int entityId, Vector3 worldPosition, int amount)
         {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using MightyHeroes.Core.EventSystem;
+using MightyHeroes.Gameplay.Combat.Payloads;
 using MightyHeroes.Gameplay.Health.Payloads;
 using MightyHeroes.Gameplay.Health.Types;
 using UnityEngine;
@@ -69,6 +70,8 @@ namespace MightyHeroes.Gameplay.FloatingText
             _eventHub.HealthEvents.DamageAppliedEvent.Register(OnDamageApplied);
             _eventHub.HealthEvents.HealthChangedEvent.Register(OnHealthChanged);
             _eventHub.HealthEvents.EntityDiedEvent.Register(OnEntityDied);
+            _eventHub.HealthEvents.ShieldChangedEvent.Register(OnShieldChanged);
+            _eventHub.CombatEvents.AttackBuffChangedEvent.Register(OnAttackBuffChanged);
         }
 
         private void UnregisterEvents()
@@ -76,6 +79,8 @@ namespace MightyHeroes.Gameplay.FloatingText
             _eventHub.HealthEvents.DamageAppliedEvent.Unregister(OnDamageApplied);
             _eventHub.HealthEvents.HealthChangedEvent.Unregister(OnHealthChanged);
             _eventHub.HealthEvents.EntityDiedEvent.Unregister(OnEntityDied);
+            _eventHub.HealthEvents.ShieldChangedEvent.Unregister(OnShieldChanged);
+            _eventHub.CombatEvents.AttackBuffChangedEvent.Unregister(OnAttackBuffChanged);
         }
 
         // EVENT HANDLERS
@@ -110,42 +115,72 @@ namespace MightyHeroes.Gameplay.FloatingText
         /// raised. Damage-caused decreases are already covered by
         /// OnDamageApplied and are ignored here to avoid double text.
         /// </summary>
-private void OnHealthChanged(HealthChangedPayload payload)
-{
-    if (payload.Reason != HealthChangeReason.Heal)
-        return;
+        private void OnHealthChanged(HealthChangedPayload payload)
+        {
+            if (payload.Reason != HealthChangeReason.Heal)
+                return;
 
-    int delta = payload.CurrentHealth - payload.PreviousHealth;
+            int delta = payload.CurrentHealth - payload.PreviousHealth;
 
-    if (delta <= 0)
-        return;
+            if (delta <= 0)
+                return;
 
-    Vector3 anchor = _anchorProvider.GetAnchorPosition(payload.EntityId);
-    _service.ShowHeal(payload.EntityId, anchor, delta);
-}
+            Vector3 anchor = _anchorProvider.GetAnchorPosition(payload.EntityId);
+            _service.ShowHeal(payload.EntityId, anchor, delta);
+        }
 
         /// <summary>
         /// Shows K.O., and additionally Overkill if the last recorded hit's
         /// health damage exceeded OverkillHealthMultiplier times the health
         /// the entity had immediately before that hit.
         /// </summary>
-private void OnEntityDied(EntityDiedPayload payload)
-{
-    Vector3 anchor = _anchorProvider.GetAnchorPosition(payload.EntityId);
-
-    _service.ShowKnockOut(payload.EntityId, anchor);
-
-    if (_healthBeforeLastHit.TryGetValue(payload.EntityId, out int healthBefore) &&
-        _lastHealthDamage.TryGetValue(payload.EntityId, out int healthDamage))
-    {
-        if (healthBefore > 0 && healthDamage >= healthBefore * OverkillHealthMultiplier)
+        private void OnEntityDied(EntityDiedPayload payload)
         {
-            _service.ShowOverkill(payload.EntityId, anchor);
-        }
-    }
+            Vector3 anchor = _anchorProvider.GetAnchorPosition(payload.EntityId);
 
-    _healthBeforeLastHit.Remove(payload.EntityId);
-    _lastHealthDamage.Remove(payload.EntityId);
-}
+            _service.ShowKnockOut(payload.EntityId, anchor);
+
+            if (_healthBeforeLastHit.TryGetValue(payload.EntityId, out int healthBefore) &&
+                _lastHealthDamage.TryGetValue(payload.EntityId, out int healthDamage))
+            {
+                if (healthBefore > 0 && healthDamage >= healthBefore * OverkillHealthMultiplier)
+                {
+                    _service.ShowOverkill(payload.EntityId, anchor);
+                }
+            }
+
+            _healthBeforeLastHit.Remove(payload.EntityId);
+            _lastHealthDamage.Remove(payload.EntityId);
+        }
+
+        /// <summary>
+        /// Shows "+N" when an entity gains shield during battle.
+        /// Starting shield is granted with source id 0 at initialization and is
+        /// skipped so shielded enemies do not pop text at battle start.
+        /// </summary>
+        private void OnShieldChanged(ShieldChangedPayload payload)
+        {
+            int gained = payload.CurrentShield - payload.PreviousShield;
+
+            if (gained <= 0 || payload.SourceEntityId == 0)
+                return;
+
+            Vector3 anchor = _anchorProvider.GetAnchorPosition(payload.EntityId);
+            _service.ShowShieldGain(payload.EntityId, anchor, gained);
+        }
+
+        /// <summary>
+        /// Shows "ATK +N%" when an attack buff is granted or raised.
+        /// Consumption (value dropping to 0) shows nothing; the boosted damage
+        /// numbers are the feedback for that.
+        /// </summary>
+        private void OnAttackBuffChanged(AttackBuffChangedPayload payload)
+        {
+            if (payload.CurrentPercent <= payload.PreviousPercent)
+                return;
+
+            Vector3 anchor = _anchorProvider.GetAnchorPosition(payload.EntityId);
+            _service.ShowAttackBuff(payload.EntityId, anchor, payload.CurrentPercent);
+        }
     }
 }

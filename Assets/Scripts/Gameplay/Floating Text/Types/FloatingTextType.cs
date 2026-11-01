@@ -13,5 +13,7 @@ namespace MightyHeroes.Gameplay.FloatingText.Types
         Overkill = 3,
         Combo = 4,
         Absorbed = 5,
+        ShieldGain = 6,
+        AttackBuff = 7,
     }
 }
