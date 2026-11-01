@@ -119,7 +119,7 @@ namespace MightyHeroes.Gameplay.Enemy
             _eventHub = stateMachine.EventHub;
 
             base.Initialize(entityId);
-            base.InitializeHealth(_eventHub, _enemyStatsData.MaxHealth, _enemyStatsData.MaxShield);
+            base.InitializeHealth(_eventHub, _enemyStatsData.MaxHealth, _enemyStatsData.MaxShield, _enemyStatsData.StartingShield);
 
             RegisterEvents();
             InitializeHud();

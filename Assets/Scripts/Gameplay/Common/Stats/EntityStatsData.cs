@@ -19,6 +19,8 @@ namespace MightyHeroes.Gameplay.Common.Stats
         [Header("Base Stats")]
         [SerializeField] private int _maxHealth;
         [SerializeField] private int _maxShield;
+        [Tooltip("Shield granted at battle start. Clamped to MaxShield.")]
+        [SerializeField, Min(0)] private int _startingShield;
         [SerializeField] private int _baseAttack;
         [SerializeField] private int _baseDefense;
         [SerializeField] private int _baseActionPoints;
@@ -41,6 +43,11 @@ namespace MightyHeroes.Gameplay.Common.Stats
         public int MaxShield => _maxShield;
 
         /// <summary>
+        /// Shield granted at battle start. Never exceeds MaxShield.
+        /// </summary>
+        public int StartingShield => _startingShield;
+
+        /// <summary>
         /// Base attack power before any modifiers are applied.
         /// </summary>
         public int BaseAttack => _baseAttack;
@@ -58,11 +65,15 @@ namespace MightyHeroes.Gameplay.Common.Stats
 #if UNITY_EDITOR
 
         /// <summary>
-        /// Validates that the EntityKey is unique across all EntityStatsData assets.
+        /// Clamps StartingShield to MaxShield and validates that the EntityKey
+        /// is unique across all EntityStatsData assets.
         /// This check runs only in the Unity Editor and never at runtime.
         /// </summary>
         private void OnValidate()
         {
+            if (_startingShield > _maxShield)
+                _startingShield = Mathf.Max(_maxShield, 0);
+
             if (string.IsNullOrWhiteSpace(_entityKey))
             {
                 return;

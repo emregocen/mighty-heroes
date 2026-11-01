@@ -85,9 +85,14 @@ namespace MightyHeroes.Gameplay.Common.Entity
         /// <param name="eventHub">Battle-scoped event hub instance.</param>
         /// <param name="maxHealth">Initial maximum health.</param>
         /// <param name="maxShield">Initial maximum shield capacity.</param>
-        protected void InitializeHealth(EventHub eventHub, int maxHealth, int maxShield)
+        /// <param name="startingShield">
+        /// Shield granted at battle start, clamped to maxShield. Granted with
+        /// source id 0 so presentation can tell it apart from in-battle shield actions.
+        /// </param>
+        protected void InitializeHealth(EventHub eventHub, int maxHealth, int maxShield, int startingShield)
         {
             _health = new CombatHealth(eventHub, EntityId, maxHealth, maxShield);
+            _health.AddShield(startingShield, sourceEntityId: 0);
         }
 
         /// <summary>

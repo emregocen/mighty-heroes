@@ -166,7 +166,7 @@ namespace MightyHeroes.Gameplay.Hero
             _eventHub = stateMachine.EventHub;
 
             base.Initialize(entityId);
-            base.InitializeHealth(_eventHub, _heroStatsData.MaxHealth, _heroStatsData.MaxShield);
+            base.InitializeHealth(_eventHub, _heroStatsData.MaxHealth, _heroStatsData.MaxShield, _heroStatsData.StartingShield);
             
             _healEffectView?.Initialize(_eventHub, EntityId);
 
