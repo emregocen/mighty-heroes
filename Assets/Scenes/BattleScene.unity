@@ -68364,6 +68364,14 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2913472545328567676, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
+      propertyPath: m_fontSize
+      value: 80
+      objectReference: {fileID: 0}
+    - target: {fileID: 2913472545328567676, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 80
+      objectReference: {fileID: 0}
     - target: {fileID: 3346495076386399135, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -87802,6 +87810,10 @@ PrefabInstance:
     - target: {fileID: 2791041614653547287, guid: 441aa8544c5254f3ca588638374019ad, type: 3}
       propertyPath: elementTypes.Array.data[3].Color.r
       value: 0.6020617
+      objectReference: {fileID: 0}
+    - target: {fileID: 2791041614653547287, guid: 441aa8544c5254f3ca588638374019ad, type: 3}
+      propertyPath: elementTypes.Array.data[1].TileType
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2791041614653547287, guid: 441aa8544c5254f3ca588638374019ad, type: 3}
       propertyPath: elementTypes.Array.data[2].TileType

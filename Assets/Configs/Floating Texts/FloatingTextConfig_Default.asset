@@ -38,7 +38,7 @@ MonoBehaviour:
     FadeStartFraction: 0.6
   - Type: 2
     Style: {fileID: 11400000, guid: 6f2b4f0ce64cd418aa1b24a655553093, type: 2}
-    FontSize: 5
+    FontSize: 4
     FontStyle: 1
     Lifetime: 2
     RiseDistance: 0.4
@@ -93,7 +93,7 @@ MonoBehaviour:
     FadeStartFraction: 0.6
   - Type: 7
     Style: {fileID: 11400000, guid: c595c3a542ba4a5d969c1af5bba57140, type: 2}
-    FontSize: 3
+    FontSize: 2
     FontStyle: 1
     Lifetime: 1.2
     RiseDistance: 0.6
