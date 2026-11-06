@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: TextStyle_Overkill
   m_EditorClassIdentifier: Assembly-CSharp::TextStyleConfig
   FaceColor: {r: 1, g: 0.37086567, b: 0.1462264, a: 1}
-  OutlineColor: {r: 0.2360092, g: 0.15886438, b: 0.2830189, a: 1}
+  OutlineColor: {r: 0.8980392, g: 0.8980392, b: 0.8980392, a: 1}
   OutlineWidth: 0.2
   UseUnderlay: 0
   UnderlayColor: {r: 0, g: 0, b: 0, a: 1}
   UnderlayOffset: {x: 1, y: -1}
   UnderlaySoftness: 0.3
   UseGlow: 1
-  GlowColor: {r: 0.92066514, g: 0.7877358, b: 1, a: 1}
+  GlowColor: {r: 0.3301887, g: 0.3301887, b: 0.3301887, a: 1}
   GlowPower: 0.3

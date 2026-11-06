@@ -106,7 +106,7 @@ namespace MightyHeroes.Gameplay.FloatingText
             callback?.Invoke(this);
         }
         
-        /// <summary>Applies the same shared style system used by FloatingTextWorldView.</summary>
+        /// <summary>Applies the same shared style system used by FloatingTextAnchoredView.</summary>
         private void ApplyAppearance(FloatingTextConfig.TypeSettings settings)
         {
             if (_label == null)
