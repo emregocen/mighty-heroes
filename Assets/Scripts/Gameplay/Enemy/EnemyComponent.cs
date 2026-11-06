@@ -83,6 +83,9 @@ namespace MightyHeroes.Gameplay.Enemy
         [SerializeField] private ShieldBarView _shieldBarView;
         [SerializeField] private ActionPointView _actionPointView;
 
+        /// <summary>Enemy status icon row (attack buff). Driven by StatusIconPresenter. Optional.</summary>
+        [SerializeField] private StatusIconBarView _statusIconBarView;
+
         /// <summary>Reference to the enemy state machine. Assigned by BattleBootstrapper during Initialize().</summary>
         private EnemyStateMachine _stateMachine;
 
@@ -96,6 +99,9 @@ namespace MightyHeroes.Gameplay.Enemy
 
         /// <summary>Exposes the owning enemy state machine.</summary>
         public EnemyStateMachine StateMachine => _stateMachine;
+
+        /// <summary>Status icon view for StatusIconPresenter registration. Can be null.</summary>
+        public StatusIconBarView StatusIconBarView => _statusIconBarView;
 
         // PUBLIC METHODS — Initialization
 
@@ -119,7 +125,7 @@ namespace MightyHeroes.Gameplay.Enemy
             _eventHub = stateMachine.EventHub;
 
             base.Initialize(entityId);
-            base.InitializeHealth(_eventHub, _enemyStatsData.MaxHealth, _enemyStatsData.MaxShield);
+            base.InitializeHealth(_eventHub, _enemyStatsData.MaxHealth, _enemyStatsData.MaxShield, _enemyStatsData.StartingShield);
 
             RegisterEvents();
             InitializeHud();
@@ -381,6 +387,9 @@ namespace MightyHeroes.Gameplay.Enemy
 
         /// <summary>
         /// Refreshes the shield bar view from the current runtime shield state.
+        /// The bar stays visible for the whole battle whenever the entity has
+        /// shield capacity (MaxShield > 0), showing an empty slider at 0 shield.
+        /// Entities without shield capacity keep the bar hidden.
         /// </summary>
         /// <param name="animate">Whether the presentation should animate the change.</param>
         private void RefreshShieldView(bool animate)
@@ -389,7 +398,7 @@ namespace MightyHeroes.Gameplay.Enemy
                 return;
 
             _shieldBarView.SetValue(Health.CurrentShield, Health.MaxShield, animate);
-            _shieldBarView.SetVisible(Health.MaxShield > 0 && Health.CurrentShield > 0);
+            _shieldBarView.SetVisible(Health.MaxShield > 0);
         }
 
         /// <summary>

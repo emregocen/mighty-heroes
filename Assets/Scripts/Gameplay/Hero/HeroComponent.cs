@@ -113,6 +113,9 @@ namespace MightyHeroes.Gameplay.Hero
         /// <summary>Hero shield bar presentation view.</summary>
         [SerializeField] private ShieldBarView _shieldBarView;
 
+        /// <summary>Hero status icon row (attack buff). Driven by StatusIconPresenter.</summary>
+        [SerializeField] private StatusIconBarView _statusIconBarView;
+
         /// <summary>Hero action point presentation view.</summary>
         [SerializeField] private ActionPointView _actionPointView;
 
@@ -129,6 +132,9 @@ namespace MightyHeroes.Gameplay.Hero
 
         /// <summary>Exposes the owning hero state machine.</summary>
         public HeroStateMachine StateMachine => _stateMachine;
+
+        /// <summary>Status icon view for StatusIconPresenter registration. Can be null.</summary>
+        public StatusIconBarView StatusIconBarView => _statusIconBarView;
 
 
         /// <summary>
@@ -166,7 +172,7 @@ namespace MightyHeroes.Gameplay.Hero
             _eventHub = stateMachine.EventHub;
 
             base.Initialize(entityId);
-            base.InitializeHealth(_eventHub, _heroStatsData.MaxHealth, _heroStatsData.MaxShield);
+            base.InitializeHealth(_eventHub, _heroStatsData.MaxHealth, _heroStatsData.MaxShield, _heroStatsData.StartingShield);
             
             _healEffectView?.Initialize(_eventHub, EntityId);
 
@@ -336,6 +342,26 @@ namespace MightyHeroes.Gameplay.Hero
         {
             Health.AddShield(amount, sourceEntityId: EntityId);
             RefreshShieldView(true);
+        }
+
+        /// <summary>
+        /// Grants a pending attack buff that boosts every hit of the next attack
+        /// sequence. A lower buff never replaces a higher pending one.
+        /// Must only be called from a State (HeroSupportState).
+        /// </summary>
+        /// <param name="percent">Attack bonus percent (25 = +25%).</param>
+        public void ApplyAttackBuff(int percent)
+        {
+            Modifiers.GrantAttackBuff(percent, sourceEntityId: EntityId);
+        }
+
+        /// <summary>
+        /// Consumes the pending attack buff after an attack sequence has used it.
+        /// Must only be called from a State (HeroAttackState).
+        /// </summary>
+        public void ConsumeAttackBuff()
+        {
+            Modifiers.ConsumeAttackBuff();
         }
 
         // PUBLIC METHODS — HUD
@@ -556,6 +582,9 @@ namespace MightyHeroes.Gameplay.Hero
 
         /// <summary>
         /// Refreshes the shield bar view from the current runtime shield state.
+        /// The bar stays visible for the whole battle whenever the entity has
+        /// shield capacity (MaxShield > 0), showing an empty slider at 0 shield.
+        /// Entities without shield capacity keep the bar hidden.
         /// </summary>
         /// <param name="animate">Whether the presentation should animate the change.</param>
         private void RefreshShieldView(bool animate)
@@ -564,7 +593,7 @@ namespace MightyHeroes.Gameplay.Hero
                 return;
 
             _shieldBarView.SetValue(Health.CurrentShield, Health.MaxShield, animate);
-            _shieldBarView.SetVisible(Health.MaxShield > 0 && Health.CurrentShield > 0);
+            _shieldBarView.SetVisible(Health.MaxShield > 0);
         }
 
         /// <summary>

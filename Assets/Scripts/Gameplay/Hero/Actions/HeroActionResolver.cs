@@ -19,7 +19,7 @@ namespace MightyHeroes.Gameplay.Hero.Actions
     /// the per-tier effect value, resolved here into EffectValue so states
     /// never read balance data directly.
     ///
-    /// ActionTypes with no implemented system yet (Buff, Special,
+    /// ActionTypes with no implemented system yet (Special,
     /// Skip, None) resolve to HeroActionExecution.None(); no AP is spent
     /// and no animation plays for those matches.
     /// </summary>
@@ -65,6 +65,9 @@ namespace MightyHeroes.Gameplay.Hero.Actions
 
                 case ActionType.Shield:
                     return ResolveSupport(payload, ActionType.Shield, _tierData.ShieldAmounts);
+
+                case ActionType.Buff:
+                    return ResolveSupport(payload, ActionType.Buff, _tierData.AttackBuffPercents);
 
                 default:
                     GameLogger.Log(LogSourceType.Hero,

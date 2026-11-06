@@ -18,6 +18,8 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
     /// - Raises HeroAttackHit events for each hit frame so CombatSystem can resolve damage.
     /// - Subscribes to AllEnemiesDefeatedEvent while active to set _isVictoryPending.
     /// - Decides whether to retreat or go directly to victory at sequence end.
+    /// - Consumes the hero's pending attack buff once the sequence has landed
+    ///   at least one hit, so the buff covers every step of a single combo.
     ///
     /// DamageType is carried from the resolved HeroActionExecution (set by the
     /// matched tile's ActionType — Attack or MagicAttack) through the base class
@@ -189,6 +191,9 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
         {
             GameLogger.Log(LogSourceType.Hero,
                 $"HeroAttackState - OnSequenceEnded called. IsVictoryPending={_isVictoryPending}");
+
+            if (LastHitStep > 0)
+                StateMachine.Hero.ConsumeAttackBuff();
 
             if (_isVictoryPending)
             {

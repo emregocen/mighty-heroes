@@ -8,6 +8,11 @@ namespace MightyHeroes.UI.Battle.Views
     /// <summary>
     /// Renders shield values through a slider and optional text.
     /// This class only handles presentation and does not own gameplay state.
+    ///
+    /// Visibility and value are driven entirely by the owning entity component.
+    /// Awake only applies the default hidden state when the owner has not yet
+    /// pushed any state, because Awake order is undefined and the owner may
+    /// initialize this view before its own Awake runs.
     /// </summary>
     public sealed class ShieldBarView : MonoBehaviour
     {
@@ -26,12 +31,14 @@ namespace MightyHeroes.UI.Battle.Views
         [SerializeField] private float _hiddenAlpha = 0.00f;
 
         private Tween _valueTween;
+        private bool _hasOwnerState;
 
         // 3) CONSTRUCTOR / UNITY CALLBACKS
 
         private void Awake()
         {
-            ResetView();
+            if (!_hasOwnerState)
+                ResetView();
         }
 
         private void OnDisable()
@@ -54,6 +61,8 @@ namespace MightyHeroes.UI.Battle.Views
         /// <param name="animate">Whether the slider value should animate.</param>
         public void SetValue(int currentShield, int maxShield, bool animate)
         {
+            _hasOwnerState = true;
+
             int safeMaxShield = Mathf.Max(DefaultMaxSliderValue, maxShield);
             int safeCurrentShield = Mathf.Clamp(currentShield, MinSliderValue, safeMaxShield);
 
@@ -67,15 +76,8 @@ namespace MightyHeroes.UI.Battle.Views
         /// <param name="isVisible">Whether the view should be visible.</param>
         public void SetVisible(bool isVisible)
         {
-            if (_canvasGroup == null)
-            {
-                gameObject.SetActive(isVisible);
-                return;
-            }
-
-            _canvasGroup.alpha = isVisible ? _visibleAlpha : _hiddenAlpha;
-            _canvasGroup.interactable = isVisible;
-            _canvasGroup.blocksRaycasts = isVisible;
+            _hasOwnerState = true;
+            ApplyVisibility(isVisible);
         }
 
         /// <summary>
@@ -94,10 +96,28 @@ namespace MightyHeroes.UI.Battle.Views
                 _slider.value = MinSliderValue;
             }
 
-            SetVisible(false);
+            ApplyVisibility(false);
         }
 
         // 6) PRIVATE METHODS
+
+        /// <summary>
+        /// Applies the visibility state through the CanvasGroup when assigned,
+        /// otherwise by toggling the GameObject.
+        /// </summary>
+        /// <param name="isVisible">Whether the view should be visible.</param>
+        private void ApplyVisibility(bool isVisible)
+        {
+            if (_canvasGroup == null)
+            {
+                gameObject.SetActive(isVisible);
+                return;
+            }
+
+            _canvasGroup.alpha = isVisible ? _visibleAlpha : _hiddenAlpha;
+            _canvasGroup.interactable = isVisible;
+            _canvasGroup.blocksRaycasts = isVisible;
+        }
 
         /// <summary>
         /// Updates the shield text presentation.

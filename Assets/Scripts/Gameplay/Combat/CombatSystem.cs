@@ -13,7 +13,12 @@ namespace MightyHeroes.Gameplay.Combat
     /// <summary>
     /// Minimal combat resolution system.
     ///
-    /// Single responsibility: receive AttackHit intent → resolve damage → raise DamageIntentEvent → publish CombatHitResolved.
+    /// Single responsibility: receive AttackHit intent → resolve damage → apply attacker modifiers
+    /// → raise DamageIntentEvent → publish CombatHitResolved.
+    ///
+    /// Attacker modifiers (attack buff) are applied here, after the resolver's base
+    /// formula, so ICombatResolver stays a pure damage formula. Buff consumption is
+    /// owned by the attacker's state machine (once per attack sequence).
     ///
     /// This system has zero knowledge of animations, FSMs, or entity component internals.
     /// Target selection is fully delegated to IBattleField.
@@ -87,6 +92,18 @@ namespace MightyHeroes.Gameplay.Combat
             _eventHub.EnemyEvents.EnemyAttackHitEvent.Unregister(OnEnemyAttackHit);
         }
 
+        /// <summary>
+        /// Applies the attacker's runtime modifiers (attack buff) to resolved damage.
+        /// Returns the damage unchanged when the attacker has no modifier model.
+        /// </summary>
+        private int ApplyAttackerModifiers(ICombatAttacker attacker, int damage)
+        {
+            if (attacker.Modifiers == null)
+                return damage;
+
+            return attacker.Modifiers.ApplyAttackBuff(damage);
+        }
+
         // EVENT HANDLERS
 
         /// <summary>
@@ -128,10 +145,10 @@ namespace MightyHeroes.Gameplay.Combat
                 return;
             }
 
-            int damage = _combatResolver.ResolveDamage(attacker, target, payload.AttackIntensity);
+            int damage = ApplyAttackerModifiers(attacker, _combatResolver.ResolveDamage(attacker, target, payload.AttackIntensity));
 
             GameLogger.Log(LogSourceType.CombatSystem,
-                $"Hero hit Enemy[{target.EntityId}] Damage={damage} Direction={payload.HitDirection}");
+                $"Hero hit Enemy[{target.EntityId}] Damage={damage} Buff={attacker.Modifiers?.AttackBuffPercent ?? 0}% Direction={payload.HitDirection}");
 
             _eventHub.CombatEvents.CombatDamageIntentEvent.Raise(
                 new CombatDamageIntentPayload(
@@ -166,7 +183,7 @@ namespace MightyHeroes.Gameplay.Combat
                 return;
             }
 
-            int damage = _combatResolver.ResolveDamage(attacker, target, payload.AttackIntensity);
+            int damage = ApplyAttackerModifiers(attacker, _combatResolver.ResolveDamage(attacker, target, payload.AttackIntensity));
 
             GameLogger.Log(LogSourceType.CombatSystem,
                 $"Enemy[{payload.EnemyId}] hit Hero Damage={damage} Direction={payload.HitDirection}");

@@ -4,6 +4,7 @@ using MightyHeroes.Gameplay.Combat.Interfaces;
 using UnityEngine;
 using MightyHeroes.Gameplay.Health;
 using MightyHeroes.Core.EventSystem;
+using MightyHeroes.Gameplay.Combat.Modifiers;
 
 namespace MightyHeroes.Gameplay.Common.Entity
 {
@@ -54,6 +55,17 @@ namespace MightyHeroes.Gameplay.Common.Entity
         protected CombatHealth Health => _health;
 
         /// <summary>
+        /// Runtime combat modifier model (attack buff). Created with health.
+        /// </summary>
+        private CombatModifiers _modifiers;
+
+        /// <summary>
+        /// Runtime combat modifiers applied to this entity's outgoing damage.
+        /// Null until InitializeHealth is called.
+        /// </summary>
+        public CombatModifiers Modifiers => _modifiers;
+
+        /// <summary>
         /// Indicates whether the hero still has remaining action points.
         /// </summary>
         public bool HasRemainingActionPoints => _runtimeStats != null && _runtimeStats.CurrentActionPoints > 0;
@@ -79,15 +91,21 @@ namespace MightyHeroes.Gameplay.Common.Entity
         protected abstract EntityStatsData GetStatsData();
 
         /// <summary>
-        /// Initializes the runtime health model for this entity.
+        /// Initializes the runtime health and combat modifier models for this entity.
         /// This method should be called by derived entity components after base initialization.
         /// </summary>
         /// <param name="eventHub">Battle-scoped event hub instance.</param>
         /// <param name="maxHealth">Initial maximum health.</param>
         /// <param name="maxShield">Initial maximum shield capacity.</param>
-        protected void InitializeHealth(EventHub eventHub, int maxHealth, int maxShield)
+        /// <param name="startingShield">
+        /// Shield granted at battle start, clamped to maxShield. Granted with
+        /// source id 0 so presentation can tell it apart from in-battle shield actions.
+        /// </param>
+        protected void InitializeHealth(EventHub eventHub, int maxHealth, int maxShield, int startingShield)
         {
             _health = new CombatHealth(eventHub, EntityId, maxHealth, maxShield);
+            _health.AddShield(startingShield, sourceEntityId: 0);
+            _modifiers = new CombatModifiers(eventHub, EntityId);
         }
 
         /// <summary>

@@ -40,5 +40,13 @@ namespace MightyHeroes.Gameplay.Combat.Events
         public GameEvent<CombatHitResolvedPayload> CombatHitResolvedEvent =>
             Registry.GetEvent<CombatHitResolvedPayload>();
 
+        /// <summary>
+        /// Raised by CombatModifiers when an entity's pending attack buff is
+        /// granted, replaced by a higher value, or consumed.
+        /// Intended for status icons and floating text.
+        /// </summary>
+        public GameEvent<AttackBuffChangedPayload> AttackBuffChangedEvent =>
+            Registry.GetEvent<AttackBuffChangedPayload>();
+
     }
 }

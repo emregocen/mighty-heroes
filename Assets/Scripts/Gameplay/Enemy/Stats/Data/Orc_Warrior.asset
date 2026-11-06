@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Enemy.Stats.EnemyStatsData
   _entityKey: enemy.orc.warrior
   _maxHealth: 70
-  _maxShield: 0
+  _maxShield: 50
+  _startingShield: 0
   _baseAttack: 5
   _baseDefense: 40
   _baseActionPoints: 1
