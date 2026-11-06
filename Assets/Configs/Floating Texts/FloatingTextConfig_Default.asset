@@ -18,7 +18,7 @@ MonoBehaviour:
   _typeSettings:
   - Type: 0
     Style: {fileID: 11400000, guid: 3c471ae13a0384d88aaacb9858de2110, type: 2}
-    FontSize: 60
+    FontSize: 100
     FontStyle: 0
     Lifetime: 1
     RiseDistance: 70
@@ -29,7 +29,7 @@ MonoBehaviour:
     FadeStartFraction: 0.6
   - Type: 1
     Style: {fileID: 11400000, guid: 6f2b4f0ce64cd418aa1b24a655553093, type: 2}
-    FontSize: 56
+    FontSize: 100
     FontStyle: 0
     Lifetime: 0.8
     RiseDistance: 80
@@ -40,7 +40,7 @@ MonoBehaviour:
     FadeStartFraction: 0.6
   - Type: 2
     Style: {fileID: 11400000, guid: 6f2b4f0ce64cd418aa1b24a655553093, type: 2}
-    FontSize: 80
+    FontSize: 120
     FontStyle: 1
     Lifetime: 2
     RiseDistance: 60
@@ -51,7 +51,7 @@ MonoBehaviour:
     FadeStartFraction: 0.6
   - Type: 3
     Style: {fileID: 11400000, guid: 04c96a61080334b60ba4b09f6f6f5940, type: 2}
-    FontSize: 64
+    FontSize: 120
     FontStyle: 1
     Lifetime: 1.3
     RiseDistance: 60
@@ -62,7 +62,7 @@ MonoBehaviour:
     FadeStartFraction: 0.6
   - Type: 4
     Style: {fileID: 11400000, guid: 3c471ae13a0384d88aaacb9858de2110, type: 2}
-    FontSize: 80
+    FontSize: 120
     FontStyle: 0
     Lifetime: 1
     RiseDistance: 40
@@ -73,7 +73,7 @@ MonoBehaviour:
     FadeStartFraction: 0.6
   - Type: 5
     Style: {fileID: 11400000, guid: 69271d4e70c44429a0f04be26b30c82a, type: 2}
-    FontSize: 54
+    FontSize: 100
     FontStyle: 0
     Lifetime: 1
     RiseDistance: 70
@@ -84,7 +84,7 @@ MonoBehaviour:
     FadeStartFraction: 0.6
   - Type: 6
     Style: {fileID: 11400000, guid: 69271d4e70c44429a0f04be26b30c82a, type: 2}
-    FontSize: 56
+    FontSize: 100
     FontStyle: 1
     Lifetime: 1
     RiseDistance: 80
@@ -95,7 +95,7 @@ MonoBehaviour:
     FadeStartFraction: 0.6
   - Type: 7
     Style: {fileID: 11400000, guid: c595c3a542ba4a5d969c1af5bba57140, type: 2}
-    FontSize: 48
+    FontSize: 100
     FontStyle: 1
     Lifetime: 1.2
     RiseDistance: 80
