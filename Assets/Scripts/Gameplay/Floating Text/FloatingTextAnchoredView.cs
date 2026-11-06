@@ -1,4 +1,5 @@
 using DG.Tweening;
+using MightyHeroes.Core.Logging;
 using TMPro;
 using UnityEngine;
 
@@ -29,6 +30,7 @@ namespace MightyHeroes.Gameplay.FloatingText
         [SerializeField] private RectTransform _rectTransform;
 
         private Canvas _rootCanvas;
+        private bool _hasReportedMissingCanvas;
         private Camera _worldCamera;
         private Vector3 _worldAnchor;
         private Vector2 _baseOffset;
@@ -125,6 +127,13 @@ namespace MightyHeroes.Gameplay.FloatingText
             {
                 Canvas canvas = GetComponentInParent<Canvas>();
                 _rootCanvas = canvas != null ? canvas.rootCanvas : null;
+            }
+
+            if (_rootCanvas == null && !_hasReportedMissingCanvas)
+            {
+                _hasReportedMissingCanvas = true;
+                GameLogger.Log(LogSourceType.UI,
+                    "FloatingTextAnchoredView: no Canvas found above the floating text parent; texts cannot render. Add a Canvas to the parent or move it under the HUD canvas.");
             }
 
             _worldCamera = Camera.main;
