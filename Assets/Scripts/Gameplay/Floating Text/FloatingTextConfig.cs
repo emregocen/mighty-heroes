@@ -36,7 +36,7 @@ namespace MightyHeroes.Gameplay.FloatingText
 
             [Tooltip("Font size for this type. Not part of TextStyleConfig since it's a per-context " +
                      "sizing decision (K.O. reads bigger than a damage number), not shared material style.")]
-            public float FontSize = 8f;
+            public float FontSize = 60f;
 
             [Tooltip("Bold/Italic/Normal for this type.")]
             public FontStyles FontStyle = FontStyles.Normal;
@@ -45,14 +45,14 @@ namespace MightyHeroes.Gameplay.FloatingText
             [Tooltip("Total seconds the text is visible before it's returned to the pool.")]
             public float Lifetime = 0.9f;
 
-            [Tooltip("How far upward (world units) the text drifts over its lifetime.")]
-            public float RiseDistance = 0.8f;
+            [Tooltip("How far upward (canvas reference pixels) the text drifts over its lifetime.")]
+            public float RiseDistance = 70f;
 
             [Tooltip("Degrees of random tilt applied on spawn, in [-value, value].")]
             public float RandomTiltDegrees = 8f;
 
-            [Tooltip("Random offset radius applied on spawn so simultaneous texts don't overlap exactly.")]
-            public float RandomOffsetRadius = 0.25f;
+            [Tooltip("Random offset radius (canvas reference pixels) applied on spawn so simultaneous texts don't overlap exactly.")]
+            public float RandomOffsetRadius = 25f;
 
             [Header("Scale")]
             public float StartScale = 0.6f;
@@ -67,15 +67,30 @@ namespace MightyHeroes.Gameplay.FloatingText
         [Header("Pool")]
         [SerializeField, Min(1)] private int _poolSizePerPrefab = 8;
 
+        [Header("Stacking (anchored texts)")]
+        [Tooltip("Seconds after the last spawn on an entity during which a new text still stacks above it.")]
+        [SerializeField, Min(0f)] private float _stackWindowSeconds = 0.6f;
+
+        [Tooltip("Vertical distance in canvas reference pixels between stacked texts on the same entity.")]
+        [SerializeField, Min(0f)] private float _stackSpacing = 56f;
+
         [Header("Per-Type Settings")]
         [SerializeField] private List<TypeSettings> _typeSettings = new List<TypeSettings>();
 
         // PROPERTIES
 
+        /// <summary>Number of pre-warmed instances per prefab pool.</summary>
         public int PoolSizePerPrefab => _poolSizePerPrefab;
+
+        /// <summary>Stack window in seconds for anchored texts.</summary>
+        public float StackWindowSeconds => _stackWindowSeconds;
+
+        /// <summary>Stack spacing in canvas reference pixels for anchored texts.</summary>
+        public float StackSpacing => _stackSpacing;
 
         // PUBLIC METHODS
 
+        /// <summary>Returns the settings for the given type, or defaults if none are configured.</summary>
         public TypeSettings GetSettings(FloatingTextType type)
         {
             foreach (TypeSettings settings in _typeSettings)

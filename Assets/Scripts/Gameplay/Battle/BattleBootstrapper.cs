@@ -89,10 +89,13 @@ namespace MightyHeroes.Core.Battle
 
         [Header("Floating Text")]
         [SerializeField] private FloatingTextConfig _floatingTextConfig;
-        [SerializeField] private FloatingTextWorldView _floatingTextWorldPrefab;
-        [SerializeField] private Transform _floatingTextWorldParent;
+        [Tooltip("Screen-space text that follows an entity's world position (damage, heal, shield, buff, K.O.).")]
+        [SerializeField] private FloatingTextAnchoredView _floatingTextAnchoredPrefab;
+        [Tooltip("Fixed screen-space text (combo callouts).")]
         [SerializeField] private FloatingTextScreenView _floatingTextScreenPrefab;
+        [Tooltip("Full-screen RectTransform on the HUD canvas that parents both floating text pools.")]
         [SerializeField] private Transform _floatingTextScreenParent;
+        [Tooltip("World-space height above the entity root where floating texts start.")]
         [SerializeField] private float _floatingTextHeightOffset = 1.6f;
 
         // FIELDS — Runtime
@@ -547,32 +550,27 @@ namespace MightyHeroes.Core.Battle
         }
 
         /// <summary>
-        /// Initializes the floating text service and presenter. Both prefabs
-        /// and the config must be assigned for this to activate — if any is
-        /// missing, floating text is silently disabled for this battle.
+        /// Initializes the floating text service and presenter. Both prefabs,
+        /// the screen parent and the config must be assigned for this to
+        /// activate; if any is missing, floating text is disabled for this battle.
         /// </summary>
-private void InitializeFloatingText()
-{
-    if (_floatingTextConfig == null || _floatingTextWorldPrefab == null || _floatingTextScreenPrefab == null)
-    {
-        GameLogger.Log(LogSourceType.BattleSystem,
-            "BattleBootstrapper.InitializeFloatingText: missing config or prefab, skipping.");
-        return;
-    }
+        private void InitializeFloatingText()
+        {
+            if (_floatingTextConfig == null || _floatingTextAnchoredPrefab == null || _floatingTextScreenPrefab == null || _floatingTextScreenParent == null)
+            {
+                GameLogger.Log(LogSourceType.BattleSystem,
+                    "BattleBootstrapper.InitializeFloatingText: missing config, prefab or parent, skipping.");
+                return;
+            }
 
-    _floatingTextService = new FloatingTextService(
-        _floatingTextConfig,
-        _floatingTextWorldPrefab,
-        _floatingTextWorldParent,
-        _floatingTextScreenPrefab,
-        _floatingTextScreenParent);
+            _floatingTextService = new FloatingTextService(_floatingTextConfig, _floatingTextAnchoredPrefab, _floatingTextScreenPrefab, _floatingTextScreenParent);
 
-    var anchorProvider = new BattleFormationAnchorProvider(_heroComponent, _battleFormation, _floatingTextHeightOffset);
+            var anchorProvider = new BattleFormationAnchorProvider(_heroComponent, _battleFormation, _floatingTextHeightOffset);
 
-    _floatingTextPresenter = new FloatingTextPresenter(_eventHub, _floatingTextService, anchorProvider);
+            _floatingTextPresenter = new FloatingTextPresenter(_eventHub, _floatingTextService, anchorProvider);
 
-    GameLogger.Log(LogSourceType.BattleSystem, "FloatingText initialized.");
-}
+            GameLogger.Log(LogSourceType.BattleSystem, "FloatingText initialized.");
+        }
 
         /// <summary>
         /// Creates the status icon presenter and registers the hero and every

@@ -45706,13 +45706,9 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 879630260}
     - target: {fileID: 3172675781767647117, guid: a9dee7567a8b648cc986a4c53ce06d04, type: 3}
-      propertyPath: _floatingTextWorldParent
+      propertyPath: _floatingTextAnchoredPrefab
       value: 
-      objectReference: {fileID: 371979050}
-    - target: {fileID: 3172675781767647117, guid: a9dee7567a8b648cc986a4c53ce06d04, type: 3}
-      propertyPath: _floatingTextWorldPrefab
-      value: 
-      objectReference: {fileID: 8204372689454043544, guid: bfd68fb4d932a4ddfbbb9d6798cce042, type: 3}
+      objectReference: {fileID: 8306435047930137031, guid: 8a6595321eb14e1394746fbe2bcf9478, type: 3}
     - target: {fileID: 3172675781767647117, guid: a9dee7567a8b648cc986a4c53ce06d04, type: 3}
       propertyPath: _victoryCameraController
       value: 

@@ -34,10 +34,10 @@ namespace MightyHeroes.Gameplay.FloatingText
 
         /// <summary>
         /// stackWindowSeconds: how long after the last spawn a new one still
-        /// counts as part of the same stack. stackSpacing: vertical world-space
-        /// distance between each stacked entry.
+        /// counts as part of the same stack. stackSpacing: vertical distance in
+        /// canvas reference pixels between each stacked entry.
         /// </summary>
-        public FloatingTextStackTracker(float stackWindowSeconds = 0.6f, float stackSpacing = 0.5f)
+        public FloatingTextStackTracker(float stackWindowSeconds, float stackSpacing)
         {
             _stackWindowSeconds = stackWindowSeconds;
             _stackSpacing = stackSpacing;
@@ -47,7 +47,7 @@ namespace MightyHeroes.Gameplay.FloatingText
 
         /// <summary>
         /// Registers a new spawn for the given entity and returns the vertical
-        /// offset (world units) this spawn should be placed at, stacking above
+        /// offset (canvas pixels) this spawn should be placed at, stacking above
         /// any texts spawned for the same entity within the stack window.
         /// </summary>
         public float RegisterSpawnAndGetOffset(int entityId)

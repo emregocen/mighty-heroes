@@ -6,9 +6,10 @@ using UnityEngine;
 namespace MightyHeroes.Gameplay.FloatingText
 {
     /// <summary>
-    /// Resolves floating-text anchor points using the hero reference and
-    /// BattleFormation's enemy lookup. Chest-height offset is applied uniformly;
-    /// adjust _heightOffset if hero/enemy proportions differ significantly.
+    /// Resolves floating-text world anchors using the hero reference and
+    /// BattleFormation's enemy lookup. The height offset (Inspector value on
+    /// BattleBootstrapper) is applied uniformly above the entity root so texts
+    /// start around head height; the anchored view then projects it to screen.
     /// </summary>
     public sealed class BattleFormationAnchorProvider : IFloatingTextAnchorProvider
     {
@@ -20,7 +21,13 @@ namespace MightyHeroes.Gameplay.FloatingText
 
         // CONSTRUCTOR
 
-        public BattleFormationAnchorProvider(HeroComponent hero, BattleFormation formation, float heightOffset = 1.6f)
+        /// <summary>
+        /// Creates an anchor provider for the given hero and formation.
+        /// </summary>
+        /// <param name="hero">Battle hero.</param>
+        /// <param name="formation">Enemy formation used to find enemies by id.</param>
+        /// <param name="heightOffset">World-space height above the entity root.</param>
+        public BattleFormationAnchorProvider(HeroComponent hero, BattleFormation formation, float heightOffset)
         {
             _hero = hero;
             _formation = formation;
@@ -28,24 +35,22 @@ namespace MightyHeroes.Gameplay.FloatingText
         }
 
         // PUBLIC METHODS
-public Vector3 GetAnchorPosition(int entityId)
-{
-    if (_hero != null && entityId == _hero.EntityId)
-    {
-        Debug.Log($"[AnchorProvider] entityId={entityId} matched HERO '{_hero.name}' at {_hero.Position}");
-        return _hero.Position + Vector3.up * _heightOffset;
-    }
 
-    var enemy = _formation.FindEnemyById(entityId);
+        /// <summary>
+        /// Returns the world anchor above the given entity, or Vector3.zero if
+        /// the id matches neither the hero nor a formation enemy.
+        /// </summary>
+        public Vector3 GetAnchorPosition(int entityId)
+        {
+            if (_hero != null && entityId == _hero.EntityId)
+                return _hero.Position + Vector3.up * _heightOffset;
 
-    if (enemy != null)
-    {
-        Debug.Log($"[AnchorProvider] entityId={entityId} matched ENEMY '{(enemy as UnityEngine.Component)?.gameObject.name}' at {enemy.Position}");
-        return enemy.Position + Vector3.up * _heightOffset;
-    }
+            ICombatEntity enemy = _formation.FindEnemyById(entityId);
 
-    Debug.Log($"[AnchorProvider] entityId={entityId} matched NOTHING, returning zero");
-    return Vector3.zero;
-}
+            if (enemy != null)
+                return enemy.Position + Vector3.up * _heightOffset;
+
+            return Vector3.zero;
+        }
     }
 }

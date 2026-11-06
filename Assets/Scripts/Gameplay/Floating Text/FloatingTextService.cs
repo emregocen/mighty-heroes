@@ -6,11 +6,14 @@ namespace MightyHeroes.Gameplay.FloatingText
     /// <summary>
     /// Central entry point for spawning floating combat text.
     ///
-    /// Owns two pools — world-space (damage, heal, K.O., overkill) and
-    /// screen-space (combo) — and exposes a small, semantic API so callers
-    /// (FloatingTextPresenter) never touch pools or views directly.
+    /// Owns two pools, both on the screen-space HUD canvas:
+    /// - anchored views (damage, heal, shield, buff, K.O., overkill) that follow
+    ///   an entity's world position on screen;
+    /// - fixed screen views (combo) at a fixed HUD anchor.
+    /// Exposes a small, semantic API so callers (FloatingTextPresenter) never
+    /// touch pools or views directly.
     ///
-    /// World-space spawns are stacked per entity via FloatingTextStackTracker
+    /// Anchored spawns are stacked per entity via FloatingTextStackTracker
     /// so simultaneous or rapid-fire texts (e.g. damage immediately followed
     /// by K.O. and overkill on the same death) stack vertically rather than
     /// overlapping.
@@ -22,28 +25,26 @@ namespace MightyHeroes.Gameplay.FloatingText
         // FIELDS
 
         private readonly FloatingTextConfig _config;
-        private readonly FloatingTextPool<FloatingTextWorldView> _worldPool;
+        private readonly FloatingTextPool<FloatingTextAnchoredView> _anchoredPool;
         private readonly FloatingTextPool<FloatingTextScreenView> _screenPool;
         private readonly FloatingTextStackTracker _stackTracker;
 
         // CONSTRUCTOR
 
-        public FloatingTextService(
-            FloatingTextConfig config,
-            FloatingTextWorldView worldPrefab,
-            Transform worldParent,
-            FloatingTextScreenView screenPrefab,
-            Transform screenParent)
+        /// <summary>
+        /// Creates both pools under the given screen-space canvas parent.
+        /// </summary>
+        /// <param name="config">Per-type settings, pool size and stack settings.</param>
+        /// <param name="anchoredPrefab">Prefab for world-anchored texts.</param>
+        /// <param name="screenPrefab">Prefab for fixed screen texts (combo).</param>
+        /// <param name="screenParent">Full-screen RectTransform on the HUD canvas.</param>
+        public FloatingTextService(FloatingTextConfig config, FloatingTextAnchoredView anchoredPrefab, FloatingTextScreenView screenPrefab, Transform screenParent)
         {
             _config = config;
 
-            _worldPool = new FloatingTextPool<FloatingTextWorldView>(
-                worldPrefab, worldParent, config.PoolSizePerPrefab);
-
-            _screenPool = new FloatingTextPool<FloatingTextScreenView>(
-                screenPrefab, screenParent, config.PoolSizePerPrefab);
-
-            _stackTracker = new FloatingTextStackTracker();
+            _anchoredPool = new FloatingTextPool<FloatingTextAnchoredView>(anchoredPrefab, screenParent, config.PoolSizePerPrefab);
+            _screenPool = new FloatingTextPool<FloatingTextScreenView>(screenPrefab, screenParent, config.PoolSizePerPrefab);
+            _stackTracker = new FloatingTextStackTracker(config.StackWindowSeconds, config.StackSpacing);
         }
 
         // PUBLIC METHODS
@@ -105,30 +106,23 @@ namespace MightyHeroes.Gameplay.FloatingText
         // PRIVATE METHODS
 
         /// <summary>
-        /// Applies the per-entity stack offset on top of worldPosition before
-        /// spawning, so texts landing close together in time stack upward
-        /// instead of overlapping.
+        /// Spawns an anchored text at worldPosition with the per-entity stack
+        /// offset (canvas pixels), so texts landing close together in time stack
+        /// upward instead of overlapping.
         /// </summary>
         private void PlayWorldStacked(int entityId, FloatingTextType type, Vector3 worldPosition, string text)
         {
             float stackOffset = _stackTracker.RegisterSpawnAndGetOffset(entityId);
-            Vector3 stackedPosition = worldPosition + Vector3.up * stackOffset;
-
-            PlayWorld(type, stackedPosition, text);
-        }
-
-        private void PlayWorld(FloatingTextType type, Vector3 worldPosition, string text)
-        {
             FloatingTextConfig.TypeSettings settings = _config.GetSettings(type);
-            FloatingTextWorldView view = _worldPool.Acquire();
+            FloatingTextAnchoredView view = _anchoredPool.Acquire();
 
-            view.PlayAt(worldPosition, text, settings, OnWorldViewReturned);
+            view.PlayAt(worldPosition, stackOffset, text, settings, OnAnchoredViewReturned);
         }
 
-        private void OnWorldViewReturned(IFloatingTextHandle handle)
+        private void OnAnchoredViewReturned(IFloatingTextHandle handle)
         {
-            if (handle is FloatingTextWorldView view)
-                _worldPool.Release(view);
+            if (handle is FloatingTextAnchoredView view)
+                _anchoredPool.Release(view);
         }
 
         private void OnScreenViewReturned(IFloatingTextHandle handle)
