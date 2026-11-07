@@ -37,7 +37,7 @@ MonoBehaviour:
     Scale: 1
   - Prefabs:
     - {fileID: 1809022330002312, guid: ed511b7776af6174e9b1255c7a81e59c, type: 3}
-    Scale: 1.2
+    Scale: 0.5
   _enemyHitVfx:
     Prefabs:
     - {fileID: 1384676760634654, guid: 289ba3245c9c98c42aeb93d5f45a2248, type: 3}
