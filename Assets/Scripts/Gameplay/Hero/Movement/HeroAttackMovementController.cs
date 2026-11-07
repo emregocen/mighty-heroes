@@ -48,6 +48,8 @@ namespace MightyHeroes.Gameplay.Hero.Movement
 
         private Tween _swordArmTween;
         private Tween _swordHandTween;
+        private bool _isIdleSwordPoseEnabled;
+        private bool _wasIdleSwordPoseEnabledBeforeHeal;
         private Tween _retreatTween;
 
         // PROPERTIES
@@ -158,14 +160,26 @@ namespace MightyHeroes.Gameplay.Hero.Movement
         }
 
         /// <summary>
-        /// Called when a heal animation starts.
+        /// Called when a heal (support) animation starts.
         /// Blends the sword idle override layers down to zero so the heal clip
-        /// is not distorted by the sword pose. Does not touch root motion or
-        /// retreat state, since heal has no movement phase.
+        /// is not distorted by the sword pose, remembering whether the pose was
+        /// on. Does not touch root motion or retreat state, since heal has no
+        /// movement phase.
         /// </summary>
         public void NotifyHealStarted()
         {
+            _wasIdleSwordPoseEnabledBeforeHeal = _isIdleSwordPoseEnabled;
             DisableIdleSwordPose();
+        }
+
+        /// <summary>
+        /// Called when a heal (support) animation ends.
+        /// Restores the sword idle override layers to their state before the heal.
+        /// </summary>
+        public void NotifyHealEnded()
+        {
+            if (_wasIdleSwordPoseEnabledBeforeHeal)
+                EnableIdleSwordPose();
         }
 
         /// <summary>
@@ -273,6 +287,7 @@ namespace MightyHeroes.Gameplay.Hero.Movement
         /// <summary>Blends sword idle override layers up with configured duration.</summary>
         private void EnableIdleSwordPose()
         {
+            _isIdleSwordPoseEnabled = true;
             BlendLayer(_swordArmLayerIndex, _swordArmIdleWeight, ref _swordArmTween);
             BlendLayer(_swordHandLayerIndex, _swordHandIdleWeight, ref _swordHandTween);
         }
@@ -280,6 +295,7 @@ namespace MightyHeroes.Gameplay.Hero.Movement
         /// <summary>Blends sword idle override layers down to zero with configured duration.</summary>
         private void DisableIdleSwordPose()
         {
+            _isIdleSwordPoseEnabled = false;
             BlendLayer(_swordArmLayerIndex, 0f, ref _swordArmTween);
             BlendLayer(_swordHandLayerIndex, 0f, ref _swordHandTween);
         }

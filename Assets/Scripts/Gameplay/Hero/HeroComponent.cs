@@ -319,8 +319,9 @@ namespace MightyHeroes.Gameplay.Hero
         }
 
         /// <summary>
-        /// Starts the heal animation and fades LookAt IK out so the heal clip
-        /// is not bent toward the current target.
+        /// Starts the heal animation, fades LookAt IK out and lowers the sword
+        /// idle override layers so the heal clip is neither bent toward the
+        /// current target nor overridden by the idle sword pose.
         /// Shared by all support actions until dedicated clips exist.
         /// Must only be called from a State (HeroSupportState).
         /// </summary>
@@ -328,6 +329,7 @@ namespace MightyHeroes.Gameplay.Hero
         public void PlayHeal(int healVariant)
         {
             _heroTargetFocusController?.NotifyHealStarted();
+            _attackMovementController?.NotifyHealStarted();
             _animator.SetInteger(Anim_HealVariant, healVariant);
             _animator.SetTrigger(Anim_DoHeal);
         }
@@ -533,11 +535,12 @@ namespace MightyHeroes.Gameplay.Hero
 
         /// <summary>
         /// Called by HealSequenceEndedBehaviour when the heal animation clip finishes.
-        /// Restores LookAt IK, then forwards to the FSM as a signal only.
+        /// Restores LookAt IK and the sword idle pose, then forwards to the FSM as a signal only.
         /// </summary>
         public void NotifyHealSequenceEnded()
         {
             _heroTargetFocusController?.NotifyHealEnded();
+            _attackMovementController?.NotifyHealEnded();
             _stateMachine.NotifyHealSequenceEnded();
         }
 
