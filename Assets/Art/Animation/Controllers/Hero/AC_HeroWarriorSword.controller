@@ -1550,7 +1550,7 @@ AnimatorStateMachine:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: TauntLowerBody
+  m_Name: LowerBodyLock
   m_ChildStates:
   - serializedVersion: 1
     m_State: {fileID: -7942314920332211340}
@@ -3046,7 +3046,7 @@ AnimatorController:
     m_SyncedLayerAffectsTiming: 0
     m_Controller: {fileID: 9100000}
   - serializedVersion: 5
-    m_Name: TauntLowerBody
+    m_Name: LowerBodyLock
     m_StateMachine: {fileID: -4058208046176989725}
     m_Mask: {fileID: 31900000, guid: 8da86fa73e1d346ffa3da22a6da3d64f, type: 2}
     m_Motions: []
@@ -4973,7 +4973,8 @@ AnimatorStateMachine:
   m_AnyStateTransitions: []
   m_EntryTransitions: []
   m_StateMachineTransitions: {}
-  m_StateMachineBehaviours: []
+  m_StateMachineBehaviours:
+  - {fileID: -8994989503811843294}
   m_AnyStatePosition: {x: 50, y: -10, z: 0}
   m_EntryPosition: {x: 50, y: 50, z: 0}
   m_ExitPosition: {x: 50, y: 210, z: 0}
@@ -5640,3 +5641,18 @@ AnimatorTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 1
+--- !u!114 &-8994989503811843294
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91ceb48b83ba4e3491cdf2f21923baa3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Animation.Behaviours.LowerBodyLockBehaviour
+  _lockLayerName: LowerBodyLock
+  _blendInDuration: 0.15
+  _blendOutDuration: 0.2
