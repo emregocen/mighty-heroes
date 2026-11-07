@@ -51,13 +51,13 @@ namespace MightyHeroes.Gameplay.Battle
         [SerializeField, Range(0f, 1f)] private float _heroBias = 0.4f;
 
         [Tooltip("Sideways distance of the camera from the hero-enemy line.")]
-        [SerializeField, Min(0.5f)] private float _sideDistance = 3.5f;
+        [SerializeField, Min(0.5f)] private float _sideDistance = 6f;
 
         [Tooltip("Camera height above the hero's root.")]
-        [SerializeField] private float _cameraHeight = 1.3f;
+        [SerializeField] private float _cameraHeight = 1.8f;
 
         [Tooltip("Height of the point the camera looks at, above the hero's root.")]
-        [SerializeField] private float _lookHeight = 1.1f;
+        [SerializeField] private float _lookHeight = 1f;
 
         [Tooltip("Camera roll in degrees for a dramatic tilted frame.")]
         [SerializeField, Range(-30f, 30f)] private float _dutchAngle = 8f;
@@ -120,6 +120,7 @@ namespace MightyHeroes.Gameplay.Battle
             }
 
             _killCamera.Priority = PriorityInactive;
+            _killCamera.StandbyUpdate = CinemachineVirtualCameraBase.StandbyUpdateMode.Always;
             _originalDefaultBlend = _brain.DefaultBlend;
             _originalIgnoreTimeScale = _brain.IgnoreTimeScale;
 
@@ -151,6 +152,8 @@ namespace MightyHeroes.Gameplay.Battle
         /// Places the kill camera on the side of the hero-enemy line that the
         /// battle camera is already on (never crossing the 180 degree line),
         /// biased toward the hero, looking at the bias point with dutch tilt.
+        /// ForceCameraPosition pushes the new pose into Cinemachine immediately so
+        /// the blend never starts from the camera's stale standby state.
         /// </summary>
         private bool PlaceCamera(int heroId, int enemyId)
         {
@@ -173,8 +176,11 @@ namespace MightyHeroes.Gameplay.Battle
             Vector3 cameraPosition = focus + side * _sideDistance + Vector3.up * _cameraHeight;
             Vector3 lookPoint = focus + Vector3.up * _lookHeight;
 
-            _killCamera.transform.SetPositionAndRotation(cameraPosition, Quaternion.LookRotation(lookPoint - cameraPosition));
+            Quaternion cameraRotation = Quaternion.LookRotation(lookPoint - cameraPosition);
+
             _killCamera.Lens.Dutch = _dutchAngle;
+            _killCamera.transform.SetPositionAndRotation(cameraPosition, cameraRotation);
+            _killCamera.ForceCameraPosition(cameraPosition, cameraRotation);
             return true;
         }
 
