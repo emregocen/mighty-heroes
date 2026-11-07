@@ -13,7 +13,9 @@ namespace MightyHeroes.Gameplay.Battle
     /// to Hierarchy scaling so the uniform scale from CombatFeedbackData affects
     /// the whole effect (Synty prefabs ship with Local scaling).
     ///
-    /// Each effect faces the main camera, which keeps flat slash effects readable.
+    /// Each effect is pulled toward the main camera by the requested offset (so it
+    /// is not hidden inside the target's mesh) and faces the camera, which keeps
+    /// flat slash effects readable.
     /// Looping effects are stopped and cleared when their lifetime ends.
     /// </summary>
     public sealed class PooledHitVfxPlayer : MonoBehaviour, IHitVfxPlayer
@@ -34,10 +36,10 @@ namespace MightyHeroes.Gameplay.Battle
         // PUBLIC METHODS
 
         /// <summary>
-        /// Plays one pooled instance of the prefab at position, facing the camera,
-        /// and returns it to its pool after lifetime seconds.
+        /// Plays one pooled instance of the prefab at position, pulled toward and
+        /// facing the camera, and returns it to its pool after lifetime seconds.
         /// </summary>
-        public void Play(GameObject prefab, Vector3 position, float scale, float lifetime)
+        public void Play(GameObject prefab, Vector3 position, float towardCameraOffset, float scale, float lifetime)
         {
             if (prefab == null)
                 return;
@@ -48,11 +50,15 @@ namespace MightyHeroes.Gameplay.Battle
             GameObject instance = AcquireInstance(prefab);
             Transform instanceTransform = instance.transform;
 
+            if (_camera != null)
+            {
+                Vector3 toCamera = (_camera.transform.position - position).normalized;
+                position += toCamera * towardCameraOffset;
+                instanceTransform.rotation = Quaternion.LookRotation(toCamera);
+            }
+
             instanceTransform.position = position;
             instanceTransform.localScale = Vector3.one * scale;
-
-            if (_camera != null)
-                instanceTransform.rotation = Quaternion.LookRotation(_camera.transform.position - position);
 
             instance.SetActive(true);
 

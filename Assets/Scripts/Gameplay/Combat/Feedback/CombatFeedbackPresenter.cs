@@ -96,8 +96,9 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
         }
 
         /// <summary>
-        /// Plays the hit VFX set at the target's chest height. Final hero hits
-        /// use their tier's set, earlier combo hits the set of the tier below.
+        /// Plays the hit VFX set at the target's chest height, pulled toward the
+        /// camera so it is not hidden inside the body. Final hero hits use their
+        /// tier's set, earlier combo hits the set of the tier below.
         /// </summary>
         private void PlayHitVfx(CombatHitResolvedPayload payload, bool isHeroHit, bool isFinalHit)
         {
@@ -125,7 +126,7 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
             Vector3 spawnPosition = targetPosition + Vector3.up * _data.HitVfxHeightOffset;
 
             foreach (GameObject prefab in vfxSet.Prefabs)
-                _hitVfxPlayer.Play(prefab, spawnPosition, vfxSet.Scale, _data.HitVfxLifetime);
+                _hitVfxPlayer.Play(prefab, spawnPosition, _data.HitVfxTowardCameraOffset, vfxSet.Scale, _data.HitVfxLifetime);
         }
 
         /// <summary>Returns the per-tier value (index tier - 1), clamped to the array bounds.</summary>

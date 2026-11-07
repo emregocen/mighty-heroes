@@ -66,6 +66,9 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
         [Tooltip("World-space height above the target's root where hit VFX spawn (roughly chest height).")]
         [SerializeField] private float _hitVfxHeightOffset = 1.1f;
 
+        [Tooltip("World distance hit VFX are pulled from the target's center toward the camera, so they render in front of the body instead of inside it.")]
+        [SerializeField, Min(0f)] private float _hitVfxTowardCameraOffset = 0.6f;
+
         [Tooltip("Seconds before a hit VFX instance is stopped and returned to its pool.")]
         [SerializeField, Min(0.1f)] private float _hitVfxLifetime = 1.5f;
 
@@ -91,6 +94,9 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
 
         /// <summary>World-space height above the target root for hit VFX.</summary>
         public float HitVfxHeightOffset => _hitVfxHeightOffset;
+
+        /// <summary>World distance hit VFX are pulled toward the camera from the target's center.</summary>
+        public float HitVfxTowardCameraOffset => _hitVfxTowardCameraOffset;
 
         /// <summary>Seconds before a hit VFX instance returns to its pool.</summary>
         public float HitVfxLifetime => _hitVfxLifetime;

@@ -36,4 +36,5 @@ MonoBehaviour:
     - {fileID: 1384676760634654, guid: 289ba3245c9c98c42aeb93d5f45a2248, type: 3}
     Scale: 0.8
   _hitVfxHeightOffset: 1.1
+  _hitVfxTowardCameraOffset: 0.6
   _hitVfxLifetime: 1.5
