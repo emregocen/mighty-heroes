@@ -17,10 +17,16 @@ namespace MightyHeroes.Gameplay.Battle
     /// is not hidden inside the target's mesh) and faces the camera, which keeps
     /// flat slash effects readable.
     /// Looping effects are stopped and cleared when their lifetime ends.
+    ///
+    /// New instances are moved to the render layer (HitVfx by default) so
+    /// HitVfxOverlayCamera can draw them on top of character meshes.
     /// </summary>
     public sealed class PooledHitVfxPlayer : MonoBehaviour, IHitVfxPlayer
     {
         // FIELDS
+
+        [Tooltip("Layer hit VFX instances are moved to. Must match HitVfxOverlayCamera. Empty keeps the prefab layer.")]
+        [SerializeField] private string _renderLayerName = "HitVfx";
 
         private readonly Dictionary<GameObject, Queue<GameObject>> _pools = new Dictionary<GameObject, Queue<GameObject>>();
         private readonly Dictionary<GameObject, ParticleSystem[]> _particleCache = new Dictionary<GameObject, ParticleSystem[]>();
@@ -88,6 +94,8 @@ namespace MightyHeroes.Gameplay.Battle
             GameObject instance = Instantiate(prefab, transform);
             instance.SetActive(false);
 
+            ApplyRenderLayer(instance);
+
             ParticleSystem[] particles = instance.GetComponentsInChildren<ParticleSystem>(true);
 
             foreach (ParticleSystem particle in particles)
@@ -99,6 +107,21 @@ namespace MightyHeroes.Gameplay.Battle
 
             _particleCache.Add(instance, particles);
             return instance;
+        }
+
+        /// <summary>Moves the instance and all its children to the render layer, if it exists.</summary>
+        private void ApplyRenderLayer(GameObject instance)
+        {
+            if (string.IsNullOrEmpty(_renderLayerName))
+                return;
+
+            int layer = LayerMask.NameToLayer(_renderLayerName);
+
+            if (layer < 0)
+                return;
+
+            foreach (Transform child in instance.GetComponentsInChildren<Transform>(true))
+                child.gameObject.layer = layer;
         }
 
         /// <summary>Stops the instance after lifetime seconds and returns it to its pool.</summary>
