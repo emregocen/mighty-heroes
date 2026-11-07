@@ -118,6 +118,21 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
         }
 
         /// <summary>
+        /// Requests the kill moment (kill-cam + slow motion) when the final hero hit
+        /// of a tier at or above KillMomentMinTier kills its target.
+        /// </summary>
+        private void RequestKillMoment(CombatHitResolvedPayload payload, bool isHeroHit, bool isFinalHit)
+        {
+            if (!isHeroHit || !isFinalHit || payload.TotalSteps < _data.KillMomentMinTier)
+                return;
+
+            if (!payload.TargetWasAlive || payload.TargetIsAliveAfter)
+                return;
+
+            _eventHub.CombatEvents.KillCamRequestedEvent.Raise(new KillCamRequestedPayload(payload.AttackerId, payload.TargetId));
+        }
+
+        /// <summary>
         /// Plays the hit VFX set at the target's chest height, pulled toward the
         /// camera so it is not hidden inside the body. Final hero hits use their
         /// tier's set, earlier combo hits the set of the tier below.
@@ -174,6 +189,7 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
             PlayShake(payload, isHeroHit, isFinalHit);
             PlayHitVfx(payload, isHeroHit, isFinalHit);
             RequestHitStop(payload, isHeroHit, isFinalHit);
+            RequestKillMoment(payload, isHeroHit, isFinalHit);
         }
     }
 }

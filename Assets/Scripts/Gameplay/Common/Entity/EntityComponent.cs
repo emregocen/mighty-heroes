@@ -119,7 +119,7 @@ namespace MightyHeroes.Gameplay.Common.Entity
         }
 
         /// <summary>
-        /// Freezes the given Animator for duration seconds (hit-stop), then
+        /// Freezes the given Animator for duration real seconds (hit-stop), then
         /// resumes it at normal speed. A new request while frozen extends the
         /// freeze to whichever end time is later; it never stacks.
         /// Derived components call this from their HitStopRequested handler.
@@ -131,7 +131,7 @@ namespace MightyHeroes.Gameplay.Common.Entity
             if (animator == null || duration <= 0f || !isActiveAndEnabled)
                 return;
 
-            _hitStopEndTime = Mathf.Max(_hitStopEndTime, Time.time + duration);
+            _hitStopEndTime = Mathf.Max(_hitStopEndTime, Time.unscaledTime + duration);
 
             if (_hitStopRoutine != null)
                 return;
@@ -220,7 +220,7 @@ namespace MightyHeroes.Gameplay.Common.Entity
         /// <summary>Waits until the hit-stop end time, then resumes the animator.</summary>
         private IEnumerator RunHitStop()
         {
-            while (Time.time < _hitStopEndTime)
+            while (Time.unscaledTime < _hitStopEndTime)
                 yield return null;
 
             _hitStopRoutine = null;

@@ -5,7 +5,7 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
 {
     /// <summary>
     /// Design-time tuning for combat "feel" feedback driven by hit events:
-    /// camera shake, hit VFX and hit-stop.
+    /// camera shake, hit VFX, hit-stop and the kill moment (kill-cam + slow motion).
     ///
     /// Per-tier arrays are indexed by tier - 1 (index 0 = Tier 1). For hero
     /// attacks the tier equals the combo step count (HeroActionExecution
@@ -58,8 +58,21 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
         [Tooltip("Animator freeze per tier on the final hit of a hero attack, in seconds (index 0 = Tier 1). Zero disables hit-stop for that tier.")]
         [SerializeField] private float[] _heroHitStopDurations = { 0f, 0f, 0.1f };
 
-        [Tooltip("Freeze used instead when the final hit also kills the target. Only applies to tiers whose hit-stop is enabled.")]
-        [SerializeField, Min(0f)] private float _killingHitStopDuration = 0.2f;
+        [Tooltip("Freeze used instead when the final hit also kills the target. Only applies to tiers whose hit-stop is enabled. Keep short when the kill moment plays; slow motion carries the drama.")]
+        [SerializeField, Min(0f)] private float _killingHitStopDuration = 0.08f;
+
+        [Header("Kill Moment (kill-cam + slow motion)")]
+        [Tooltip("Minimum tier whose killing final hit plays the kill moment. Set above 3 to disable.")]
+        [SerializeField, Range(1, 4)] private int _killMomentMinTier = 3;
+
+        [Tooltip("Time scale during the kill moment (0.25 = quarter speed).")]
+        [SerializeField, Range(0.05f, 1f)] private float _killSlowMotionTimeScale = 0.25f;
+
+        [Tooltip("Real seconds the slow motion is held before easing back.")]
+        [SerializeField, Min(0f)] private float _killSlowMotionHoldDuration = 0.5f;
+
+        [Tooltip("Real seconds to ease from slow motion back to normal speed.")]
+        [SerializeField, Min(0.01f)] private float _killSlowMotionRecoverDuration = 0.3f;
 
         [Header("Hit VFX - Hero Attacks")]
         [Tooltip("VFX per tier for the final hit of a hero attack (index 0 = Tier 1). Non-final combo hits use the tier below.")]
@@ -98,6 +111,18 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
 
         /// <summary>Freeze used when the final hit kills the target (enabled tiers only).</summary>
         public float KillingHitStopDuration => _killingHitStopDuration;
+
+        /// <summary>Minimum tier whose killing final hit plays the kill moment.</summary>
+        public int KillMomentMinTier => _killMomentMinTier;
+
+        /// <summary>Time scale during the kill moment.</summary>
+        public float KillSlowMotionTimeScale => _killSlowMotionTimeScale;
+
+        /// <summary>Real seconds the kill slow motion is held.</summary>
+        public float KillSlowMotionHoldDuration => _killSlowMotionHoldDuration;
+
+        /// <summary>Real seconds to ease back from kill slow motion.</summary>
+        public float KillSlowMotionRecoverDuration => _killSlowMotionRecoverDuration;
 
         /// <summary>Hero hit VFX per tier, indexed by tier - 1.</summary>
         public HitVfxSet[] HeroHitVfxTiers => _heroHitVfxTiers;

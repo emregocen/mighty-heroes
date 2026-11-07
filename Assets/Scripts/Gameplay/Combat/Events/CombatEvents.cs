@@ -55,5 +55,12 @@ namespace MightyHeroes.Gameplay.Combat.Events
         public GameEvent<HitStopRequestedPayload> HitStopRequestedEvent =>
             Registry.GetEvent<HitStopRequestedPayload>();
 
+        /// <summary>
+        /// Raised by CombatFeedbackPresenter when a high-tier final hit kills its
+        /// target. KillCamController plays the side kill-cam and slow motion.
+        /// </summary>
+        public GameEvent<KillCamRequestedPayload> KillCamRequestedEvent =>
+            Registry.GetEvent<KillCamRequestedPayload>();
+
     }
 }

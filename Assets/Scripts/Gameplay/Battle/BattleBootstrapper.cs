@@ -95,6 +95,8 @@ namespace MightyHeroes.Core.Battle
         [SerializeField] private CinemachineImpulseShaker _cameraShaker;
         [Tooltip("Pooled player for hit VFX. Optional.")]
         [SerializeField] private PooledHitVfxPlayer _hitVfxPlayer;
+        [Tooltip("Side kill-cam and slow motion on high-tier killing hits. Optional.")]
+        [SerializeField] private KillCamController _killCamController;
 
         [Header("Floating Text")]
         [SerializeField] private FloatingTextConfig _floatingTextConfig;
@@ -624,6 +626,9 @@ namespace MightyHeroes.Core.Battle
             var entityLocator = new BattleEntityLocator(_heroComponent, _enemyFormation);
 
             _combatFeedbackPresenter = new CombatFeedbackPresenter(_eventHub, _combatFeedbackData, _cameraShaker, _hitVfxPlayer, entityLocator, _heroComponent.EntityId);
+
+            if (_killCamController != null)
+                _killCamController.Initialize(_eventHub, _combatFeedbackData, entityLocator);
         }
 
         // PRIVATE METHODS — Disposal
