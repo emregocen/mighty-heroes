@@ -183,15 +183,6 @@ namespace MightyHeroes.Gameplay.Hero.Movement
         }
 
         /// <summary>
-        /// Called when a heal animation ends.
-        /// Blends the sword idle override layers back up to their idle weights.
-        /// </summary>
-        public void NotifyHealEnded()
-        { 
-            EnableIdleSwordPose();
-        }
-        
-        /// <summary>
         /// Immediately cancels an in-progress retreat without raising RetreatCompleted.
         /// Called when battle ends during retreat so the FSM can transition to
         /// VictoryState cleanly without a stale tween or callback firing afterward.
