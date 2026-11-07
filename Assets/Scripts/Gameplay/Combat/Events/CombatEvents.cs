@@ -48,5 +48,12 @@ namespace MightyHeroes.Gameplay.Combat.Events
         public GameEvent<AttackBuffChangedPayload> AttackBuffChangedEvent =>
             Registry.GetEvent<AttackBuffChangedPayload>();
 
+        /// <summary>
+        /// Raised by CombatFeedbackPresenter to briefly freeze the attacker's and
+        /// target's animations. Entity components pause their own Animator.
+        /// </summary>
+        public GameEvent<HitStopRequestedPayload> HitStopRequestedEvent =>
+            Registry.GetEvent<HitStopRequestedPayload>();
+
     }
 }

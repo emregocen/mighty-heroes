@@ -1,3 +1,4 @@
+using System.Collections;
 using MightyHeroes.Gameplay.Common.Runtime;
 using MightyHeroes.Gameplay.Common.Stats;
 using MightyHeroes.Gameplay.Combat.Interfaces;
@@ -59,6 +60,15 @@ namespace MightyHeroes.Gameplay.Common.Entity
         /// </summary>
         private CombatModifiers _modifiers;
 
+        /// <summary>Running hit-stop coroutine, if any.</summary>
+        private Coroutine _hitStopRoutine;
+
+        /// <summary>Animator paused by the running hit-stop.</summary>
+        private Animator _hitStopAnimator;
+
+        /// <summary>Time at which the running hit-stop ends.</summary>
+        private float _hitStopEndTime;
+
         /// <summary>
         /// Runtime combat modifiers applied to this entity's outgoing damage.
         /// Null until InitializeHealth is called.
@@ -106,6 +116,48 @@ namespace MightyHeroes.Gameplay.Common.Entity
             _health = new CombatHealth(eventHub, EntityId, maxHealth, maxShield);
             _health.AddShield(startingShield, sourceEntityId: 0);
             _modifiers = new CombatModifiers(eventHub, EntityId);
+        }
+
+        /// <summary>
+        /// Freezes the given Animator for duration seconds (hit-stop), then
+        /// resumes it at normal speed. A new request while frozen extends the
+        /// freeze to whichever end time is later; it never stacks.
+        /// Derived components call this from their HitStopRequested handler.
+        /// </summary>
+        /// <param name="animator">Animator owned by the derived component.</param>
+        /// <param name="duration">Freeze duration in seconds.</param>
+        protected void ApplyHitStop(Animator animator, float duration)
+        {
+            if (animator == null || duration <= 0f || !isActiveAndEnabled)
+                return;
+
+            _hitStopEndTime = Mathf.Max(_hitStopEndTime, Time.time + duration);
+
+            if (_hitStopRoutine != null)
+                return;
+
+            _hitStopAnimator = animator;
+            _hitStopAnimator.speed = 0f;
+            _hitStopRoutine = StartCoroutine(RunHitStop());
+        }
+
+        /// <summary>
+        /// Ends any running hit-stop immediately and restores animator speed.
+        /// Called from derived components' disposal.
+        /// </summary>
+        protected void CancelHitStop()
+        {
+            if (_hitStopRoutine != null)
+            {
+                StopCoroutine(_hitStopRoutine);
+                _hitStopRoutine = null;
+            }
+
+            if (_hitStopAnimator != null)
+                _hitStopAnimator.speed = 1f;
+
+            _hitStopAnimator = null;
+            _hitStopEndTime = 0f;
         }
 
         /// <summary>
@@ -163,6 +215,16 @@ namespace MightyHeroes.Gameplay.Common.Entity
         public void ResetActionPoints()
         {
             _runtimeStats?.ResetActionPoints();
+        }
+
+        /// <summary>Waits until the hit-stop end time, then resumes the animator.</summary>
+        private IEnumerator RunHitStop()
+        {
+            while (Time.time < _hitStopEndTime)
+                yield return null;
+
+            _hitStopRoutine = null;
+            CancelHitStop();
         }
     }
 }

@@ -5,7 +5,7 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
 {
     /// <summary>
     /// Design-time tuning for combat "feel" feedback driven by hit events:
-    /// camera shake and hit VFX (hit-stop follows in the next step).
+    /// camera shake, hit VFX and hit-stop.
     ///
     /// Per-tier arrays are indexed by tier - 1 (index 0 = Tier 1). For hero
     /// attacks the tier equals the combo step count (HeroActionExecution
@@ -54,6 +54,13 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
         [Tooltip("Impulse force for every enemy hit that lands on the hero.")]
         [SerializeField, Min(0f)] private float _enemyHitShakeForce = 0.3f;
 
+        [Header("Hit-Stop - Hero Attacks")]
+        [Tooltip("Animator freeze per tier on the final hit of a hero attack, in seconds (index 0 = Tier 1). Zero disables hit-stop for that tier.")]
+        [SerializeField] private float[] _heroHitStopDurations = { 0f, 0f, 0.1f };
+
+        [Tooltip("Freeze used instead when the final hit also kills the target. Only applies to tiers whose hit-stop is enabled.")]
+        [SerializeField, Min(0f)] private float _killingHitStopDuration = 0.2f;
+
         [Header("Hit VFX - Hero Attacks")]
         [Tooltip("VFX per tier for the final hit of a hero attack (index 0 = Tier 1). Non-final combo hits use the tier below.")]
         [SerializeField] private HitVfxSet[] _heroHitVfxTiers = new HitVfxSet[TierCount];
@@ -86,6 +93,12 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
         /// <summary>Impulse force for enemy hits on the hero.</summary>
         public float EnemyHitShakeForce => _enemyHitShakeForce;
 
+        /// <summary>Final-hit animator freeze per tier in seconds, indexed by tier - 1.</summary>
+        public float[] HeroHitStopDurations => _heroHitStopDurations;
+
+        /// <summary>Freeze used when the final hit kills the target (enabled tiers only).</summary>
+        public float KillingHitStopDuration => _killingHitStopDuration;
+
         /// <summary>Hero hit VFX per tier, indexed by tier - 1.</summary>
         public HitVfxSet[] HeroHitVfxTiers => _heroHitVfxTiers;
 
@@ -109,6 +122,9 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
         {
             if (_heroHitShakeForces == null || _heroHitShakeForces.Length != TierCount)
                 Debug.LogWarning($"CombatFeedbackData._heroHitShakeForces must contain exactly {TierCount} entries.", this);
+
+            if (_heroHitStopDurations == null || _heroHitStopDurations.Length != TierCount)
+                Debug.LogWarning($"CombatFeedbackData._heroHitStopDurations must contain exactly {TierCount} entries.", this);
 
             if (_heroHitVfxTiers == null || _heroHitVfxTiers.Length != TierCount)
                 Debug.LogWarning($"CombatFeedbackData._heroHitVfxTiers must contain exactly {TierCount} entries.", this);

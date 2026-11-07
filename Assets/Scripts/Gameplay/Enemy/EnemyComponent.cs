@@ -363,6 +363,7 @@ namespace MightyHeroes.Gameplay.Enemy
         private void RegisterEvents()
         {
             _eventHub.CombatEvents.CombatDamageIntentEvent.Register(OnDamageIntent);
+            _eventHub.CombatEvents.HitStopRequestedEvent.Register(OnHitStopRequested);
         }
 
         /// <summary>
@@ -371,6 +372,8 @@ namespace MightyHeroes.Gameplay.Enemy
         private void UnregisterEvents()
         {
             _eventHub.CombatEvents.CombatDamageIntentEvent.Unregister(OnDamageIntent);
+            _eventHub.CombatEvents.HitStopRequestedEvent.Unregister(OnHitStopRequested);
+            CancelHitStop();
         }
 
         /// <summary>
@@ -458,6 +461,15 @@ namespace MightyHeroes.Gameplay.Enemy
             }
 
             _stateMachine.SwitchToTakingHitState(payload.HitDirection);
+        }
+
+        /// <summary>
+        /// Freezes this entity's Animator when it is the attacker or target of a hit-stop.
+        /// </summary>
+        private void OnHitStopRequested(HitStopRequestedPayload payload)
+        {
+            if (payload.Involves(EntityId))
+                ApplyHitStop(_animator, payload.Duration);
         }
     }
 }

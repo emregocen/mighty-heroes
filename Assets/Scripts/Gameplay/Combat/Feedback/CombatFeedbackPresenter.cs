@@ -7,15 +7,17 @@ using UnityEngine;
 namespace MightyHeroes.Gameplay.Combat.Feedback
 {
     /// <summary>
-    /// Turns resolved combat hits into presentation feedback: camera shake and
-    /// hit VFX (hit-stop follows in the next step).
+    /// Turns resolved combat hits into presentation feedback: camera shake,
+    /// hit VFX and hit-stop.
     ///
     /// Listens to CombatHitResolvedEvent, which CombatSystem raises once per
     /// hit after damage is applied. For hero hits the payload's TotalSteps is
     /// the action tier, so strength scales with match size:
     /// - final combo hit uses the tier's shake force and VFX,
     /// - earlier combo hits use a reduced shake and the VFX of the tier below,
-    /// - a killing hit multiplies the shake by KillingHitShakeMultiplier.
+    /// - a killing hit multiplies the shake by KillingHitShakeMultiplier,
+    /// - hit-stop only on the final hero hit of tiers with a non-zero duration
+    ///   (Tier 3 by default), longer when that hit kills the target.
     /// Enemy hits on the hero use a single fixed shake and VFX.
     ///
     /// Shaker and VFX player are both optional; a null dependency simply
@@ -96,6 +98,26 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
         }
 
         /// <summary>
+        /// Requests a hit-stop for the final hero hit when the tier has one enabled.
+        /// Entity components freeze their own Animators on HitStopRequestedEvent.
+        /// </summary>
+        private void RequestHitStop(CombatHitResolvedPayload payload, bool isHeroHit, bool isFinalHit)
+        {
+            if (!isHeroHit || !isFinalHit)
+                return;
+
+            float duration = GetTierValue(_data.HeroHitStopDurations, payload.TotalSteps);
+
+            if (duration <= 0f)
+                return;
+
+            if (payload.TargetWasAlive && !payload.TargetIsAliveAfter)
+                duration = Mathf.Max(duration, _data.KillingHitStopDuration);
+
+            _eventHub.CombatEvents.HitStopRequestedEvent.Raise(new HitStopRequestedPayload(payload.AttackerId, payload.TargetId, duration));
+        }
+
+        /// <summary>
         /// Plays the hit VFX set at the target's chest height, pulled toward the
         /// camera so it is not hidden inside the body. Final hero hits use their
         /// tier's set, earlier combo hits the set of the tier below.
@@ -151,6 +173,7 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
 
             PlayShake(payload, isHeroHit, isFinalHit);
             PlayHitVfx(payload, isHeroHit, isFinalHit);
+            RequestHitStop(payload, isHeroHit, isFinalHit);
         }
     }
 }

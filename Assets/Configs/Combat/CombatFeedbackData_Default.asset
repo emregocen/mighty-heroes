@@ -19,6 +19,11 @@ MonoBehaviour:
   _nonFinalHitShakeMultiplier: 0.5
   _killingHitShakeMultiplier: 1.3
   _enemyHitShakeForce: 0.3
+  _heroHitStopDurations:
+  - 0
+  - 0
+  - 0.1
+  _killingHitStopDuration: 0.2
   _heroHitVfxTiers:
   - Prefabs:
     - {fileID: 1384676760634654, guid: 289ba3245c9c98c42aeb93d5f45a2248, type: 3}
