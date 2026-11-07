@@ -1,20 +1,25 @@
 using System;
 using MightyHeroes.Core.EventSystem;
+using MightyHeroes.Gameplay.Combat.Interfaces;
 using MightyHeroes.Gameplay.Combat.Payloads;
+using UnityEngine;
 
 namespace MightyHeroes.Gameplay.Combat.Feedback
 {
     /// <summary>
-    /// Turns resolved combat hits into presentation feedback (camera shake
-    /// today; tier-scaled VFX and hit-stop in the following steps).
+    /// Turns resolved combat hits into presentation feedback: camera shake and
+    /// hit VFX (hit-stop follows in the next step).
     ///
     /// Listens to CombatHitResolvedEvent, which CombatSystem raises once per
     /// hit after damage is applied. For hero hits the payload's TotalSteps is
     /// the action tier, so strength scales with match size:
-    /// - final combo hit uses the tier force,
-    /// - earlier combo hits use tier force * NonFinalHitShakeMultiplier,
-    /// - a killing hit is multiplied by KillingHitShakeMultiplier.
-    /// Enemy hits on the hero use a single fixed force.
+    /// - final combo hit uses the tier's shake force and VFX,
+    /// - earlier combo hits use a reduced shake and the VFX of the tier below,
+    /// - a killing hit multiplies the shake by KillingHitShakeMultiplier.
+    /// Enemy hits on the hero use a single fixed shake and VFX.
+    ///
+    /// Shaker and VFX player are both optional; a null dependency simply
+    /// disables that part of the feedback.
     ///
     /// Constructed and disposed by BattleBootstrapper, scoped to one battle.
     /// </summary>
@@ -25,6 +30,8 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
         private readonly EventHub _eventHub;
         private readonly CombatFeedbackData _data;
         private readonly ICameraShaker _cameraShaker;
+        private readonly IHitVfxPlayer _hitVfxPlayer;
+        private readonly ICombatEntityLocator _entityLocator;
         private readonly int _heroEntityId;
         private bool _isDisposed;
 
@@ -35,13 +42,17 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
         /// </summary>
         /// <param name="eventHub">Battle-scoped event hub.</param>
         /// <param name="data">Feedback tuning values.</param>
-        /// <param name="cameraShaker">Camera shake implementation.</param>
+        /// <param name="cameraShaker">Camera shake implementation, or null to disable shake.</param>
+        /// <param name="hitVfxPlayer">Hit VFX implementation, or null to disable hit VFX.</param>
+        /// <param name="entityLocator">Resolves target positions for hit VFX.</param>
         /// <param name="heroEntityId">Hero runtime id, used to tell hero hits from enemy hits.</param>
-        public CombatFeedbackPresenter(EventHub eventHub, CombatFeedbackData data, ICameraShaker cameraShaker, int heroEntityId)
+        public CombatFeedbackPresenter(EventHub eventHub, CombatFeedbackData data, ICameraShaker cameraShaker, IHitVfxPlayer hitVfxPlayer, ICombatEntityLocator entityLocator, int heroEntityId)
         {
             _eventHub = eventHub;
             _data = data;
             _cameraShaker = cameraShaker;
+            _hitVfxPlayer = hitVfxPlayer;
+            _entityLocator = entityLocator;
             _heroEntityId = heroEntityId;
 
             _eventHub.CombatEvents.CombatHitResolvedEvent.Register(OnCombatHitResolved);
@@ -61,14 +72,19 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
 
         // PRIVATE METHODS
 
-        /// <summary>Returns the shake force for a resolved hit.</summary>
-        private float ResolveShakeForce(CombatHitResolvedPayload payload)
+        /// <summary>Plays camera shake for the hit, if a shaker is assigned.</summary>
+        private void PlayShake(CombatHitResolvedPayload payload, bool isHeroHit, bool isFinalHit)
         {
-            if (payload.AttackerId != _heroEntityId)
-                return _data.EnemyHitShakeForce;
+            if (_cameraShaker == null)
+                return;
+
+            if (!isHeroHit)
+            {
+                _cameraShaker.Shake(_data.EnemyHitShakeForce);
+                return;
+            }
 
             float force = GetTierValue(_data.HeroHitShakeForces, payload.TotalSteps);
-            bool isFinalHit = payload.StepIndex >= payload.TotalSteps;
 
             if (!isFinalHit)
                 force *= _data.NonFinalHitShakeMultiplier;
@@ -76,14 +92,47 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
             if (payload.TargetWasAlive && !payload.TargetIsAliveAfter)
                 force *= _data.KillingHitShakeMultiplier;
 
-            return force;
+            _cameraShaker.Shake(force);
+        }
+
+        /// <summary>
+        /// Plays the hit VFX set at the target's chest height. Final hero hits
+        /// use their tier's set, earlier combo hits the set of the tier below.
+        /// </summary>
+        private void PlayHitVfx(CombatHitResolvedPayload payload, bool isHeroHit, bool isFinalHit)
+        {
+            if (_hitVfxPlayer == null || _entityLocator == null)
+                return;
+
+            if (!_entityLocator.TryGetPosition(payload.TargetId, out Vector3 targetPosition))
+                return;
+
+            CombatFeedbackData.HitVfxSet vfxSet;
+
+            if (isHeroHit)
+            {
+                int tier = isFinalHit ? payload.TotalSteps : payload.TotalSteps - 1;
+                vfxSet = GetTierValue(_data.HeroHitVfxTiers, tier);
+            }
+            else
+            {
+                vfxSet = _data.EnemyHitVfx;
+            }
+
+            if (vfxSet == null || vfxSet.Prefabs == null)
+                return;
+
+            Vector3 spawnPosition = targetPosition + Vector3.up * _data.HitVfxHeightOffset;
+
+            foreach (GameObject prefab in vfxSet.Prefabs)
+                _hitVfxPlayer.Play(prefab, spawnPosition, vfxSet.Scale, _data.HitVfxLifetime);
         }
 
         /// <summary>Returns the per-tier value (index tier - 1), clamped to the array bounds.</summary>
-        private float GetTierValue(float[] values, int tier)
+        private T GetTierValue<T>(T[] values, int tier)
         {
             if (values == null || values.Length == 0)
-                return 0f;
+                return default;
 
             int index = Math.Clamp(tier - 1, 0, values.Length - 1);
             return values[index];
@@ -96,7 +145,11 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
             if (!payload.DamageApplied)
                 return;
 
-            _cameraShaker.Shake(ResolveShakeForce(payload));
+            bool isHeroHit = payload.AttackerId == _heroEntityId;
+            bool isFinalHit = payload.StepIndex >= payload.TotalSteps;
+
+            PlayShake(payload, isHeroHit, isFinalHit);
+            PlayHitVfx(payload, isHeroHit, isFinalHit);
         }
     }
 }

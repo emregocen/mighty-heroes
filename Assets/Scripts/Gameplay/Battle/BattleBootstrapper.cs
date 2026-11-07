@@ -89,10 +89,12 @@ namespace MightyHeroes.Core.Battle
         [SerializeField] private BattleIntroController _battleIntroController;
 
         [Header("Combat Feedback")]
-        [Tooltip("Tier-based camera shake tuning. Leave empty to disable combat feedback.")]
+        [Tooltip("Tier-based camera shake and hit VFX tuning. Leave empty to disable combat feedback.")]
         [SerializeField] private CombatFeedbackData _combatFeedbackData;
-        [Tooltip("Impulse source wrapper used for camera shake. The battle camera needs a CinemachineImpulseListener.")]
+        [Tooltip("Impulse source wrapper used for camera shake. Optional. The battle camera needs a CinemachineImpulseListener.")]
         [SerializeField] private CinemachineImpulseShaker _cameraShaker;
+        [Tooltip("Pooled player for hit VFX. Optional.")]
+        [SerializeField] private PooledHitVfxPlayer _hitVfxPlayer;
 
         [Header("Floating Text")]
         [SerializeField] private FloatingTextConfig _floatingTextConfig;
@@ -605,20 +607,23 @@ namespace MightyHeroes.Core.Battle
         }
 
         /// <summary>
-        /// Creates the combat feedback presenter (camera shake). Feedback is
-        /// optional: if the data or shaker is not assigned it is skipped.
-        /// Must run after InitializeHero so the hero entity id exists.
+        /// Creates the combat feedback presenter (camera shake, hit VFX).
+        /// Requires the data asset and the hero; shaker and VFX player are each
+        /// optional and simply disable their part of the feedback when missing.
+        /// Must run after InitializeHero and InitializeEnemies so entity ids exist.
         /// </summary>
         private void InitializeCombatFeedback()
         {
-            if (_combatFeedbackData == null || _cameraShaker == null || _heroComponent == null)
+            if (_combatFeedbackData == null || _heroComponent == null)
             {
                 GameLogger.Log(LogSourceType.BattleSystem,
-                    "BattleBootstrapper.InitializeCombatFeedback: missing data, shaker or hero, skipping.");
+                    "BattleBootstrapper.InitializeCombatFeedback: missing data or hero, skipping.");
                 return;
             }
 
-            _combatFeedbackPresenter = new CombatFeedbackPresenter(_eventHub, _combatFeedbackData, _cameraShaker, _heroComponent.EntityId);
+            var entityLocator = new BattleEntityLocator(_heroComponent, _battleFormation);
+
+            _combatFeedbackPresenter = new CombatFeedbackPresenter(_eventHub, _combatFeedbackData, _cameraShaker, _hitVfxPlayer, entityLocator, _heroComponent.EntityId);
         }
 
         // PRIVATE METHODS — Disposal

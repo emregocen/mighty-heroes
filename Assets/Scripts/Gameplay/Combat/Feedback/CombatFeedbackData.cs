@@ -1,9 +1,11 @@
+using System;
 using UnityEngine;
 
 namespace MightyHeroes.Gameplay.Combat.Feedback
 {
     /// <summary>
-    /// Design-time tuning for combat "feel" feedback driven by hit events.
+    /// Design-time tuning for combat "feel" feedback driven by hit events:
+    /// camera shake and hit VFX (hit-stop follows in the next step).
     ///
     /// Per-tier arrays are indexed by tier - 1 (index 0 = Tier 1). For hero
     /// attacks the tier equals the combo step count (HeroActionExecution
@@ -19,6 +21,22 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
 
         /// <summary>Number of supported action tiers.</summary>
         public const int TierCount = 3;
+
+        // NESTED TYPES
+
+        /// <summary>
+        /// One hit VFX setup: every prefab in the list plays together at the
+        /// same position with the same uniform scale.
+        /// </summary>
+        [Serializable]
+        public sealed class HitVfxSet
+        {
+            /// <summary>Particle prefabs played together for this hit.</summary>
+            public GameObject[] Prefabs;
+
+            /// <summary>Uniform scale applied to every prefab in the set.</summary>
+            [Min(0.01f)] public float Scale = 1f;
+        }
 
         // FIELDS
 
@@ -36,6 +54,21 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
         [Tooltip("Impulse force for every enemy hit that lands on the hero.")]
         [SerializeField, Min(0f)] private float _enemyHitShakeForce = 0.3f;
 
+        [Header("Hit VFX - Hero Attacks")]
+        [Tooltip("VFX per tier for the final hit of a hero attack (index 0 = Tier 1). Non-final combo hits use the tier below.")]
+        [SerializeField] private HitVfxSet[] _heroHitVfxTiers = new HitVfxSet[TierCount];
+
+        [Header("Hit VFX - Enemy Attacks")]
+        [Tooltip("VFX for every enemy hit that lands on the hero.")]
+        [SerializeField] private HitVfxSet _enemyHitVfx = new HitVfxSet();
+
+        [Header("Hit VFX - Placement")]
+        [Tooltip("World-space height above the target's root where hit VFX spawn (roughly chest height).")]
+        [SerializeField] private float _hitVfxHeightOffset = 1.1f;
+
+        [Tooltip("Seconds before a hit VFX instance is stopped and returned to its pool.")]
+        [SerializeField, Min(0.1f)] private float _hitVfxLifetime = 1.5f;
+
         // PROPERTIES
 
         /// <summary>Final-hit impulse force per tier, indexed by tier - 1.</summary>
@@ -50,14 +83,29 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
         /// <summary>Impulse force for enemy hits on the hero.</summary>
         public float EnemyHitShakeForce => _enemyHitShakeForce;
 
+        /// <summary>Hero hit VFX per tier, indexed by tier - 1.</summary>
+        public HitVfxSet[] HeroHitVfxTiers => _heroHitVfxTiers;
+
+        /// <summary>VFX for enemy hits on the hero.</summary>
+        public HitVfxSet EnemyHitVfx => _enemyHitVfx;
+
+        /// <summary>World-space height above the target root for hit VFX.</summary>
+        public float HitVfxHeightOffset => _hitVfxHeightOffset;
+
+        /// <summary>Seconds before a hit VFX instance returns to its pool.</summary>
+        public float HitVfxLifetime => _hitVfxLifetime;
+
 #if UNITY_EDITOR
         // UNITY CALLBACKS
 
-        /// <summary>Editor-only validation of per-tier array length.</summary>
+        /// <summary>Editor-only validation of per-tier array lengths.</summary>
         private void OnValidate()
         {
             if (_heroHitShakeForces == null || _heroHitShakeForces.Length != TierCount)
                 Debug.LogWarning($"CombatFeedbackData._heroHitShakeForces must contain exactly {TierCount} entries.", this);
+
+            if (_heroHitVfxTiers == null || _heroHitVfxTiers.Length != TierCount)
+                Debug.LogWarning($"CombatFeedbackData._heroHitVfxTiers must contain exactly {TierCount} entries.", this);
         }
 #endif
     }

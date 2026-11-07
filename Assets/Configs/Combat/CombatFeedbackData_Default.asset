@@ -19,3 +19,21 @@ MonoBehaviour:
   _nonFinalHitShakeMultiplier: 0.5
   _killingHitShakeMultiplier: 1.3
   _enemyHitShakeForce: 0.3
+  _heroHitVfxTiers:
+  - Prefabs:
+    - {fileID: 1384676760634654, guid: 289ba3245c9c98c42aeb93d5f45a2248, type: 3}
+    Scale: 1
+  - Prefabs:
+    - {fileID: 1303429800363182, guid: 9a905dc8b3b361840bb50c14f05926a9, type: 3}
+    - {fileID: 1201505000128532, guid: ba1ddd059de115f44b44ff52413832aa, type: 3}
+    Scale: 1
+  - Prefabs:
+    - {fileID: 1180248314969840, guid: 101d62f0a3e4fef4eab61adb79c845df, type: 3}
+    - {fileID: 1778345465858944, guid: 73043e7e6fb36e342b9337207bf317d9, type: 3}
+    Scale: 1.2
+  _enemyHitVfx:
+    Prefabs:
+    - {fileID: 1384676760634654, guid: 289ba3245c9c98c42aeb93d5f45a2248, type: 3}
+    Scale: 0.8
+  _hitVfxHeightOffset: 1.1
+  _hitVfxLifetime: 1.5
