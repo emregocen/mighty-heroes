@@ -43,7 +43,7 @@ MonoBehaviour:
     FontSize: 100
     FontStyle: 1
     Lifetime: 1.75
-    RiseDistance: 150
+    RiseDistance: 160
     RandomTiltDegrees: 10
     RandomOffsetRadius: 8
     StartScale: 0.3
@@ -54,7 +54,7 @@ MonoBehaviour:
     FontSize: 80
     FontStyle: 1
     Lifetime: 2.2
-    RiseDistance: 200
+    RiseDistance: 180
     RandomTiltDegrees: 10
     RandomOffsetRadius: 8
     StartScale: 0.3
