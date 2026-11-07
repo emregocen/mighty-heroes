@@ -551,6 +551,7 @@ namespace MightyHeroes.Gameplay.Hero
         private void RegisterEvents()
         {
             _eventHub.CombatEvents.CombatDamageIntentEvent.Register(OnDamageIntent);
+            _eventHub.CombatEvents.HitStopRequestedEvent.Register(OnHitStopRequested);
 
             // Wire movement controller event into FSM signal chain.
             if (_attackMovementController != null)
@@ -563,6 +564,8 @@ namespace MightyHeroes.Gameplay.Hero
         private void UnregisterEvents()
         {
             _eventHub.CombatEvents.CombatDamageIntentEvent.Unregister(OnDamageIntent);
+            _eventHub.CombatEvents.HitStopRequestedEvent.Unregister(OnHitStopRequested);
+            CancelHitStop();
 
             if (_attackMovementController != null)
                 _attackMovementController.RetreatCompleted -= OnRetreatCompleted;
@@ -664,6 +667,15 @@ namespace MightyHeroes.Gameplay.Hero
         private void OnRetreatCompleted()
         {
             _stateMachine.NotifyRetreatEnded();
+        }
+
+        /// <summary>
+        /// Freezes this entity's Animator when it is the attacker or target of a hit-stop.
+        /// </summary>
+        private void OnHitStopRequested(HitStopRequestedPayload payload)
+        {
+            if (payload.Involves(EntityId))
+                ApplyHitStop(_animator, payload.Duration);
         }
     }
 }

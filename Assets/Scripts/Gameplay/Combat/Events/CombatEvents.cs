@@ -48,5 +48,19 @@ namespace MightyHeroes.Gameplay.Combat.Events
         public GameEvent<AttackBuffChangedPayload> AttackBuffChangedEvent =>
             Registry.GetEvent<AttackBuffChangedPayload>();
 
+        /// <summary>
+        /// Raised by CombatFeedbackPresenter to briefly freeze the attacker's and
+        /// target's animations. Entity components pause their own Animator.
+        /// </summary>
+        public GameEvent<HitStopRequestedPayload> HitStopRequestedEvent =>
+            Registry.GetEvent<HitStopRequestedPayload>();
+
+        /// <summary>
+        /// Raised by CombatFeedbackPresenter when a high-tier final hit kills its
+        /// target. KillCamController plays the side kill-cam and slow motion.
+        /// </summary>
+        public GameEvent<KillCamRequestedPayload> KillCamRequestedEvent =>
+            Registry.GetEvent<KillCamRequestedPayload>();
+
     }
 }

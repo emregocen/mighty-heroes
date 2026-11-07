@@ -7,6 +7,7 @@ using MightyHeroes.Gameplay.Battle;
 using MightyHeroes.Gameplay.Battle.Formation;
 using MightyHeroes.Gameplay.Battle.Intro;
 using MightyHeroes.Gameplay.Combat;
+using MightyHeroes.Gameplay.Combat.Feedback;
 using MightyHeroes.Gameplay.Common.Actions;
 using MightyHeroes.Gameplay.Enemy.AI;
 using MightyHeroes.Gameplay.Enemy.StateMachine;
@@ -87,6 +88,16 @@ namespace MightyHeroes.Core.Battle
         [SerializeField] private BattleIntroConfig _battleIntroConfig;
         [SerializeField] private BattleIntroController _battleIntroController;
 
+        [Header("Combat Feedback")]
+        [Tooltip("Tier-based camera shake and hit VFX tuning. Leave empty to disable combat feedback.")]
+        [SerializeField] private CombatFeedbackData _combatFeedbackData;
+        [Tooltip("Impulse source wrapper used for camera shake. Optional. The battle camera needs a CinemachineImpulseListener.")]
+        [SerializeField] private CinemachineImpulseShaker _cameraShaker;
+        [Tooltip("Pooled player for hit VFX. Optional.")]
+        [SerializeField] private PooledHitVfxPlayer _hitVfxPlayer;
+        [Tooltip("Side kill-cam and slow motion on high-tier killing hits. Optional.")]
+        [SerializeField] private KillCamController _killCamController;
+
         [Header("Floating Text")]
         [SerializeField] private FloatingTextConfig _floatingTextConfig;
         [Tooltip("Screen-space text that follows an entity's world position (damage, heal, shield, buff, K.O.).")]
@@ -118,6 +129,7 @@ namespace MightyHeroes.Core.Battle
         private FloatingTextService _floatingTextService;
         private FloatingTextPresenter _floatingTextPresenter;
         private StatusIconPresenter _statusIconPresenter;
+        private CombatFeedbackPresenter _combatFeedbackPresenter;
 
         // UNITY CALLBACKS
 
@@ -146,6 +158,7 @@ namespace MightyHeroes.Core.Battle
             InitializeBattleTimer();
             InitializeFloatingText();
             InitializeStatusIcons();
+            InitializeCombatFeedback();
             InitializeBattleFlowController();
         }
 
@@ -182,6 +195,7 @@ namespace MightyHeroes.Core.Battle
             DisposeBattleFlowController();
             DisposeFloatingText();
             DisposeStatusIcons();
+            DisposeCombatFeedback();
             DisposeBattleTimer();
             DisposeCombatSystem();
             DisposeEnemyComponents();
@@ -594,6 +608,29 @@ namespace MightyHeroes.Core.Battle
             }
         }
 
+        /// <summary>
+        /// Creates the combat feedback presenter (camera shake, hit VFX).
+        /// Requires the data asset and the hero; shaker and VFX player are each
+        /// optional and simply disable their part of the feedback when missing.
+        /// Must run after InitializeHero and InitializeEnemies so entity ids exist.
+        /// </summary>
+        private void InitializeCombatFeedback()
+        {
+            if (_combatFeedbackData == null || _heroComponent == null)
+            {
+                GameLogger.Log(LogSourceType.BattleSystem,
+                    "BattleBootstrapper.InitializeCombatFeedback: missing data or hero, skipping.");
+                return;
+            }
+
+            var entityLocator = new BattleEntityLocator(_heroComponent, _enemyFormation);
+
+            _combatFeedbackPresenter = new CombatFeedbackPresenter(_eventHub, _combatFeedbackData, _cameraShaker, _hitVfxPlayer, entityLocator, _heroComponent.EntityId);
+
+            if (_killCamController != null)
+                _killCamController.Initialize(_eventHub, _combatFeedbackData, entityLocator);
+        }
+
         // PRIVATE METHODS — Disposal
 
         /// <summary>Disposes the BattleFlowController to unregister its event handlers.</summary>
@@ -702,6 +739,13 @@ namespace MightyHeroes.Core.Battle
             _floatingTextPresenter?.Dispose();
             _floatingTextPresenter = null;
             _floatingTextService = null;
+        }
+
+        /// <summary>Disposes the combat feedback presenter to unregister its event handlers.</summary>
+        private void DisposeCombatFeedback()
+        {
+            _combatFeedbackPresenter?.Dispose();
+            _combatFeedbackPresenter = null;
         }
 
         /// <summary>Disposes the status icon presenter to unregister its event handlers.</summary>
