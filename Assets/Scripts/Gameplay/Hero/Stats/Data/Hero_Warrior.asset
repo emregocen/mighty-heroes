@@ -18,4 +18,4 @@ MonoBehaviour:
   _baseAttack: 25
   _baseDefense: 30
   _baseActionPoints: 4
-  _comboThresholdForUltimate: 3
+  _ultimateData: {fileID: 11400000, guid: 9ebc6d8b4016486a81050fbc56bbbec3, type: 2}

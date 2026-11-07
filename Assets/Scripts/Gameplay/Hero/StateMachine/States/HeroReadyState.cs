@@ -46,6 +46,9 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
         {
             HeroActionExecution execution = StateMachine.ActionResolver.Resolve(payload);
 
+            if (execution.ActionType != ActionType.None)
+                StateMachine.Hero.ChargeUltimate(payload.ActionType, payload.MatchCount);
+
             switch (execution.ActionType)
             {
                 case ActionType.Attack:

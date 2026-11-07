@@ -4,6 +4,7 @@ using MightyHeroes.Gameplay.Animation.Interfaces;
 using MightyHeroes.Gameplay.Combat.Interfaces;
 using MightyHeroes.Gameplay.Combat.Payloads;
 using MightyHeroes.Gameplay.Combat.Types;
+using MightyHeroes.Gameplay.Common.Actions;
 using MightyHeroes.Gameplay.Common.Entity;
 using MightyHeroes.Gameplay.Common.Stats;
 using MightyHeroes.Gameplay.Health.Presentation;
@@ -13,6 +14,7 @@ using MightyHeroes.Gameplay.Hero.Presentation;
 using MightyHeroes.Gameplay.Hero.StateMachine;
 using MightyHeroes.Gameplay.Hero.Stats;
 using MightyHeroes.Gameplay.Puzzle;
+using MightyHeroes.Gameplay.Ultimate;
 using MightyHeroes.UI.Battle.Views;
 using UnityEngine;
 
@@ -116,6 +118,9 @@ namespace MightyHeroes.Gameplay.Hero
         /// <summary>Hero status icon row (attack buff). Driven by StatusIconPresenter.</summary>
         [SerializeField] private StatusIconBarView _statusIconBarView;
 
+        /// <summary>Runtime ultimate gauge. Created on initialize when HeroStatsData has UltimateData.</summary>
+        private UltimateGauge _ultimateGauge;
+
         /// <summary>Hero action point presentation view.</summary>
         [SerializeField] private ActionPointView _actionPointView;
 
@@ -135,6 +140,9 @@ namespace MightyHeroes.Gameplay.Hero
 
         /// <summary>Status icon view for StatusIconPresenter registration. Can be null.</summary>
         public StatusIconBarView StatusIconBarView => _statusIconBarView;
+
+        /// <summary>Ultimate gauge, or null when the hero has no UltimateData.</summary>
+        public UltimateGauge UltimateGauge => _ultimateGauge;
 
 
         /// <summary>
@@ -173,6 +181,9 @@ namespace MightyHeroes.Gameplay.Hero
 
             base.Initialize(entityId);
             base.InitializeHealth(_eventHub, _heroStatsData.MaxHealth, _heroStatsData.MaxShield, _heroStatsData.StartingShield);
+
+            if (_heroStatsData.UltimateData != null)
+                _ultimateGauge = new UltimateGauge(_eventHub, EntityId, _heroStatsData.UltimateData);
             
             _healEffectView?.Initialize(_eventHub, EntityId);
 
@@ -362,6 +373,24 @@ namespace MightyHeroes.Gameplay.Hero
         public void ConsumeAttackBuff()
         {
             Modifiers.ConsumeAttackBuff();
+        }
+
+        /// <summary>
+        /// Fills the ultimate gauge when the matched action type is the hero's
+        /// affinity. Does nothing for other colors or when the hero has no ultimate.
+        /// Must only be called from a State (HeroReadyState).
+        /// </summary>
+        /// <param name="matchedActionType">Action type of the matched tiles.</param>
+        /// <param name="matchCount">Number of matched tiles.</param>
+        public void ChargeUltimate(ActionType matchedActionType, int matchCount)
+        {
+            if (_ultimateGauge == null || matchedActionType != _ultimateGauge.Data.AffinityActionType)
+                return;
+
+            _ultimateGauge.Fill(matchCount);
+
+            GameLogger.Log(LogSourceType.Hero,
+                $"Ultimate gauge {_ultimateGauge.CurrentValue}/{_ultimateGauge.Capacity} Full={_ultimateGauge.IsFull}");
         }
 
         // PUBLIC METHODS — HUD
