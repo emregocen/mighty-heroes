@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using MightyHeroes.Core.EventSystem;
 using MightyHeroes.Gameplay.Combat.Interfaces;
 using MightyHeroes.Gameplay.Combat.Payloads;
@@ -22,11 +21,6 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
     /// Shaker and VFX player are both optional; a null dependency simply
     /// disables that part of the feedback.
     ///
-    /// Target positions are captured on CombatDamageIntentEvent, before damage
-    /// is applied. A killing hit removes the enemy from the formation before
-    /// CombatHitResolvedEvent fires, so the captured position is the fallback
-    /// that keeps VFX on killing hits.
-    ///
     /// Constructed and disposed by BattleBootstrapper, scoped to one battle.
     /// </summary>
     public sealed class CombatFeedbackPresenter : IDisposable
@@ -39,7 +33,6 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
         private readonly IHitVfxPlayer _hitVfxPlayer;
         private readonly ICombatEntityLocator _entityLocator;
         private readonly int _heroEntityId;
-        private readonly Dictionary<int, Vector3> _lastTargetPositions = new Dictionary<int, Vector3>();
         private bool _isDisposed;
 
         // CONSTRUCTOR
@@ -62,7 +55,6 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
             _entityLocator = entityLocator;
             _heroEntityId = heroEntityId;
 
-            _eventHub.CombatEvents.CombatDamageIntentEvent.Register(OnCombatDamageIntent);
             _eventHub.CombatEvents.CombatHitResolvedEvent.Register(OnCombatHitResolved);
         }
 
@@ -74,9 +66,7 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
             if (_isDisposed)
                 return;
 
-            _eventHub.CombatEvents.CombatDamageIntentEvent.Unregister(OnCombatDamageIntent);
             _eventHub.CombatEvents.CombatHitResolvedEvent.Unregister(OnCombatHitResolved);
-            _lastTargetPositions.Clear();
             _isDisposed = true;
         }
 
@@ -115,7 +105,7 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
             if (_hitVfxPlayer == null || _entityLocator == null)
                 return;
 
-            if (!_entityLocator.TryGetPosition(payload.TargetId, out Vector3 targetPosition) && !_lastTargetPositions.TryGetValue(payload.TargetId, out targetPosition))
+            if (!_entityLocator.TryGetPosition(payload.TargetId, out Vector3 targetPosition))
                 return;
 
             CombatFeedbackData.HitVfxSet vfxSet;
@@ -150,15 +140,6 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
         }
 
         // EVENT HANDLERS
-
-        /// <summary>
-        /// Captures the target position while the target is still in the formation.
-        /// </summary>
-        private void OnCombatDamageIntent(CombatDamageIntentPayload payload)
-        {
-            if (_entityLocator != null && _entityLocator.TryGetPosition(payload.TargetEntityId, out Vector3 position))
-                _lastTargetPositions[payload.TargetEntityId] = position;
-        }
 
         private void OnCombatHitResolved(CombatHitResolvedPayload payload)
         {

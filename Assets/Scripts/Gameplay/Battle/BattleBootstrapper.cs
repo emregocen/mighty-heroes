@@ -621,7 +621,7 @@ namespace MightyHeroes.Core.Battle
                 return;
             }
 
-            var entityLocator = new BattleEntityLocator(_heroComponent, _battleFormation);
+            var entityLocator = new BattleEntityLocator(_heroComponent, _enemyFormation);
 
             _combatFeedbackPresenter = new CombatFeedbackPresenter(_eventHub, _combatFeedbackData, _cameraShaker, _hitVfxPlayer, entityLocator, _heroComponent.EntityId);
         }
