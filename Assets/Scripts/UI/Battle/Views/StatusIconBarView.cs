@@ -67,7 +67,7 @@ namespace MightyHeroes.UI.Battle.Views
                 _attackBuffIcon.SetActive(percent > 0);
 
             if (_attackBuffValueText != null)
-                _attackBuffValueText.text = percent > 0 ? $"+{percent}%" : string.Empty;
+                _attackBuffValueText.text = percent > 0 ? $"+{percent}% ATK" : string.Empty;
 
             if (isIncrease)
                 PlayPunch(ref _attackBuffTween, _attackBuffIcon);
@@ -109,7 +109,7 @@ namespace MightyHeroes.UI.Battle.Views
                 return;
 
             tween?.Kill(complete: true);
-            icon.transform.localScale = Vector3.one;
+            //icon.transform.localScale = Vector3.one;
             tween = icon.transform.DOPunchScale(Vector3.one * _punchScale, _punchDuration, 6, 0.5f).SetLink(icon);
         }
 

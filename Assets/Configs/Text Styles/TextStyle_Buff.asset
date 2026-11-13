@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fb6210b867a8464eb4a66e1ba2bccc3, type: 3}
   m_Name: TextStyle_Buff
   m_EditorClassIdentifier: Assembly-CSharp::TextStyleConfig
-  FaceColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  FaceColor: {r: 0.6666667, g: 0.5058824, b: 1, a: 1}
   OutlineColor: {r: 0.16037738, g: 0.16037738, b: 0.16037738, a: 1}
   OutlineWidth: 0.3
   UseUnderlay: 0

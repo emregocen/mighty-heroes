@@ -54,6 +54,21 @@ AnimatorState:
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
   m_TimeParameter: 
+--- !u!114 &-8994989503811843294
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91ceb48b83ba4e3491cdf2f21923baa3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Animation.Behaviours.LowerBodyLockBehaviour
+  _lockLayerName: LowerBodyLock
+  _blendInDuration: 0.15
+  _blendOutDuration: 0.2
 --- !u!114 &-8993566591978046219
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3909,27 +3924,27 @@ AnimatorStateMachine:
   m_AnyStateTransitions: []
   m_EntryTransitions: []
   m_StateMachineTransitions:
-  - first: {fileID: 6029366146819539436}
-    second:
-    - {fileID: 7701703551976363961}
-  - first: {fileID: 905369527243185521}
-    second:
-    - {fileID: 6594896300106351786}
-  - first: {fileID: -4529679196943150929}
-    second:
-    - {fileID: 1109753082337972489}
-  - first: {fileID: -2523530572305405423}
-    second:
-    - {fileID: -1550716895994969471}
-  - first: {fileID: -8014458604633545354}
-    second:
-    - {fileID: 8374934151850184240}
-  - first: {fileID: -2387016545068547070}
-    second:
-    - {fileID: 1906868370116055885}
   - first: {fileID: 6965076662336562119}
     second:
     - {fileID: 4493972965690552365}
+  - first: {fileID: -2387016545068547070}
+    second:
+    - {fileID: 1906868370116055885}
+  - first: {fileID: -8014458604633545354}
+    second:
+    - {fileID: 8374934151850184240}
+  - first: {fileID: -2523530572305405423}
+    second:
+    - {fileID: -1550716895994969471}
+  - first: {fileID: -4529679196943150929}
+    second:
+    - {fileID: 1109753082337972489}
+  - first: {fileID: 905369527243185521}
+    second:
+    - {fileID: 6594896300106351786}
+  - first: {fileID: 6029366146819539436}
+    second:
+    - {fileID: 7701703551976363961}
   m_StateMachineBehaviours: []
   m_AnyStatePosition: {x: -130, y: 10, z: 0}
   m_EntryPosition: {x: -130, y: 80, z: 0}
@@ -4713,12 +4728,12 @@ AnimatorStateMachine:
   - {fileID: 5840225689309873205}
   - {fileID: -8541865925528408088}
   m_StateMachineTransitions:
-  - first: {fileID: -563814272925374278}
-    second:
-    - {fileID: -1443157988389294366}
   - first: {fileID: -2912848785288815893}
     second:
     - {fileID: 2196930177606712774}
+  - first: {fileID: -563814272925374278}
+    second:
+    - {fileID: -1443157988389294366}
   m_StateMachineBehaviours: []
   m_AnyStatePosition: {x: 120, y: -360, z: 0}
   m_EntryPosition: {x: 120, y: -300, z: 0}
@@ -5641,18 +5656,3 @@ AnimatorTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 1
---- !u!114 &-8994989503811843294
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 91ceb48b83ba4e3491cdf2f21923baa3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Animation.Behaviours.LowerBodyLockBehaviour
-  _lockLayerName: LowerBodyLock
-  _blendInDuration: 0.15
-  _blendOutDuration: 0.2
