@@ -44,6 +44,12 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
 
         private void OnPuzzleTilesMatched(PuzzleTilesMatchedPayload payload)
         {
+            if (StateMachine.Hero.IsUltimateReadyFor(payload.ActionType))
+            {
+                StateMachine.SwitchToUltimateState(StateMachine.ActionResolver.ResolveUltimate(payload));
+                return;
+            }
+
             HeroActionExecution execution = StateMachine.ActionResolver.Resolve(payload);
 
             if (execution.ActionType != ActionType.None)

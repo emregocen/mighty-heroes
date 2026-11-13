@@ -384,6 +384,28 @@ namespace MightyHeroes.Gameplay.Hero
         }
 
         /// <summary>
+        /// True when the gauge is full and the matched action type is the hero's
+        /// affinity, meaning this match fires the ultimate instead of its action.
+        /// </summary>
+        /// <param name="matchedActionType">Action type of the matched tiles.</param>
+        public bool IsUltimateReadyFor(ActionType matchedActionType)
+        {
+            return _ultimateGauge != null && _ultimateGauge.IsFull && matchedActionType == _ultimateGauge.Data.AffinityActionType;
+        }
+
+        /// <summary>
+        /// Plays the ultimate animation. Uses the heal clip until a dedicated
+        /// ultimate clip exists, so it shares the heal signals, the lower-body
+        /// lock, the sword layer handling and the LookAt fade.
+        /// Must only be called from a State (HeroUltimateState).
+        /// </summary>
+        /// <param name="variant">Ultimate animation variant.</param>
+        public void PlayUltimate(int variant)
+        {
+            PlayHeal(variant);
+        }
+
+        /// <summary>
         /// Fills the ultimate gauge when the matched action type is the hero's
         /// affinity. Does nothing for other colors or when the hero has no ultimate.
         /// Must only be called from a State (HeroReadyState).

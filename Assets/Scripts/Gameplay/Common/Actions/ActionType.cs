@@ -27,7 +27,13 @@ namespace MightyHeroes.Gameplay.Common.Actions
         Special = 6,
 
         /// <summary>Indicates no action should be taken for this match.</summary>
-        Skip = 7
+        Skip = 7,
+
+        /// <summary>
+        /// Hero ultimate. Never assigned to a tile; resolved when the gauge is full
+        /// and the affinity color is matched.
+        /// </summary>
+        Ultimate = 8
 
     }
 }

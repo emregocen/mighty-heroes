@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using MightyHeroes.Gameplay.Combat.Interfaces;
 
 namespace MightyHeroes.Gameplay.Battle.Formation
@@ -22,5 +23,13 @@ namespace MightyHeroes.Gameplay.Battle.Formation
         /// Used by CombatSystem to route incoming enemy attack hit events.
         /// </summary>
         ICombatEntity FindEnemyById(int enemyId);
+
+        /// <summary>
+        /// Adds every alive enemy of the current front line to results (the list is
+        /// cleared first). Used by CombatSystem for multi-target hits such as the
+        /// ultimate. Callers must copy before applying damage, because a killed
+        /// enemy is removed from its line immediately.
+        /// </summary>
+        void CollectFrontLineTargets(List<ICombatTarget> results);
     }
 }

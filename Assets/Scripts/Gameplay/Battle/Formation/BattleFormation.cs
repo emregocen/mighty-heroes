@@ -256,6 +256,25 @@ namespace MightyHeroes.Gameplay.Battle.Formation
             return null;
         }
 
+        /// <summary>
+        /// Adds every alive enemy of the current front line to results (cleared first).
+        /// </summary>
+        public void CollectFrontLineTargets(List<ICombatTarget> results)
+        {
+            results.Clear();
+
+            BattleLine frontLine = FrontLine;
+
+            if (frontLine == null)
+                return;
+
+            foreach (EnemyComponent enemy in frontLine.Enemies)
+            {
+                if (enemy != null && enemy.IsAlive)
+                    results.Add(enemy);
+            }
+        }
+
         // PRIVATE METHODS
 
         /// <summary>

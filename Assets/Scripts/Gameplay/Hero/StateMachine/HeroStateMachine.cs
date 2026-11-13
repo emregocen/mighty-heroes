@@ -193,6 +193,13 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine
             SwitchState(new HeroSupportState(this, execution.ActionType, execution.Variant, execution.EffectValue));
         }
 
+        /// <summary>Transitions hero to the ultimate state for the resolved execution.</summary>
+        /// <param name="execution">Ultimate execution resolved from an affinity match.</param>
+        public void SwitchToUltimateState(HeroActionExecution execution)
+        {
+            SwitchState(new HeroUltimateState(this, execution.Variant, execution.ActionIntensity));
+        }
+
         /// <summary>
         /// Raises HeroTurnEnded event so TurnSystem can advance to the next phase.
         /// </summary>

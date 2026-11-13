@@ -41,6 +41,18 @@ namespace MightyHeroes.Gameplay.Hero.Events
         public GameEvent<UltimateGaugeChangedPayload> UltimateGaugeChangedEvent =>
             Registry.GetEvent<UltimateGaugeChangedPayload>();
 
+        /// <summary>Raised by HeroUltimateState when the ultimate starts.</summary>
+        public GameEvent<UltimateStartedPayload> UltimateStartedEvent =>
+            Registry.GetEvent<UltimateStartedPayload>();
+
+        /// <summary>Raised by HeroUltimateState at the effect frame; CombatSystem resolves the damage.</summary>
+        public GameEvent<UltimateHitPayload> UltimateHitEvent =>
+            Registry.GetEvent<UltimateHitPayload>();
+
+        /// <summary>Raised by HeroUltimateState when the ultimate animation has finished.</summary>
+        public GameEvent<UltimateEndedPayload> UltimateEndedEvent =>
+            Registry.GetEvent<UltimateEndedPayload>();
+
         /// <summary>
         /// Raised when the hero hits an enemy with an attack.
         /// </summary>

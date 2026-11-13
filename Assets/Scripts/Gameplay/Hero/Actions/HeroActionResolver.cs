@@ -76,6 +76,20 @@ namespace MightyHeroes.Gameplay.Hero.Actions
             }
         }
 
+        /// <summary>
+        /// Resolves the ultimate for an affinity match while the gauge is full.
+        /// The match tier scales the ultimate damage.
+        /// </summary>
+        /// <param name="payload">Matched tiles payload raised by the puzzle.</param>
+        public HeroActionExecution ResolveUltimate(PuzzleTilesMatchedPayload payload)
+        {
+            int tier = ResolveTier(payload.MatchCount, _tierData);
+
+            GameLogger.Log(LogSourceType.Hero, $"HeroActionResolver: Ultimate MatchCount={payload.MatchCount} Tier={tier}");
+
+            return HeroActionExecution.Ultimate(ResolveSupportVariant(payload), tier);
+        }
+
         // PRIVATE METHODS
 
         /// <summary>Resolves an attack execution; tier becomes the combo step count.</summary>
