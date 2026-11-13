@@ -97,6 +97,8 @@ namespace MightyHeroes.Core.Battle
         [SerializeField] private PooledHitVfxPlayer _hitVfxPlayer;
         [Tooltip("Side kill-cam and slow motion on high-tier killing hits. Optional.")]
         [SerializeField] private KillCamController _killCamController;
+        [Tooltip("Pulled-back wide camera while the hero ultimate plays. Optional.")]
+        [SerializeField] private UltimateCameraController _ultimateCameraController;
 
         [Header("Floating Text")]
         [SerializeField] private FloatingTextConfig _floatingTextConfig;
@@ -645,6 +647,9 @@ namespace MightyHeroes.Core.Battle
 
             if (_killCamController != null)
                 _killCamController.Initialize(_eventHub, _combatFeedbackData, entityLocator);
+
+            if (_ultimateCameraController != null)
+                _ultimateCameraController.Initialize(_eventHub);
         }
 
         // PRIVATE METHODS — Disposal
