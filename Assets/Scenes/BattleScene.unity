@@ -3242,6 +3242,7 @@ Transform:
   - {fileID: 471596535}
   - {fileID: 1691170954}
   - {fileID: 287195378}
+  - {fileID: 345590017}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &29070905
@@ -29424,6 +29425,58 @@ Transform:
   - {fileID: 1405056087}
   m_Father: {fileID: 1921616653}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &234885713
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 234885714}
+  - component: {fileID: 234885715}
+  m_Layer: 0
+  m_Name: Ulti Cam Controller
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &234885714
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 234885713}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &234885715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 234885713}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 616a00c086ac4f7f810b7f0fdfe2b174, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Battle.UltimateCameraController
+  _ultimateCamera: {fileID: 345590019}
+  _pullBackDistance: 3
+  _raiseHeight: 0.8
+  _extraPitch: 4
+  _fieldOfViewIncrease: 12
+  _blendInDuration: 0.45
+  _blendOutDuration: 0.7
+  _maxHoldDuration: 5
 --- !u!1001 &235116311
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -40875,6 +40928,106 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 455634, guid: 3b03db48e79bbb4458dc957b685dadcd, type: 3}
   m_PrefabInstance: {fileID: 344809486}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &345590016
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 345590017}
+  - component: {fileID: 345590019}
+  - component: {fileID: 345590018}
+  m_Layer: 0
+  m_Name: CM_UltimateCam
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &345590017
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 345590016}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 28737449}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &345590018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 345590016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00b2d199b96b516448144ab30fb26aed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineImpulseListener
+  ApplyAfter: 2
+  ChannelMask: 1
+  Gain: 1
+  Use2DDistance: 0
+  UseCameraSpace: 1
+  SignalCombinationMode: 0
+  ReactionSettings:
+    m_SecondaryNoise: {fileID: 0}
+    AmplitudeGain: 1
+    FrequencyGain: 1
+    Duration: 1
+    m_NoiseOffsets: {x: 0, y: 0, z: 0}
+--- !u!114 &345590019
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 345590016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9dfa5b682dcd46bda6128250e975f58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineCamera
+  Priority:
+    Enabled: 0
+    m_Value: 0
+  OutputChannel: 1
+  StandbyUpdate: 1
+  m_StreamingVersion: 20241001
+  m_LegacyPriority: 0
+  Target:
+    TrackingTarget: {fileID: 0}
+    LookAtTarget: {fileID: 0}
+    CustomLookAtTarget: 0
+  Lens:
+    FieldOfView: 72
+    OrthographicSize: 10
+    NearClipPlane: 0.1
+    FarClipPlane: 5000
+    Dutch: 0
+    ModeOverride: 0
+    PhysicalProperties:
+      GateFit: 2
+      SensorSize: {x: 21.946, y: 16.002}
+      LensShift: {x: 0, y: 0}
+      FocusDistance: 10
+      Iso: 200
+      ShutterSpeed: 0.005
+      Aperture: 16
+      BladeCount: 5
+      Curvature: {x: 2, y: 11}
+      BarrelClipping: 0.25
+      Anamorphism: 0
+  BlendHint: 0
 --- !u!1001 &346059308
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -46011,6 +46164,10 @@ PrefabInstance:
       propertyPath: _floatingTextScreenPrefab
       value: 
       objectReference: {fileID: 8306435047930137031, guid: f8452a1c877924e019fa69149ea2876f, type: 3}
+    - target: {fileID: 3172675781767647117, guid: a9dee7567a8b648cc986a4c53ce06d04, type: 3}
+      propertyPath: _ultimateCameraController
+      value: 
+      objectReference: {fileID: 234885715}
     - target: {fileID: 3172675781767647117, guid: a9dee7567a8b648cc986a4c53ce06d04, type: 3}
       propertyPath: _enemyFormation.Array.size
       value: 3
@@ -68621,6 +68778,10 @@ PrefabInstance:
       propertyPath: m_Color.r
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 442426957217348045, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 444624456013670795, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
       propertyPath: m_SizeDelta.y
       value: -10
@@ -68856,6 +69017,14 @@ PrefabInstance:
     - target: {fileID: 1702683012659449502, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1726304678237840217, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
+      propertyPath: _pulseScale
+      value: 1.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 1726304678237840217, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
+      propertyPath: _pulseTarget
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 1899975889908627767, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
       propertyPath: m_AnchorMax.x
@@ -70043,6 +70212,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 5295681740157998952, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
   m_PrefabInstance: {fileID: 565400181}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &565400183 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1726304678237840217, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
+  m_PrefabInstance: {fileID: 565400181}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f050755a2b164edaac2a287f7dbd91ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.UI.Battle.Views.UltimateGaugeView
 --- !u!1001 &565668185
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -189983,6 +190163,10 @@ PrefabInstance:
       propertyPath: _statusIconBarView
       value: 
       objectReference: {fileID: 245878525}
+    - target: {fileID: 2001089462223706261, guid: d9237026601db42e48ce109bddd9520e, type: 3}
+      propertyPath: _ultimateGaugeView
+      value: 
+      objectReference: {fileID: 565400183}
     - target: {fileID: 6919102804043492224, guid: d9237026601db42e48ce109bddd9520e, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.000000031738274
@@ -255821,6 +256005,7 @@ SceneRoots:
   - {fileID: 28737449}
   - {fileID: 2037582524}
   - {fileID: 194871060}
+  - {fileID: 234885714}
   - {fileID: 879630259}
   - {fileID: 387343660}
   - {fileID: 56682582}

@@ -1058,9 +1058,8 @@ GameObject:
   - component: {fileID: 2700256545976846766}
   - component: {fileID: 3206526798145879864}
   - component: {fileID: 2503142538944388576}
-  - component: {fileID: 3253670356792793552}
-  - component: {fileID: 3257384394898250114}
   - component: {fileID: 6710552474472574278}
+  - component: {fileID: 3257384394898250114}
   m_Layer: 5
   m_Name: Hero Health Bar View
   m_TagString: Untagged
@@ -1106,60 +1105,11 @@ CanvasGroup:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1464566841989106172}
-  m_Enabled: 0
+  m_Enabled: 1
   m_Alpha: 1
   m_Interactable: 0
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!114 &3253670356792793552
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1464566841989106172}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!114 &3257384394898250114
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1464566841989106172}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a5e9a9a8a1c84ad399c39b737d0dd05, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.UI.Battle.Views.HealthBarView
-  _slider: {fileID: 3938089382840354508}
-  _canvasGroup: {fileID: 2503142538944388576}
-  _valueText: {fileID: 8497567075253339485}
-  _animationDuration: 0.2
-  _hideWhenZero: 0
-  _hideDelay: 0.15
-  _hideFadeDuration: 0.3
 --- !u!114 &6710552474472574278
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1182,6 +1132,25 @@ MonoBehaviour:
   m_LayoutPriority: 1
   m_MaxWidth: -1
   m_MaxHeight: 50
+--- !u!114 &3257384394898250114
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1464566841989106172}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a5e9a9a8a1c84ad399c39b737d0dd05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.UI.Battle.Views.HealthBarView
+  _slider: {fileID: 3938089382840354508}
+  _canvasGroup: {fileID: 2503142538944388576}
+  _valueText: {fileID: 8497567075253339485}
+  _animationDuration: 0.2
+  _hideWhenZero: 0
+  _hideDelay: 0.15
+  _hideFadeDuration: 0.3
 --- !u!1 &1769829292714098191
 GameObject:
   m_ObjectHideFlags: 0
@@ -1457,8 +1426,8 @@ GameObject:
   - component: {fileID: 4722001154219682545}
   - component: {fileID: 5572773461266390036}
   - component: {fileID: 1342271872312016288}
-  - component: {fileID: 265717756944648698}
   - component: {fileID: 8515604817255971054}
+  - component: {fileID: 265717756944648698}
   m_Layer: 5
   m_Name: 'Hero Shield Bar View '
   m_TagString: Untagged
@@ -1506,29 +1475,11 @@ CanvasGroup:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2377875523169086485}
-  m_Enabled: 0
+  m_Enabled: 1
   m_Alpha: 1
   m_Interactable: 0
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!114 &265717756944648698
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2377875523169086485}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6e0eecc41e15d4fb4b63a0d49ccb5321, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.UI.Battle.Views.ShieldBarView
-  _slider: {fileID: 1806662792022296917}
-  _canvasGroup: {fileID: 1342271872312016288}
-  _valueText: {fileID: 586131997953553399}
-  _animationDuration: 0.2
-  _visibleAlpha: 1
-  _hiddenAlpha: 0
 --- !u!114 &8515604817255971054
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1551,6 +1502,24 @@ MonoBehaviour:
   m_LayoutPriority: 1
   m_MaxWidth: -1
   m_MaxHeight: 50
+--- !u!114 &265717756944648698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2377875523169086485}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e0eecc41e15d4fb4b63a0d49ccb5321, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.UI.Battle.Views.ShieldBarView
+  _slider: {fileID: 1806662792022296917}
+  _canvasGroup: {fileID: 1342271872312016288}
+  _valueText: {fileID: 586131997953553399}
+  _animationDuration: 0.2
+  _visibleAlpha: 1
+  _hiddenAlpha: 0
 --- !u!1 &2395625074621880612
 GameObject:
   m_ObjectHideFlags: 0
@@ -3405,9 +3374,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4662135672302320780}
   - component: {fileID: 1510727066776859731}
-  - component: {fileID: 1043326209425984311}
-  - component: {fileID: 5519271794613939800}
+  - component: {fileID: 2668854165632969591}
   - component: {fileID: 3168110858273946416}
+  - component: {fileID: 1726304678237840217}
   m_Layer: 5
   m_Name: Hero Ulti Bar
   m_TagString: Untagged
@@ -3448,36 +3417,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4789181116293863855}
   m_CullTransparentMesh: 1
---- !u!225 &1043326209425984311
+--- !u!225 &2668854165632969591
 CanvasGroup:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4789181116293863855}
-  m_Enabled: 0
+  m_Enabled: 1
   m_Alpha: 1
-  m_Interactable: 0
+  m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!114 &5519271794613939800
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4789181116293863855}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6e0eecc41e15d4fb4b63a0d49ccb5321, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.UI.Battle.Views.ShieldBarView
-  _slider: {fileID: 6443476661326529451}
-  _canvasGroup: {fileID: 1043326209425984311}
-  _valueText: {fileID: 9162720282418488900}
-  _animationDuration: 0.2
-  _visibleAlpha: 1
-  _hiddenAlpha: 0
 --- !u!114 &3168110858273946416
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3500,6 +3451,28 @@ MonoBehaviour:
   m_LayoutPriority: 1
   m_MaxWidth: -1
   m_MaxHeight: 50
+--- !u!114 &1726304678237840217
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4789181116293863855}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f050755a2b164edaac2a287f7dbd91ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.UI.Battle.Views.UltimateGaugeView
+  _slider: {fileID: 1533041655747263990}
+  _canvasGroup: {fileID: 2668854165632969591}
+  _valueText: {fileID: 9162720282418488900}
+  _readyHighlight: {fileID: 0}
+  _pulseTarget: {fileID: 882950013226330513}
+  _pulseScale: 1.06
+  _pulseDuration: 0.5
+  _fillDuration: 0.25
+  _visibleAlpha: 1
+  _hiddenAlpha: 0
 --- !u!1 &4849687473285693968
 GameObject:
   m_ObjectHideFlags: 0
@@ -3857,6 +3830,9 @@ MonoBehaviour:
   _label: {fileID: 9204109320775116024}
   _normalColor: {r: 1, g: 1, b: 1, a: 1}
   _warningColor: {r: 1, g: 0.35, b: 0.35, a: 1}
+  _radialFill: {fileID: 0}
+  _radialSlider: {fileID: 0}
+  _radialStepDuration: 0.25
   _pulseScale: 1.18
   _pulseDuration: 0.45
   _pulseEase: 4
@@ -6475,6 +6451,9 @@ MonoBehaviour:
   _label: {fileID: 4763706230249881463}
   _normalColor: {r: 1, g: 1, b: 1, a: 1}
   _warningColor: {r: 1, g: 0.35, b: 0.35, a: 1}
+  _radialFill: {fileID: 0}
+  _radialSlider: {fileID: 0}
+  _radialStepDuration: 0.25
   _pulseScale: 1.18
   _pulseDuration: 0.45
   _pulseEase: 4
@@ -7579,6 +7558,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 93de3d57d9fb224458f5d460d7d929f7, type: 3}
+--- !u!114 &1533041655747263990 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1819015288477377953, guid: 93de3d57d9fb224458f5d460d7d929f7, type: 3}
+  m_PrefabInstance: {fileID: 898474203475597399}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &8658814441019276628 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8381845816909374723, guid: 93de3d57d9fb224458f5d460d7d929f7, type: 3}
@@ -10819,17 +10809,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 8381845816909374723, guid: d1dafcf3612559e4da242ec36ea4d30c, type: 3}
   m_PrefabInstance: {fileID: 4635790775090783754}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &6443476661326529451 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1819015288477377953, guid: d1dafcf3612559e4da242ec36ea4d30c, type: 3}
-  m_PrefabInstance: {fileID: 4635790775090783754}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &4844331955951415203
 PrefabInstance:
   m_ObjectHideFlags: 0

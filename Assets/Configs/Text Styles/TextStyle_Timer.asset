@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fb6210b867a8464eb4a66e1ba2bccc3, type: 3}
   m_Name: TextStyle_Timer
   m_EditorClassIdentifier: Assembly-CSharp::TextStyleConfig
-  FaceColor: {r: 0.5176471, g: 0.36862746, b: 0.24313726, a: 1}
-  OutlineColor: {r: 0.20392157, g: 0.16470589, b: 0.14901961, a: 1}
+  FaceColor: {r: 0.64705884, g: 0.4392157, b: 0.19215687, a: 1}
+  OutlineColor: {r: 0.990566, g: 0.990566, b: 0.990566, a: 1}
   OutlineWidth: 0.51
   UseUnderlay: 0
   UnderlayColor: {r: 0, g: 0, b: 0, a: 1}

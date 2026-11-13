@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: UltimateData_Warrior
   m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Ultimate.UltimateData
   _affinityActionType: 1
-  _gaugeCapacity: 20
+  _gaugeCapacity: 7
   _apCostMode: 0
   _targetMode: 0
   _damageMultiplier: 2.5
