@@ -118,6 +118,9 @@ namespace MightyHeroes.Gameplay.Hero
         /// <summary>Hero status icon row (attack buff). Driven by StatusIconPresenter.</summary>
         [SerializeField] private StatusIconBarView _statusIconBarView;
 
+        /// <summary>Hero ultimate gauge bar on the HUD. Driven by UltimateGaugePresenter. Optional.</summary>
+        [SerializeField] private UltimateGaugeView _ultimateGaugeView;
+
         /// <summary>Runtime ultimate gauge. Created on initialize when HeroStatsData has UltimateData.</summary>
         private UltimateGauge _ultimateGauge;
 
@@ -143,6 +146,9 @@ namespace MightyHeroes.Gameplay.Hero
 
         /// <summary>Ultimate gauge, or null when the hero has no UltimateData.</summary>
         public UltimateGauge UltimateGauge => _ultimateGauge;
+
+        /// <summary>Ultimate gauge view for UltimateGaugePresenter. Can be null.</summary>
+        public UltimateGaugeView UltimateGaugeView => _ultimateGaugeView;
 
 
         /// <summary>
