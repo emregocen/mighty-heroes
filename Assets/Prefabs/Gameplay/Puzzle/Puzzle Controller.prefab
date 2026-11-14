@@ -56,26 +56,22 @@ MonoBehaviour:
     TileType: 1
     Icon: {fileID: 21300000, guid: e15984e5de343944092ab5c2fa78fdf6, type: 3}
     IconColor: {r: 1, g: 0.98, b: 0.94, a: 1}
-    IconShadow: {fileID: 21300000, guid: fa0350d4e51503c4790099c6526cfd8e, type: 3}
-    IconShadowColor: {r: 0.08, g: 0.06, b: 0.06, a: 0.85}
+    ShowIconShadow: 1
   - Color: {r: 0.41876113, g: 0.29556784, b: 0.509434, a: 1}
     TileType: 3
     Icon: {fileID: 21300000, guid: 909bcd70b903e5f4f9745723e406373c, type: 3}
     IconColor: {r: 1, g: 0.98, b: 0.94, a: 1}
-    IconShadow: {fileID: 21300000, guid: 3ee1cd84ab78b504aa871ae1999957cb, type: 3}
-    IconShadowColor: {r: 0.08, g: 0.06, b: 0.06, a: 0.85}
+    ShowIconShadow: 1
   - Color: {r: 0.33333334, g: 0.579234, b: 0.7764706, a: 1}
     TileType: 5
     Icon: {fileID: 21300000, guid: a93a8779f0fe7194d9fea4d819c95528, type: 3}
     IconColor: {r: 1, g: 0.98, b: 0.94, a: 1}
-    IconShadow: {fileID: 21300000, guid: 536174c7fba3c27469b36904b6ec0428, type: 3}
-    IconShadowColor: {r: 0.08, g: 0.06, b: 0.06, a: 0.85}
+    ShowIconShadow: 1
   - Color: {r: 0.7830189, g: 0.5830612, b: 0.2031417, a: 1}
     TileType: 4
     Icon: {fileID: 21300000, guid: db61ad619b77f7a4184219533d13efac, type: 3}
     IconColor: {r: 1, g: 0.98, b: 0.94, a: 1}
-    IconShadow: {fileID: 21300000, guid: 2757923addacc324081da35754c81d42, type: 3}
-    IconShadowColor: {r: 0.08, g: 0.06, b: 0.06, a: 0.85}
+    ShowIconShadow: 1
   despawnEffects:
   - {fileID: 1809022330002312, guid: ed511b7776af6174e9b1255c7a81e59c, type: 3}
   _bodyVariants:

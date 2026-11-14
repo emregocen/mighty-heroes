@@ -26,12 +26,11 @@ namespace MightyHeroes.Gameplay.Puzzle.Grid
         [Tooltip("Icon tint. Alpha must be above zero.")]
         [SerializeField] public Color IconColor;
 
-        /// <summary>Optional shadow / outline sprite drawn under the icon (for example a Synty _Underlay sprite).</summary>
-        [Tooltip("Optional shadow sprite drawn under the icon, e.g. the matching Synty _Underlay sprite. Leave empty for no shadow.")]
-        [SerializeField] public Sprite IconShadow;
-
-        /// <summary>Tint of the icon shadow.</summary>
-        [Tooltip("Icon shadow tint. Alpha must be above zero.")]
-        [SerializeField] public Color IconShadowColor;
+        /// <summary>
+        /// Draws a drop shadow under the icon, like a UI Shadow component.
+        /// Shadow color and distance are constants in GameGridElement.
+        /// </summary>
+        [Tooltip("Draws a drop shadow under the icon. Color and distance are fixed in GameGridElement.")]
+        [SerializeField] public bool ShowIconShadow;
     }
 }

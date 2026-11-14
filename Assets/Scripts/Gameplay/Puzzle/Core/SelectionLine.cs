@@ -35,7 +35,8 @@ namespace MightyHeroes.Gameplay.Puzzle.Core
             // düzeltme
             lineRenderer.useWorldSpace = true;
             //lineRenderer.sortingLayerName = "Default"; // sprite'ların layer'ı neyse onu ver
-            lineRenderer.sortingOrder = 50; // sprite'ların üstünde çizsin
+            // Draw below the tile bodies (sorting order 1) so the line only shows in the gaps between tiles.
+            lineRenderer.sortingOrder = -1;
         }
 
         /// <summary>

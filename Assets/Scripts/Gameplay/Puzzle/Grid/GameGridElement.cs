@@ -10,12 +10,22 @@ namespace MightyHeroes.Gameplay.Puzzle.Grid
     /// </summary>
     public class GameGridElement : MonoBehaviour
     {
+        // CONSTANTS
+
+        /// <summary>Icon shadow tint (UI Shadow "Effect Color" equivalent).</summary>
+        private static readonly Color IconShadowEffectColor = new Color(0f, 0f, 0f, 0.6f);
+
+        /// <summary>Icon shadow offset in tile units (UI Shadow "Effect Distance" equivalent).</summary>
+        private static readonly Vector2 IconShadowEffectDistance = new Vector2(0.02f, -0.025f);
+
+        // FIELDS
+
         [SerializeField] private SpriteRenderer spriteRenderer;
 
         [Tooltip("Renderer for the action icon. Must sort above the body renderer.")]
         [SerializeField] private SpriteRenderer _iconRenderer;
 
-        [Tooltip("Optional renderer for the icon shadow. Must sort between the body and the icon.")]
+        [Tooltip("Renderer for the icon shadow. Uses the icon sprite; must sort between the body and the icon.")]
         [SerializeField] private SpriteRenderer _iconShadowRenderer;
 
         private float CellSize = 1f;
@@ -42,8 +52,9 @@ namespace MightyHeroes.Gameplay.Puzzle.Grid
         public ActionType TileType { get; set; }
 
         /// <summary>
-        /// Applies a tile type: body tint, action type, icon and icon shadow.
-        /// Empty icon or shadow sprites hide their renderer.
+        /// Applies a tile type: body tint, action type, icon and optional icon shadow.
+        /// The shadow reuses the icon sprite with a constant color and offset, so it
+        /// works with any icon. An empty icon hides both renderers.
         /// </summary>
         /// <param name="elementType">Tile type definition from GameGrid.</param>
         public void ApplyType(GameGridElementType elementType)
@@ -52,7 +63,10 @@ namespace MightyHeroes.Gameplay.Puzzle.Grid
             TileType = elementType.TileType;
 
             ApplyOverlay(_iconRenderer, elementType.Icon, elementType.IconColor);
-            ApplyOverlay(_iconShadowRenderer, elementType.IconShadow, elementType.IconShadowColor);
+
+            Sprite shadowSprite = elementType.ShowIconShadow ? elementType.Icon : null;
+            ApplyOverlay(_iconShadowRenderer, shadowSprite, IconShadowEffectColor);
+            PlaceIconShadow();
         }
 
         /// <summary>
@@ -64,6 +78,16 @@ namespace MightyHeroes.Gameplay.Puzzle.Grid
         {
             if (bodySprite != null)
                 spriteRenderer.sprite = bodySprite;
+        }
+
+        /// <summary>Positions the shadow at the icon position plus the constant effect distance.</summary>
+        private void PlaceIconShadow()
+        {
+            if (_iconShadowRenderer == null || _iconRenderer == null)
+                return;
+
+            Vector3 iconPosition = _iconRenderer.transform.localPosition;
+            _iconShadowRenderer.transform.localPosition = new Vector3(iconPosition.x + IconShadowEffectDistance.x, iconPosition.y + IconShadowEffectDistance.y, iconPosition.z);
         }
 
         /// <summary>Sets sprite and tint on an optional overlay renderer, hiding it when no sprite is given.</summary>
