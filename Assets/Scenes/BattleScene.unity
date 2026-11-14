@@ -68762,6 +68762,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 263712871216239374, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
+      propertyPath: m_text
+      value: 'PLAYER TURN! '
+      objectReference: {fileID: 0}
     - target: {fileID: 265717756944648698, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
       propertyPath: _slider
       value: 
