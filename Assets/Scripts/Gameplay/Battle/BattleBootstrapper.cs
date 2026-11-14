@@ -6,6 +6,7 @@ using MightyHeroes.Core.Logging;
 using MightyHeroes.Gameplay.Battle;
 using MightyHeroes.Gameplay.Battle.Formation;
 using MightyHeroes.Gameplay.Battle.Intro;
+using MightyHeroes.Gameplay.Battle.Targeting;
 using MightyHeroes.Gameplay.Combat;
 using MightyHeroes.Gameplay.Combat.Feedback;
 using MightyHeroes.Gameplay.Common.Actions;
@@ -100,6 +101,10 @@ namespace MightyHeroes.Core.Battle
         [Tooltip("Pulled-back wide camera while the hero ultimate plays. Optional.")]
         [SerializeField] private UltimateCameraController _ultimateCameraController;
 
+        [Header("Targeting")]
+        [Tooltip("World-space marker shown above the currently selected enemy. Optional.")]
+        [SerializeField] private TargetMarkerView _targetMarkerView;
+
         [Header("Floating Text")]
         [SerializeField] private FloatingTextConfig _floatingTextConfig;
         [Tooltip("Screen-space text that follows an entity's world position (damage, heal, shield, buff, K.O.).")]
@@ -133,6 +138,7 @@ namespace MightyHeroes.Core.Battle
         private StatusIconPresenter _statusIconPresenter;
         private UltimateGaugePresenter _ultimateGaugePresenter;
         private CombatFeedbackPresenter _combatFeedbackPresenter;
+        private TargetMarkerPresenter _targetMarkerPresenter;
 
         // UNITY CALLBACKS
 
@@ -149,6 +155,7 @@ namespace MightyHeroes.Core.Battle
             InitializeEnemies();
             InitializeTargetInput();
             InitializeHeroTargetFocus();
+            InitializeTargetMarker();
             InitializeBattleIntro();
             InitializeTurnSystem();
             InitializeCombatSystem();
@@ -181,14 +188,17 @@ namespace MightyHeroes.Core.Battle
 
             if (_battleIntroController != null)
             {
-                _battleIntroController.Play(onComplete: () =>
-                {
-                    _turnStateMachine.SwitchToStartState();
-                    _battleTimer?.NotifyIntroCompleted();
-                });
+                _battleIntroController.Play(
+                    onSwordDrawn: EnterHeroBattleStance,
+                    onComplete: () =>
+                    {
+                        _turnStateMachine.SwitchToStartState();
+                        _battleTimer?.NotifyIntroCompleted();
+                    });
             }
             else
             {
+                EnterHeroBattleStance();
                 _turnStateMachine.SwitchToStartState();
                 _battleTimer?.NotifyIntroCompleted();
             }
@@ -201,6 +211,7 @@ namespace MightyHeroes.Core.Battle
             DisposeStatusIcons();
             DisposeUltimateGauge();
             DisposeCombatFeedback();
+            DisposeTargetMarker();
             DisposeBattleTimer();
             DisposeCombatSystem();
             DisposeEnemyComponents();
@@ -592,6 +603,32 @@ namespace MightyHeroes.Core.Battle
         }
 
         /// <summary>
+        /// Creates the presenter that keeps the target marker on the selected enemy.
+        /// Skipped when no marker view is assigned. Must run after InitializeEnemies.
+        /// </summary>
+        private void InitializeTargetMarker()
+        {
+            if (_targetMarkerView == null)
+            {
+                GameLogger.Log(LogSourceType.BattleSystem,
+                    "BattleBootstrapper.InitializeTargetMarker: no marker view assigned, skipping.");
+                return;
+            }
+
+            _targetMarkerPresenter = new TargetMarkerPresenter(_eventHub, _battleFormation, _targetMarkerView);
+        }
+
+        /// <summary>
+        /// Puts the hero into its battle-ready sword pose. Runs when the intro draws
+        /// the sword, or at battle start when no intro controller is assigned.
+        /// </summary>
+        private void EnterHeroBattleStance()
+        {
+            if (_heroComponent != null)
+                _heroComponent.EnterBattleStance();
+        }
+
+        /// <summary>
         /// Creates the ultimate gauge presenter for the hero's HUD bar. Skipped
         /// when the hero has no gauge view; the presenter hides the view itself
         /// when the hero has no ultimate. Must run after InitializeHero.
@@ -760,6 +797,13 @@ namespace MightyHeroes.Core.Battle
             _floatingTextPresenter?.Dispose();
             _floatingTextPresenter = null;
             _floatingTextService = null;
+        }
+
+        /// <summary>Disposes the target marker presenter to unregister its event handlers.</summary>
+        private void DisposeTargetMarker()
+        {
+            _targetMarkerPresenter?.Dispose();
+            _targetMarkerPresenter = null;
         }
 
         /// <summary>Disposes the combat feedback presenter to unregister its event handlers.</summary>

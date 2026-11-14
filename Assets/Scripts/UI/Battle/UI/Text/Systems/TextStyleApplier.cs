@@ -32,12 +32,22 @@ public static class TextStyleApplier
             mat.SetFloat(ShaderUtilities.ID_UnderlayOffsetX, config.UnderlayOffset.x);
             mat.SetFloat(ShaderUtilities.ID_UnderlayOffsetY, config.UnderlayOffset.y);
         }
+        else
+        {
+            // Pooled texts reuse one material instance, so a style without
+            // underlay must switch off what a previous style switched on.
+            mat.DisableKeyword("UNDERLAY_ON");
+        }
 
         if (config.UseGlow)
         {
             mat.EnableKeyword("GLOW_ON");
             mat.SetColor(ShaderUtilities.ID_GlowColor, config.GlowColor);
             mat.SetFloat(ShaderUtilities.ID_GlowPower, config.GlowPower);
+        }
+        else
+        {
+            mat.DisableKeyword("GLOW_ON");
         }
     }
 }

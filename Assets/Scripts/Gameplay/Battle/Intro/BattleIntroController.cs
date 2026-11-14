@@ -153,17 +153,24 @@ namespace MightyHeroes.Gameplay.Battle.Intro
             GameLogger.Log(LogSourceType.BattleSystem, "BattleIntroController.Initialize complete.");
         }
 
-        public void Play(Action onComplete)
+        /// <summary>
+        /// Starts the intro sequence. Without a config the intro is skipped and both
+        /// callbacks fire immediately.
+        /// </summary>
+        /// <param name="onSwordDrawn">Invoked when the sword prop becomes visible.</param>
+        /// <param name="onComplete">Invoked when the whole intro has finished.</param>
+        public void Play(Action onSwordDrawn, Action onComplete)
         {
             if (_config == null)
             {
                 GameLogger.Log(LogSourceType.BattleSystem,
                     "BattleIntroController: no config, skipping intro.");
+                onSwordDrawn?.Invoke();
                 onComplete?.Invoke();
                 return;
             }
 
-            _introCoroutine = StartCoroutine(RunIntroSequence(onComplete));
+            _introCoroutine = StartCoroutine(RunIntroSequence(onSwordDrawn, onComplete));
         }
 
         // IIntroSignalReceiver
@@ -181,7 +188,7 @@ namespace MightyHeroes.Gameplay.Battle.Intro
 
         // PRIVATE METHODS — Sequence
 
-        private IEnumerator RunIntroSequence(Action onComplete)
+        private IEnumerator RunIntroSequence(Action onSwordDrawn, Action onComplete)
         {
             _tauntEnded = false;
 
@@ -257,6 +264,8 @@ namespace MightyHeroes.Gameplay.Battle.Intro
 
             if (_swordProp != null)
                 _swordProp.SetActive(true);
+
+            onSwordDrawn?.Invoke();
 
             GameLogger.Log(LogSourceType.BattleSystem,
                 $"About to reveal puzzle: rect null={_puzzleRect == null} canvasGroup null={_puzzleCanvasGroup == null}");
