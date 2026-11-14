@@ -53,9 +53,7 @@ namespace MightyHeroes.Gameplay.Puzzle.Grid
                         // pozisyonu kesin olarak set et
                         element.transform.position = grid.GridToWorldPosition(col, row);
 
-                        var elementType = grid.ElementTypes.GetRandom();
-                        element.Color = elementType.Color;
-                        element.TileType = elementType.TileType;
+                        grid.ApplyRandomAppearance(element);
 
                         element.Spawn();
                     }

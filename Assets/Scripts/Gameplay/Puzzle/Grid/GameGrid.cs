@@ -22,6 +22,9 @@ namespace MightyHeroes.Gameplay.Puzzle.Grid
         [SerializeField] private List<GameGridElementType> elementTypes = new();
         [SerializeField] public List<GameObject> despawnEffects = new();
 
+        [Tooltip("Grayscale tile body sprites. One is picked at random for every spawned tile. Empty keeps the prefab sprite.")]
+        [SerializeField] private List<Sprite> _bodyVariants = new();
+
         private GameGridInput gridInput;
         private GameGridMovement gridMovement;
         private GameGridSpawning gridSpawning;
@@ -127,14 +130,25 @@ namespace MightyHeroes.Gameplay.Puzzle.Grid
                 element.gameObject.layer = gameObject.layer;
 
                 //TODO: Tipleri ve buradaki sistemi tekrar düşün!
-                var randomType = elementTypes.GetRandom();
-                element.Color = randomType.Color;
-                element.TileType = randomType.TileType;
+                ApplyRandomAppearance(element);
 
                 element.SetCellSize(cellSize);
 
                 Elements.Add(element);
             }
+        }
+
+        /// <summary>
+        /// Gives the element a random tile type (color, action, icon) and a
+        /// random body variant. Used on the initial grid setup and on respawn.
+        /// </summary>
+        /// <param name="element">Element to set up.</param>
+        public void ApplyRandomAppearance(GameGridElement element)
+        {
+            element.ApplyType(elementTypes.GetRandom());
+
+            if (_bodyVariants.Count > 0)
+                element.SetBodySprite(_bodyVariants.GetRandom());
         }
 
         /// <summary>

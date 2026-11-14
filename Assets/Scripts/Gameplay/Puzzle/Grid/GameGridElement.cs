@@ -12,6 +12,12 @@ namespace MightyHeroes.Gameplay.Puzzle.Grid
     {
         [SerializeField] private SpriteRenderer spriteRenderer;
 
+        [Tooltip("Renderer for the action icon. Must sort above the body renderer.")]
+        [SerializeField] private SpriteRenderer _iconRenderer;
+
+        [Tooltip("Optional renderer for the icon shadow. Must sort between the body and the icon.")]
+        [SerializeField] private SpriteRenderer _iconShadowRenderer;
+
         private float CellSize = 1f;
 
         /// <summary>
@@ -34,6 +40,42 @@ namespace MightyHeroes.Gameplay.Puzzle.Grid
         }
 
         public ActionType TileType { get; set; }
+
+        /// <summary>
+        /// Applies a tile type: body tint, action type, icon and icon shadow.
+        /// Empty icon or shadow sprites hide their renderer.
+        /// </summary>
+        /// <param name="elementType">Tile type definition from GameGrid.</param>
+        public void ApplyType(GameGridElementType elementType)
+        {
+            Color = elementType.Color;
+            TileType = elementType.TileType;
+
+            ApplyOverlay(_iconRenderer, elementType.Icon, elementType.IconColor);
+            ApplyOverlay(_iconShadowRenderer, elementType.IconShadow, elementType.IconShadowColor);
+        }
+
+        /// <summary>
+        /// Replaces the tile body sprite (used for random body variants).
+        /// A null sprite keeps the current one.
+        /// </summary>
+        /// <param name="bodySprite">Grayscale body sprite.</param>
+        public void SetBodySprite(Sprite bodySprite)
+        {
+            if (bodySprite != null)
+                spriteRenderer.sprite = bodySprite;
+        }
+
+        /// <summary>Sets sprite and tint on an optional overlay renderer, hiding it when no sprite is given.</summary>
+        private static void ApplyOverlay(SpriteRenderer overlayRenderer, Sprite sprite, Color color)
+        {
+            if (overlayRenderer == null)
+                return;
+
+            overlayRenderer.sprite = sprite;
+            overlayRenderer.color = color;
+            overlayRenderer.enabled = sprite != null;
+        }
 
         /// <summary>
         ///     Moves the elements to the given target position (world coordinates)
