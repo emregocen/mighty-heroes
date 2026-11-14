@@ -482,6 +482,15 @@ namespace MightyHeroes.Gameplay.Hero
             _attackMovementController?.CancelRetreat();
         }
 
+        /// <summary>
+        /// Puts the hero into its battle-ready sword pose. Called by BattleBootstrapper
+        /// when the intro draws the sword, or at battle start when no intro plays.
+        /// </summary>
+        public void EnterBattleStance()
+        {
+            _attackMovementController?.EnterBattleStance();
+        }
+
         // PUBLIC METHODS — Animation Event Bridge
 
         /// <summary>

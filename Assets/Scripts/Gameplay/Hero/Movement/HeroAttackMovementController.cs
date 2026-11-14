@@ -81,7 +81,6 @@ namespace MightyHeroes.Gameplay.Hero.Movement
             CacheLayerIndices();
             CacheVisualInitialTransform();
             CaptureStartPosition();
-            EnableIdleSwordPoseInstant();
         }
 
         private void OnAnimatorMove()
@@ -118,6 +117,16 @@ namespace MightyHeroes.Gameplay.Hero.Movement
             if (_heroRoot == null) return;
             _capturedStartPosition = _heroRoot.position;
             GameLogger.Log(LogSourceType.Hero, $"CaptureStartPosition — captured={_capturedStartPosition}");
+        }
+
+        /// <summary>
+        /// Blends the sword idle override layers in. Called once when the hero becomes
+        /// battle-ready: when the sword is drawn at the end of the intro, or at battle
+        /// start when no intro plays. Awake must not do this, the intro starts unarmed.
+        /// </summary>
+        public void EnterBattleStance()
+        {
+            EnableIdleSwordPose();
         }
 
         /// <summary>
@@ -291,13 +300,6 @@ namespace MightyHeroes.Gameplay.Hero.Movement
             BlendLayer(_swordHandLayerIndex, 0f, ref _swordHandTween);
         }
 
-        /// <summary>Sets sword idle override layers to their target weights immediately, without blending.</summary>
-        private void EnableIdleSwordPoseInstant()
-        {
-            SetLayerWeight(_swordArmLayerIndex, _swordArmIdleWeight);
-            SetLayerWeight(_swordHandLayerIndex, _swordHandIdleWeight);
-        }
-
         /// <summary>
         /// Tweens a single animator layer weight to the target value.
         /// Kills any existing tween on that layer before starting a new one.
@@ -327,7 +329,7 @@ namespace MightyHeroes.Gameplay.Hero.Movement
             if (_animator == null || layerIndex < 0)
                 return;
 
-            // _animator.SetLayerWeight(layerIndex, weight);
+            _animator.SetLayerWeight(layerIndex, weight);
         }
 
         /// <summary>Caches the initial local transform of the animator visual root for later reset.</summary>

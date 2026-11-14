@@ -54,14 +54,33 @@ MonoBehaviour:
   elementTypes:
   - Color: {r: 0.8679245, g: 0.2615969, b: 0.24973297, a: 1}
     TileType: 1
+    Icon: {fileID: 21300000, guid: e15984e5de343944092ab5c2fa78fdf6, type: 3}
+    IconColor: {r: 1, g: 0.98, b: 0.94, a: 1}
+    ShowIconShadow: 1
   - Color: {r: 0.41876113, g: 0.29556784, b: 0.509434, a: 1}
-    TileType: 1
+    TileType: 3
+    Icon: {fileID: 21300000, guid: 909bcd70b903e5f4f9745723e406373c, type: 3}
+    IconColor: {r: 1, g: 0.98, b: 0.94, a: 1}
+    ShowIconShadow: 1
   - Color: {r: 0.33333334, g: 0.579234, b: 0.7764706, a: 1}
-    TileType: 1
+    TileType: 5
+    Icon: {fileID: 21300000, guid: a93a8779f0fe7194d9fea4d819c95528, type: 3}
+    IconColor: {r: 1, g: 0.98, b: 0.94, a: 1}
+    ShowIconShadow: 1
   - Color: {r: 0.7830189, g: 0.5830612, b: 0.2031417, a: 1}
-    TileType: 1
+    TileType: 4
+    Icon: {fileID: 21300000, guid: db61ad619b77f7a4184219533d13efac, type: 3}
+    IconColor: {r: 1, g: 0.98, b: 0.94, a: 1}
+    ShowIconShadow: 1
   despawnEffects:
   - {fileID: 1809022330002312, guid: ed511b7776af6174e9b1255c7a81e59c, type: 3}
+  _bodyVariants:
+  - {fileID: 21300000, guid: 1c1adcbd3c6e4419929696f1e8e579c0, type: 3}
+  - {fileID: 21300000, guid: c6fd5f5c1e0a41f1959afbcfd0a911f2, type: 3}
+  - {fileID: 21300000, guid: fa1ad164561a463dae3df4267f8eb03c, type: 3}
+  - {fileID: 21300000, guid: 0f9fa196141a4b22b162f29c9819b2b1, type: 3}
+  - {fileID: 21300000, guid: fbfea88181744dbd9815549828370621, type: 3}
+  - {fileID: 21300000, guid: c2bb30a77a6848f89c4610f9ffbcd905, type: 3}
 --- !u!1 &4035135191284247397
 GameObject:
   m_ObjectHideFlags: 0
