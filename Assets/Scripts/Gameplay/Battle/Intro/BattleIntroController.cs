@@ -76,8 +76,8 @@ namespace MightyHeroes.Gameplay.Battle.Intro
         [SerializeField] private Animator _heroAnimator;
 
         [Header("Hero Taunt Lower Body Lock")]
-        [Tooltip("Animator layer that holds the idle pose for the legs. Weight is driven by code.")]
-        [SerializeField] private string _tauntLowerBodyLayerName = "TauntLowerBody";
+        [Tooltip("Animator layer that holds the idle pose for the legs (shared with LowerBodyLockBehaviour). Weight is driven by code during the taunt.")]
+        [SerializeField] private string _tauntLowerBodyLayerName = "LowerBodyLock";
         [SerializeField] private float _lowerBodyLockBlendInDuration = 0.1f;
         [SerializeField] private float _lowerBodyLockBlendOutDuration = 0.15f;
 

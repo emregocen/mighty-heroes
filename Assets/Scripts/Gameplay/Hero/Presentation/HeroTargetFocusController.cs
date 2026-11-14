@@ -64,6 +64,9 @@ namespace MightyHeroes.Gameplay.Hero.Presentation
         private bool _wasRetreating;
         private bool _hasQueuedFocusAfterRetreat;
 
+        /// <summary>True while a heal or ultimate clip plays in place; focus changes are queued.</summary>
+        private bool _isInPlaceActionPlaying;
+
         private Sequence _lookAtSequence;
         private Tween _rootRotationTween;
         private Tween _returnFocusTween;
@@ -92,9 +95,10 @@ namespace MightyHeroes.Gameplay.Hero.Presentation
         /// Gets whether hero attack movement currently owns root rotation.
         /// </summary>
         private bool IsMovementLocked =>
-            _attackMovementController != null &&
-            (_attackMovementController.IsAttacking ||
-             _attackMovementController.IsRetreating);
+            _isInPlaceActionPlaying ||
+            (_attackMovementController != null &&
+             (_attackMovementController.IsAttacking ||
+              _attackMovementController.IsRetreating));
 
         // UNITY CALLBACKS
 
@@ -445,21 +449,35 @@ namespace MightyHeroes.Gameplay.Hero.Presentation
             _currentTargetFocus = null;
         }
                 /// <summary>
-        /// Called when a heal animation starts.
-        /// Fades LookAt IK out so the heal clip is not bent toward the target.
+        /// Called when a heal or ultimate animation starts.
+        /// Fades LookAt IK out so the clip is not bent toward the target, and defers
+        /// any target change (e.g. the ultimate clearing the front line) until the
+        /// animation ends, the same way retreat defers it.
         /// </summary>
         public void NotifyHealStarted()
         {
+            _isInPlaceActionPlaying = true;
             BlendLookAtScale(0f);
         }
 
         /// <summary>
-        /// Called when a heal animation ends.
-        /// Fades LookAt IK back in toward the current focus target.
+        /// Called when a heal or ultimate animation ends.
+        /// Fades LookAt IK back in and turns toward a target selected during the
+        /// animation. When every enemy is dead there is no new target, so the hero
+        /// keeps facing the last direction.
         /// </summary>
         public void NotifyHealEnded()
         {
+            _isInPlaceActionPlaying = false;
             BlendLookAtScale(1f);
+
+            if (!_hasQueuedFocusAfterRetreat || IsMovementLocked)
+                return;
+
+            _hasQueuedFocusAfterRetreat = false;
+
+            if (ActiveTargetFocus != null)
+                FocusTarget(ActiveTargetFocus);
         }
     }
 }

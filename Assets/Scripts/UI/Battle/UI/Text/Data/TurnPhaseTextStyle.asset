@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fb6210b867a8464eb4a66e1ba2bccc3, type: 3}
   m_Name: TurnPhaseTextStyle
   m_EditorClassIdentifier: Assembly-CSharp::TextStyleConfig
-  FaceColor: {r: 0, g: 0.71723115, b: 1, a: 1}
-  OutlineColor: {r: 0.044695295, g: 0, b: 0.4811321, a: 1}
+  FaceColor: {r: 0.105882354, g: 0.69411767, b: 0.9647059, a: 1}
+  OutlineColor: {r: 1, g: 1, b: 1, a: 1}
   OutlineWidth: 0.51
   UseUnderlay: 0
   UnderlayColor: {r: 0, g: 0, b: 0, a: 1}

@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: BattleTimerConfig
   m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Battle.BattleTimer.BattleTimerConfig
   _durationSeconds: 90
-  _startImmediately: 1
+  _startImmediately: 0
   _warningThresholdSeconds: 10

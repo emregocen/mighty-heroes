@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using MightyHeroes.Core.EventSystem;
 using MightyHeroes.Core.Logging;
 using MightyHeroes.Gameplay.Battle.Formation;
@@ -7,6 +8,8 @@ using MightyHeroes.Gameplay.Combat.Payloads;
 using MightyHeroes.Gameplay.Combat.Types;
 using MightyHeroes.Gameplay.Enemy.Payloads;
 using MightyHeroes.Gameplay.Hero.Payloads;
+using MightyHeroes.Gameplay.Ultimate;
+using MightyHeroes.Gameplay.Ultimate.Payloads;
 
 namespace MightyHeroes.Gameplay.Combat
 {
@@ -38,6 +41,7 @@ namespace MightyHeroes.Gameplay.Combat
         private readonly ICombatResolver _combatResolver;
         private readonly ICombatEntity _heroEntity;
         private readonly IBattleField _battleField;
+        private readonly List<ICombatTarget> _multiTargetBuffer = new List<ICombatTarget>();
         private bool _isDisposed;
 
         // CONSTRUCTOR
@@ -84,12 +88,14 @@ namespace MightyHeroes.Gameplay.Combat
         {
             _eventHub.HeroEvents.HeroAttackHitEvent.Register(OnHeroAttackHit);
             _eventHub.EnemyEvents.EnemyAttackHitEvent.Register(OnEnemyAttackHit);
+            _eventHub.HeroEvents.UltimateHitEvent.Register(OnUltimateHit);
         }
 
         private void UnregisterEvents()
         {
             _eventHub.HeroEvents.HeroAttackHitEvent.Unregister(OnHeroAttackHit);
             _eventHub.EnemyEvents.EnemyAttackHitEvent.Unregister(OnEnemyAttackHit);
+            _eventHub.HeroEvents.UltimateHitEvent.Unregister(OnUltimateHit);
         }
 
         /// <summary>
@@ -159,6 +165,56 @@ namespace MightyHeroes.Gameplay.Combat
                     hitDirection: payload.HitDirection,
                     stepIndex: payload.StepIndex,
                     totalSteps: payload.TotalSteps));
+        }
+
+        /// <summary>
+        /// Handles the hero ultimate hit: collects the targets of the target mode,
+        /// copies them (a kill removes the enemy from its line immediately), then
+        /// resolves tier damage times the ultimate multiplier for each and raises
+        /// one DamageIntent per target. StepIndex equals TotalSteps (the tier) so
+        /// feedback treats every ultimate hit as a final hit of that tier.
+        /// </summary>
+        private void OnUltimateHit(UltimateHitPayload payload)
+        {
+            if (_isDisposed)
+                return;
+
+            ICombatAttacker attacker = _heroEntity as ICombatAttacker;
+
+            if (attacker == null)
+                return;
+
+            switch (payload.TargetMode)
+            {
+                case UltimateTargetMode.FrontLine:
+                default:
+                    _battleField.CollectFrontLineTargets(_multiTargetBuffer);
+                    break;
+            }
+
+            ICombatTarget[] targets = _multiTargetBuffer.ToArray();
+
+            GameLogger.Log(LogSourceType.CombatSystem,
+                $"Ultimate hit Tier={payload.Tier} Multiplier={payload.DamageMultiplier} Targets={targets.Length}");
+
+            foreach (ICombatTarget target in targets)
+            {
+                if (target == null || !target.IsAlive)
+                    continue;
+
+                int baseDamage = _combatResolver.ResolveDamage(attacker, target, payload.Tier);
+                int damage = ApplyAttackerModifiers(attacker, (int)Math.Round(baseDamage * payload.DamageMultiplier));
+
+                _eventHub.CombatEvents.CombatDamageIntentEvent.Raise(
+                    new CombatDamageIntentPayload(
+                        targetEntityId: target.EntityId,
+                        attackerEntityId: attacker.EntityId,
+                        damageAmount: damage,
+                        damageType: DamageType.Physical,
+                        hitDirection: HitDirection.Center,
+                        stepIndex: payload.Tier,
+                        totalSteps: payload.Tier));
+            }
         }
 
         private void OnEnemyAttackHit(EnemyAttackHitPayload payload)

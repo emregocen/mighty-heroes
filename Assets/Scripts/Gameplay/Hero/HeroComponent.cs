@@ -4,6 +4,7 @@ using MightyHeroes.Gameplay.Animation.Interfaces;
 using MightyHeroes.Gameplay.Combat.Interfaces;
 using MightyHeroes.Gameplay.Combat.Payloads;
 using MightyHeroes.Gameplay.Combat.Types;
+using MightyHeroes.Gameplay.Common.Actions;
 using MightyHeroes.Gameplay.Common.Entity;
 using MightyHeroes.Gameplay.Common.Stats;
 using MightyHeroes.Gameplay.Health.Presentation;
@@ -13,6 +14,7 @@ using MightyHeroes.Gameplay.Hero.Presentation;
 using MightyHeroes.Gameplay.Hero.StateMachine;
 using MightyHeroes.Gameplay.Hero.Stats;
 using MightyHeroes.Gameplay.Puzzle;
+using MightyHeroes.Gameplay.Ultimate;
 using MightyHeroes.UI.Battle.Views;
 using UnityEngine;
 
@@ -116,6 +118,12 @@ namespace MightyHeroes.Gameplay.Hero
         /// <summary>Hero status icon row (attack buff). Driven by StatusIconPresenter.</summary>
         [SerializeField] private StatusIconBarView _statusIconBarView;
 
+        /// <summary>Hero ultimate gauge bar on the HUD. Driven by UltimateGaugePresenter. Optional.</summary>
+        [SerializeField] private UltimateGaugeView _ultimateGaugeView;
+
+        /// <summary>Runtime ultimate gauge. Created on initialize when HeroStatsData has UltimateData.</summary>
+        private UltimateGauge _ultimateGauge;
+
         /// <summary>Hero action point presentation view.</summary>
         [SerializeField] private ActionPointView _actionPointView;
 
@@ -135,6 +143,12 @@ namespace MightyHeroes.Gameplay.Hero
 
         /// <summary>Status icon view for StatusIconPresenter registration. Can be null.</summary>
         public StatusIconBarView StatusIconBarView => _statusIconBarView;
+
+        /// <summary>Ultimate gauge, or null when the hero has no UltimateData.</summary>
+        public UltimateGauge UltimateGauge => _ultimateGauge;
+
+        /// <summary>Ultimate gauge view for UltimateGaugePresenter. Can be null.</summary>
+        public UltimateGaugeView UltimateGaugeView => _ultimateGaugeView;
 
 
         /// <summary>
@@ -173,6 +187,9 @@ namespace MightyHeroes.Gameplay.Hero
 
             base.Initialize(entityId);
             base.InitializeHealth(_eventHub, _heroStatsData.MaxHealth, _heroStatsData.MaxShield, _heroStatsData.StartingShield);
+
+            if (_heroStatsData.UltimateData != null)
+                _ultimateGauge = new UltimateGauge(_eventHub, EntityId, _heroStatsData.UltimateData);
             
             _healEffectView?.Initialize(_eventHub, EntityId);
 
@@ -308,8 +325,9 @@ namespace MightyHeroes.Gameplay.Hero
         }
 
         /// <summary>
-        /// Starts the heal animation and fades LookAt IK out so the heal clip
-        /// is not bent toward the current target.
+        /// Starts the heal animation, fades LookAt IK out and lowers the sword
+        /// idle override layers so the heal clip is neither bent toward the
+        /// current target nor overridden by the idle sword pose.
         /// Shared by all support actions until dedicated clips exist.
         /// Must only be called from a State (HeroSupportState).
         /// </summary>
@@ -317,6 +335,7 @@ namespace MightyHeroes.Gameplay.Hero
         public void PlayHeal(int healVariant)
         {
             _heroTargetFocusController?.NotifyHealStarted();
+            _attackMovementController?.NotifyHealStarted();
             _animator.SetInteger(Anim_HealVariant, healVariant);
             _animator.SetTrigger(Anim_DoHeal);
         }
@@ -362,6 +381,46 @@ namespace MightyHeroes.Gameplay.Hero
         public void ConsumeAttackBuff()
         {
             Modifiers.ConsumeAttackBuff();
+        }
+
+        /// <summary>
+        /// True when the gauge is full and the matched action type is the hero's
+        /// affinity, meaning this match fires the ultimate instead of its action.
+        /// </summary>
+        /// <param name="matchedActionType">Action type of the matched tiles.</param>
+        public bool IsUltimateReadyFor(ActionType matchedActionType)
+        {
+            return _ultimateGauge != null && _ultimateGauge.IsFull && matchedActionType == _ultimateGauge.Data.AffinityActionType;
+        }
+
+        /// <summary>
+        /// Plays the ultimate animation. Uses the heal clip until a dedicated
+        /// ultimate clip exists, so it shares the heal signals, the lower-body
+        /// lock, the sword layer handling and the LookAt fade.
+        /// Must only be called from a State (HeroUltimateState).
+        /// </summary>
+        /// <param name="variant">Ultimate animation variant.</param>
+        public void PlayUltimate(int variant)
+        {
+            PlayHeal(variant);
+        }
+
+        /// <summary>
+        /// Fills the ultimate gauge when the matched action type is the hero's
+        /// affinity. Does nothing for other colors or when the hero has no ultimate.
+        /// Must only be called from a State (HeroReadyState).
+        /// </summary>
+        /// <param name="matchedActionType">Action type of the matched tiles.</param>
+        /// <param name="matchCount">Number of matched tiles.</param>
+        public void ChargeUltimate(ActionType matchedActionType, int matchCount)
+        {
+            if (_ultimateGauge == null || matchedActionType != _ultimateGauge.Data.AffinityActionType)
+                return;
+
+            _ultimateGauge.Fill(matchCount);
+
+            GameLogger.Log(LogSourceType.Hero,
+                $"Ultimate gauge {_ultimateGauge.CurrentValue}/{_ultimateGauge.Capacity} Full={_ultimateGauge.IsFull}");
         }
 
         // PUBLIC METHODS — HUD
@@ -504,11 +563,12 @@ namespace MightyHeroes.Gameplay.Hero
 
         /// <summary>
         /// Called by HealSequenceEndedBehaviour when the heal animation clip finishes.
-        /// Restores LookAt IK, then forwards to the FSM as a signal only.
+        /// Restores LookAt IK and the sword idle pose, then forwards to the FSM as a signal only.
         /// </summary>
         public void NotifyHealSequenceEnded()
         {
             _heroTargetFocusController?.NotifyHealEnded();
+            _attackMovementController?.NotifyHealEnded();
             _stateMachine.NotifyHealSequenceEnded();
         }
 

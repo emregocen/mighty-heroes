@@ -97,6 +97,8 @@ namespace MightyHeroes.Core.Battle
         [SerializeField] private PooledHitVfxPlayer _hitVfxPlayer;
         [Tooltip("Side kill-cam and slow motion on high-tier killing hits. Optional.")]
         [SerializeField] private KillCamController _killCamController;
+        [Tooltip("Pulled-back wide camera while the hero ultimate plays. Optional.")]
+        [SerializeField] private UltimateCameraController _ultimateCameraController;
 
         [Header("Floating Text")]
         [SerializeField] private FloatingTextConfig _floatingTextConfig;
@@ -129,6 +131,7 @@ namespace MightyHeroes.Core.Battle
         private FloatingTextService _floatingTextService;
         private FloatingTextPresenter _floatingTextPresenter;
         private StatusIconPresenter _statusIconPresenter;
+        private UltimateGaugePresenter _ultimateGaugePresenter;
         private CombatFeedbackPresenter _combatFeedbackPresenter;
 
         // UNITY CALLBACKS
@@ -158,6 +161,7 @@ namespace MightyHeroes.Core.Battle
             InitializeBattleTimer();
             InitializeFloatingText();
             InitializeStatusIcons();
+            InitializeUltimateGauge();
             InitializeCombatFeedback();
             InitializeBattleFlowController();
         }
@@ -195,6 +199,7 @@ namespace MightyHeroes.Core.Battle
             DisposeBattleFlowController();
             DisposeFloatingText();
             DisposeStatusIcons();
+            DisposeUltimateGauge();
             DisposeCombatFeedback();
             DisposeBattleTimer();
             DisposeCombatSystem();
@@ -587,6 +592,19 @@ namespace MightyHeroes.Core.Battle
         }
 
         /// <summary>
+        /// Creates the ultimate gauge presenter for the hero's HUD bar. Skipped
+        /// when the hero has no gauge view; the presenter hides the view itself
+        /// when the hero has no ultimate. Must run after InitializeHero.
+        /// </summary>
+        private void InitializeUltimateGauge()
+        {
+            if (_heroComponent == null || _heroComponent.UltimateGaugeView == null)
+                return;
+
+            _ultimateGaugePresenter = new UltimateGaugePresenter(_eventHub, _heroComponent.UltimateGaugeView, _heroComponent.EntityId, _heroComponent.UltimateGauge);
+        }
+
+        /// <summary>
         /// Creates the status icon presenter and registers the hero and every
         /// formation enemy. Entities without a StatusIconBarView are skipped.
         /// Must run after InitializeHero and InitializeEnemies so entity ids exist.
@@ -629,6 +647,9 @@ namespace MightyHeroes.Core.Battle
 
             if (_killCamController != null)
                 _killCamController.Initialize(_eventHub, _combatFeedbackData, entityLocator);
+
+            if (_ultimateCameraController != null)
+                _ultimateCameraController.Initialize(_eventHub);
         }
 
         // PRIVATE METHODS — Disposal
@@ -746,6 +767,13 @@ namespace MightyHeroes.Core.Battle
         {
             _combatFeedbackPresenter?.Dispose();
             _combatFeedbackPresenter = null;
+        }
+
+        /// <summary>Disposes the ultimate gauge presenter to unregister its event handlers.</summary>
+        private void DisposeUltimateGauge()
+        {
+            _ultimateGaugePresenter?.Dispose();
+            _ultimateGaugePresenter = null;
         }
 
         /// <summary>Disposes the status icon presenter to unregister its event handlers.</summary>

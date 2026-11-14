@@ -60,6 +60,14 @@ namespace MightyHeroes.Gameplay.Hero.Actions
             return new HeroActionExecution(ActionType.Attack, attackVariant, actionIntensity, damageType, 0);
         }
 
+        /// <summary>Creates an ultimate execution for the tier of the triggering affinity match.</summary>
+        /// <param name="variant">Ultimate animation variant.</param>
+        /// <param name="actionIntensity">Tier of the triggering match.</param>
+        public static HeroActionExecution Ultimate(int variant, int actionIntensity)
+        {
+            return new HeroActionExecution(ActionType.Ultimate, variant, actionIntensity, DamageType.Physical, 0);
+        }
+
         /// <summary>Creates a self-targeted support execution (Heal, Shield, Buff).</summary>
         /// <param name="supportType">Support action type.</param>
         /// <param name="variant">Support animation variant.</param>

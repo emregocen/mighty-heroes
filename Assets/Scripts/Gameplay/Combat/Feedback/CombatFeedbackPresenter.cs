@@ -2,6 +2,7 @@ using System;
 using MightyHeroes.Core.EventSystem;
 using MightyHeroes.Gameplay.Combat.Interfaces;
 using MightyHeroes.Gameplay.Combat.Payloads;
+using MightyHeroes.Gameplay.Ultimate.Payloads;
 using UnityEngine;
 
 namespace MightyHeroes.Gameplay.Combat.Feedback
@@ -35,6 +36,7 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
         private readonly IHitVfxPlayer _hitVfxPlayer;
         private readonly ICombatEntityLocator _entityLocator;
         private readonly int _heroEntityId;
+        private bool _isUltimateActive;
         private bool _isDisposed;
 
         // CONSTRUCTOR
@@ -58,6 +60,8 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
             _heroEntityId = heroEntityId;
 
             _eventHub.CombatEvents.CombatHitResolvedEvent.Register(OnCombatHitResolved);
+            _eventHub.HeroEvents.UltimateStartedEvent.Register(OnUltimateStarted);
+            _eventHub.HeroEvents.UltimateEndedEvent.Register(OnUltimateEnded);
         }
 
         // PUBLIC METHODS
@@ -69,6 +73,8 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
                 return;
 
             _eventHub.CombatEvents.CombatHitResolvedEvent.Unregister(OnCombatHitResolved);
+            _eventHub.HeroEvents.UltimateStartedEvent.Unregister(OnUltimateStarted);
+            _eventHub.HeroEvents.UltimateEndedEvent.Unregister(OnUltimateEnded);
             _isDisposed = true;
         }
 
@@ -123,7 +129,7 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
         /// </summary>
         private void RequestKillMoment(CombatHitResolvedPayload payload, bool isHeroHit, bool isFinalHit)
         {
-            if (!isHeroHit || !isFinalHit || payload.TotalSteps < _data.KillMomentMinTier)
+            if (_isUltimateActive || !isHeroHit || !isFinalHit || payload.TotalSteps < _data.KillMomentMinTier)
                 return;
 
             if (!payload.TargetWasAlive || payload.TargetIsAliveAfter)
@@ -177,6 +183,17 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
         }
 
         // EVENT HANDLERS
+
+        /// <summary>Suppresses the per-target kill moment while the ultimate plays its own cinematic.</summary>
+        private void OnUltimateStarted(UltimateStartedPayload payload)
+        {
+            _isUltimateActive = true;
+        }
+
+        private void OnUltimateEnded(UltimateEndedPayload payload)
+        {
+            _isUltimateActive = false;
+        }
 
         private void OnCombatHitResolved(CombatHitResolvedPayload payload)
         {

@@ -1,5 +1,6 @@
 using MightyHeroes.Core.EventSystem;
 using MightyHeroes.Gameplay.Hero.Payloads;
+using MightyHeroes.Gameplay.Ultimate.Payloads;
 
 namespace MightyHeroes.Gameplay.Hero.Events
 {
@@ -32,6 +33,25 @@ namespace MightyHeroes.Gameplay.Hero.Events
         /// </summary>
         public GameEvent<HeroHitReactionEndedPayload> HeroHitReactionEndedEvent =>
             Registry.GetEvent<HeroHitReactionEndedPayload>();
+
+        /// <summary>
+        /// Raised by UltimateGauge whenever the hero's ultimate gauge fills or empties.
+        /// Intended for the gauge HUD.
+        /// </summary>
+        public GameEvent<UltimateGaugeChangedPayload> UltimateGaugeChangedEvent =>
+            Registry.GetEvent<UltimateGaugeChangedPayload>();
+
+        /// <summary>Raised by HeroUltimateState when the ultimate starts.</summary>
+        public GameEvent<UltimateStartedPayload> UltimateStartedEvent =>
+            Registry.GetEvent<UltimateStartedPayload>();
+
+        /// <summary>Raised by HeroUltimateState at the effect frame; CombatSystem resolves the damage.</summary>
+        public GameEvent<UltimateHitPayload> UltimateHitEvent =>
+            Registry.GetEvent<UltimateHitPayload>();
+
+        /// <summary>Raised by HeroUltimateState when the ultimate animation has finished.</summary>
+        public GameEvent<UltimateEndedPayload> UltimateEndedEvent =>
+            Registry.GetEvent<UltimateEndedPayload>();
 
         /// <summary>
         /// Raised when the hero hits an enemy with an attack.
