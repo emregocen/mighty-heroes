@@ -27,6 +27,7 @@ namespace MightyHeroes.Gameplay.Enemy.StateMachine.States
 
         /// <summary>
         /// Resolves the next enemy action and transitions immediately.
+        /// A missing or None decision skips the turn.
         /// </summary>
         public override void Enter()
         {
@@ -37,6 +38,13 @@ namespace MightyHeroes.Gameplay.Enemy.StateMachine.States
 
             _decision = ResolveDecision();
 
+            if (_decision == null)
+            {
+                GameLogger.Error(LogSourceType.Enemy, $"Enemy[{StateMachine.Enemy.EntityId}] Ready: no AI decision, skipping turn.");
+                SkipTurn();
+                return;
+            }
+
             switch (_decision.ActionType)
             {
                 case ActionType.Attack:
@@ -45,7 +53,7 @@ namespace MightyHeroes.Gameplay.Enemy.StateMachine.States
 
                 case ActionType.None:
                 default:
-                    StateMachine.SwitchToIdleState();
+                    SkipTurn();
                     break;
             }
         }
@@ -56,6 +64,15 @@ namespace MightyHeroes.Gameplay.Enemy.StateMachine.States
         public override void Exit()
         {
             _decision = null;
+        }
+
+        /// <summary>
+        /// Ends the enemy turn without acting so the turn flow does not wait forever.
+        /// </summary>
+        private void SkipTurn()
+        {
+            StateMachine.SwitchToIdleState();
+            StateMachine.FinishEnemyTurn();
         }
 
         /// <summary>

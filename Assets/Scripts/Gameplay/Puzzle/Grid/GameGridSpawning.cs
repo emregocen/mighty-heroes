@@ -77,8 +77,6 @@ namespace MightyHeroes.Gameplay.Puzzle.Grid
 
             yield return new WaitForSeconds(0.4f);
 
-            PuzzleController.Instance.MovesAvailable--;
-
             GameEvents.OnElementsDespawned.Invoke(elements[0].TileType, elements.Count);
 
             if (PuzzleController.Instance.EventHub is null) GameLogger.Error(LogSourceType.PuzzleSystem, "PuzzleController EventHub is null");
