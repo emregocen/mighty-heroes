@@ -37,6 +37,13 @@ namespace MightyHeroes.Gameplay.Battle.Intro
         [Tooltip("Wait time after swapping to the battle camera, before the intro is considered complete.")]
         [SerializeField, Min(0f)] private float _sweepBackDuration = 0.8f;
 
+        [Header("Skip")]
+        [Tooltip("Taps are ignored for this many seconds after the intro starts, so a tap from the previous screen does not skip it.")]
+        [SerializeField, Min(0f)] private float _skipInputDelay = 0.5f;
+
+        [Tooltip("Camera blend from the intro camera to the battle camera when the intro is skipped.")]
+        [SerializeField, Min(0f)] private float _skipCameraBlendDuration = 0.4f;
+
         [Header("Puzzle Reveal")]
         [SerializeField, Min(0f)] private float _puzzleRevealLeadTime = 0.4f;
         [SerializeField, Min(0f)] private float _puzzleRevealDuration = 0.35f;
@@ -50,5 +57,11 @@ namespace MightyHeroes.Gameplay.Battle.Intro
         public float SweepBackDuration => _sweepBackDuration;
         public float PuzzleRevealLeadTime => _puzzleRevealLeadTime;
         public float PuzzleRevealDuration => _puzzleRevealDuration;
+
+        /// <summary>Seconds after the intro starts before a tap can skip it.</summary>
+        public float SkipInputDelay => _skipInputDelay;
+
+        /// <summary>Intro-to-battle camera blend duration used when the intro is skipped.</summary>
+        public float SkipCameraBlendDuration => _skipCameraBlendDuration;
     }
 }
