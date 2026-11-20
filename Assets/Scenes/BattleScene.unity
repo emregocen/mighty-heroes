@@ -23376,14 +23376,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Battle.KillCamController
   _killCamera: {fileID: 287195380}
-  _heroBias: 0.4
-  _sideDistance: 3.5
-  _cameraHeight: 1.3
+  _orbitAngle: 40
+  _useRightShoulder: 1
+  _cameraDistance: 5
+  _lookBias: 0.7
+  _cameraHeight: 3.5
   _lookHeight: 1.1
   _dutchAngle: 8
   _blendInDuration: 0.15
   _blendOutDuration: 0.6
   _maxHoldDuration: 3
+  _debugPreviewKey: 107
 --- !u!1001 &195446038
 PrefabInstance:
   m_ObjectHideFlags: 0

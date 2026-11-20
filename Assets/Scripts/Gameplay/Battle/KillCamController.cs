@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using MightyHeroes.Battle.TurnFlow.Payloads;
 using MightyHeroes.Core.EventSystem;
@@ -12,9 +13,17 @@ using UnityEngine;
 namespace MightyHeroes.Gameplay.Battle
 {
     /// <summary>
-    /// Plays the cinematic kill moment on KillCamRequestedEvent: a side camera
-    /// between hero and killed enemy (biased toward the hero, with dutch tilt)
-    /// plus a short global slow motion.
+    /// Plays the cinematic kill moment on KillCamRequestedEvent: an
+    /// over-the-shoulder camera behind the hero looking at the killed enemy
+    /// (with dutch tilt) plus a short global slow motion.
+    ///
+    /// Framing: the camera orbits the hero at OrbitAngle around the
+    /// hero-enemy line, over the hero's right or left shoulder. 0 degrees is
+    /// straight behind the hero, 90 degrees is a pure side view.
+    ///
+    /// Debug: in the Editor and development builds, DebugPreviewKey (K) plays
+    /// the kill camera on the current target without killing it and without
+    /// slow motion, so the framing can be tuned live. Not active in release builds.
     ///
     /// Flow:
     /// - Request: place the kill camera, raise its priority above the battle
@@ -47,11 +56,17 @@ namespace MightyHeroes.Gameplay.Battle
         [SerializeField] private CinemachineCamera _killCamera;
 
         [Header("Framing")]
-        [Tooltip("Where the camera centers between hero (0) and enemy (1).")]
-        [SerializeField, Range(0f, 1f)] private float _heroBias = 0.4f;
+        [Tooltip("Camera angle around the hero from the hero-enemy line. 0 = straight behind the hero, 90 = pure side view.")]
+        [SerializeField, Range(0f, 90f)] private float _orbitAngle = 50f;
 
-        [Tooltip("Sideways distance of the camera from the hero-enemy line.")]
-        [SerializeField, Min(0.5f)] private float _sideDistance = 6f;
+        [Tooltip("Over-the-shoulder side: on = hero's right shoulder, off = left shoulder.")]
+        [SerializeField] private bool _useRightShoulder = true;
+
+        [Tooltip("Horizontal distance of the camera from the hero.")]
+        [SerializeField, Min(0.5f)] private float _cameraDistance = 5.5f;
+
+        [Tooltip("Where the camera looks between hero (0) and enemy (1). Higher values keep the enemy in the center of the frame.")]
+        [SerializeField, Range(0f, 1f)] private float _lookBias = 0.65f;
 
         [Tooltip("Camera height above the hero's root.")]
         [SerializeField] private float _cameraHeight = 1.8f;
@@ -69,6 +84,13 @@ namespace MightyHeroes.Gameplay.Battle
         [Tooltip("The kill camera is released after this many real seconds even if the hero never starts walking back.")]
         [SerializeField, Min(0.5f)] private float _maxHoldDuration = 3f;
 
+        [Header("Debug (Editor and development builds only)")]
+        [Tooltip("Plays the kill camera on the current target without a kill, for framing tests.")]
+        [SerializeField] private KeyCode _debugPreviewKey = KeyCode.K;
+
+        private Func<int> _debugHeroIdProvider;
+        private Func<int> _debugTargetIdProvider;
+
         private EventHub _eventHub;
         private CombatFeedbackData _feedbackData;
         private ICombatEntityLocator _entityLocator;
@@ -83,6 +105,14 @@ namespace MightyHeroes.Gameplay.Battle
         private Coroutine _blendRestoreRoutine;
 
         // UNITY CALLBACKS
+
+        private void Update()
+        {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if (UnityEngine.Input.GetKeyDown(_debugPreviewKey))
+                PlayDebugPreview();
+#endif
+        }
 
         private void OnDisable()
         {
@@ -127,6 +157,17 @@ namespace MightyHeroes.Gameplay.Battle
             RegisterEvents();
         }
 
+        /// <summary>
+        /// Supplies the ids used by the debug preview key. Called by BattleBootstrapper.
+        /// </summary>
+        /// <param name="heroIdProvider">Returns the hero entity id.</param>
+        /// <param name="targetIdProvider">Returns the current target entity id, or a negative value when there is none.</param>
+        public void SetDebugPreviewSource(Func<int> heroIdProvider, Func<int> targetIdProvider)
+        {
+            _debugHeroIdProvider = heroIdProvider;
+            _debugTargetIdProvider = targetIdProvider;
+        }
+
         // PRIVATE METHODS
 
         private void RegisterEvents()
@@ -149,9 +190,9 @@ namespace MightyHeroes.Gameplay.Battle
         }
 
         /// <summary>
-        /// Places the kill camera on the side of the hero-enemy line that the
-        /// battle camera is already on (never crossing the 180 degree line),
-        /// biased toward the hero, looking at the bias point with dutch tilt.
+        /// Places the kill camera behind the hero at OrbitAngle over the chosen
+        /// shoulder, looking at the point between hero and enemy given by
+        /// LookBias, with dutch tilt.
         /// ForceCameraPosition pushes the new pose into Cinemachine immediately so
         /// the blend never starts from the camera's stale standby state.
         /// </summary>
@@ -166,15 +207,15 @@ namespace MightyHeroes.Gameplay.Battle
             if (heroToEnemy.sqrMagnitude < 0.0001f)
                 return false;
 
-            Vector3 focus = Vector3.Lerp(heroPosition, enemyPosition, _heroBias);
-            Vector3 side = Vector3.Cross(Vector3.up, heroToEnemy.normalized);
-            Vector3 battleCameraPosition = _brain.transform.position;
+            Vector3 forward = heroToEnemy.normalized;
+            Vector3 right = Vector3.Cross(Vector3.up, forward);
+            Vector3 side = _useRightShoulder ? right : -right;
 
-            if (Vector3.Dot(side, battleCameraPosition - focus) < 0f)
-                side = -side;
+            float angle = _orbitAngle * Mathf.Deg2Rad;
+            Vector3 offsetDirection = -forward * Mathf.Cos(angle) + side * Mathf.Sin(angle);
 
-            Vector3 cameraPosition = focus + side * _sideDistance + Vector3.up * _cameraHeight;
-            Vector3 lookPoint = focus + Vector3.up * _lookHeight;
+            Vector3 cameraPosition = heroPosition + offsetDirection * _cameraDistance + Vector3.up * _cameraHeight;
+            Vector3 lookPoint = Vector3.Lerp(heroPosition, enemyPosition, _lookBias) + Vector3.up * _lookHeight;
 
             Quaternion cameraRotation = Quaternion.LookRotation(lookPoint - cameraPosition);
 
@@ -237,6 +278,24 @@ namespace MightyHeroes.Gameplay.Battle
         {
             Time.timeScale = timeScale;
             Time.fixedDeltaTime = _originalFixedDeltaTime * timeScale;
+        }
+
+        /// <summary>
+        /// Debug only: plays the kill camera on the current target with no kill
+        /// and no slow motion. It is released after MaxHoldDuration.
+        /// </summary>
+        private void PlayDebugPreview()
+        {
+            if (_brain == null || _debugHeroIdProvider == null || _debugTargetIdProvider == null)
+                return;
+
+            int targetId = _debugTargetIdProvider();
+
+            if (targetId < 0 || !PlaceCamera(_debugHeroIdProvider(), targetId))
+                return;
+
+            ActivateCamera();
+            GameLogger.Log(LogSourceType.BattleSystem, $"KillCamController: debug preview on target {targetId}.");
         }
 
         private void RestartRoutine(ref Coroutine routine, IEnumerator body)

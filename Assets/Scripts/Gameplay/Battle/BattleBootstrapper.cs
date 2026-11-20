@@ -683,10 +683,18 @@ namespace MightyHeroes.Core.Battle
             _combatFeedbackPresenter = new CombatFeedbackPresenter(_eventHub, _combatFeedbackData, _cameraShaker, _hitVfxPlayer, entityLocator, _heroComponent.EntityId);
 
             if (_killCamController != null)
+            {
                 _killCamController.Initialize(_eventHub, _combatFeedbackData, entityLocator);
+                _killCamController.SetDebugPreviewSource(() => _heroComponent.EntityId, () => _battleFormation.CurrentTarget != null ? _battleFormation.CurrentTarget.EntityId : -1);
+            }
 
             if (_ultimateCameraController != null)
                 _ultimateCameraController.Initialize(_eventHub);
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            int tier3MatchCount = _actionTierData != null ? _actionTierData.Tier3MinMatch : 9;
+            gameObject.AddComponent<MightyHeroes.Gameplay.Battle.DevTools.BattleDebugHotkeys>().Initialize(_eventHub, _heroComponent, _combatFeedbackPresenter, tier3MatchCount);
+#endif
         }
 
         // PRIVATE METHODS — Disposal
