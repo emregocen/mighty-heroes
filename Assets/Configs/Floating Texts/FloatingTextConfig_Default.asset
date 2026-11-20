@@ -104,3 +104,14 @@ MonoBehaviour:
     StartScale: 0.4
     PunchInDuration: 0.15
     FadeStartFraction: 0.7
+  - Type: 8
+    Style: {fileID: 11400000, guid: 04c96a61080334b60ba4b09f6f6f5940, type: 2}
+    FontSize: 100
+    FontStyle: 1
+    Lifetime: 3
+    RiseDistance: 80
+    RandomTiltDegrees: 0
+    RandomOffsetRadius: 8
+    StartScale: 0.4
+    PunchInDuration: 0.15
+    FadeStartFraction: 0.7

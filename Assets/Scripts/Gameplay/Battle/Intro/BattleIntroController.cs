@@ -32,6 +32,13 @@ namespace MightyHeroes.Gameplay.Battle.Intro
     ///     the slow orbit was still running) to EnemyRevealPose over FastOrbitDuration.
     ///  6. Swap to CM_BattleCamera, sword re-enabled, puzzle revealed.
     ///  7. onComplete callback fires.
+    ///
+    /// Skip: from SkipInputDelay after Play until the battle camera takes over,
+    /// a tap or click skips the rest. Running tweens and the sequence stop, the
+    /// hero is placed at the battle position in idle, the camera blends to the
+    /// battle camera over SkipCameraBlendDuration, and the same completion
+    /// step as the normal end runs (sword, puzzle reveal, callbacks). The
+    /// optional skip hint is shown only while skipping is possible.
     /// </summary>
     public sealed class BattleIntroController : MonoBehaviour, IIntroSignalReceiver
     {
@@ -41,6 +48,9 @@ namespace MightyHeroes.Gameplay.Battle.Intro
         private const int BattleCameraActivePriority = 10;
         private const int InactivePriority = 0;
         private const float LocomotionBlendOutDuration = 0.2f;
+        private const float SkipHintFadeDuration = 0.25f;
+        private const float SkipHintPulseMinAlpha = 0.45f;
+        private const float SkipHintPulseDuration = 0.8f;
 
         private static readonly int AnimIsLocomotion = Animator.StringToHash("IsLocomotion");
         private static readonly int AnimLocomotionVariant = Animator.StringToHash("LocomotionVariant");
@@ -84,6 +94,10 @@ namespace MightyHeroes.Gameplay.Battle.Intro
         [Header("Hero Sword")]
         [SerializeField] private GameObject _swordProp;
 
+        [Header("Skip Hint (optional)")]
+        [Tooltip("Group holding the 'tap to skip' text. Shown while the intro can be skipped.")]
+        [SerializeField] private CanvasGroup _skipHintGroup;
+
         [Header("Puzzle (optional)")]
         [SerializeField] private RectTransform _puzzleRect;
         [SerializeField] private CanvasGroup _puzzleCanvasGroup;
@@ -102,6 +116,18 @@ namespace MightyHeroes.Gameplay.Battle.Intro
         private Coroutine _introCoroutine;
         private int _tauntLowerBodyLayerIndex = -1;
         private Tween _lowerBodyLockTween;
+        private Tween _walkTween;
+        private Tween _orbitTween;
+        private Tween _locomotionBlendTween;
+        private Tween _skipHintTween;
+        private Action _onSwordDrawn;
+        private Action _onComplete;
+        private float _skipEnabledTime;
+        private bool _isSkippable;
+        private bool _isTaunting;
+        private CinemachineBrain _brain;
+        private CinemachineBlendDefinition _originalDefaultBlend;
+        private bool _isBlendOverridden;
 
         // UNITY CALLBACKS
 
@@ -111,11 +137,20 @@ namespace MightyHeroes.Gameplay.Battle.Intro
             CacheTauntLowerBodyLayerIndex();
         }
 
+        private void Update()
+        {
+            if (_isSkippable && Time.unscaledTime >= _skipEnabledTime && IsSkipInputPressed())
+                SkipIntro();
+        }
+
         private void OnDestroy()
         {
             IntroSignalRegistry.Unregister(this);
 
+            KillSequenceTweens();
             _lowerBodyLockTween?.Kill();
+            _skipHintTween?.Kill();
+            RestoreBrainBlend();
 
             if (_introCoroutine != null)
                 StopCoroutine(_introCoroutine);
@@ -149,6 +184,7 @@ namespace MightyHeroes.Gameplay.Battle.Intro
 
             SetCameraPriorities(introActive: true, battleActive: false);
             HidePuzzleImmediate();
+            HideSkipHintImmediate();
 
             GameLogger.Log(LogSourceType.BattleSystem, "BattleIntroController.Initialize complete.");
         }
@@ -170,7 +206,12 @@ namespace MightyHeroes.Gameplay.Battle.Intro
                 return;
             }
 
-            _introCoroutine = StartCoroutine(RunIntroSequence(onSwordDrawn, onComplete));
+            _onSwordDrawn = onSwordDrawn;
+            _onComplete = onComplete;
+            _skipEnabledTime = Time.unscaledTime + _config.SkipInputDelay;
+            SetSkippable(true);
+
+            _introCoroutine = StartCoroutine(RunIntroSequence());
         }
 
         // IIntroSignalReceiver
@@ -188,7 +229,7 @@ namespace MightyHeroes.Gameplay.Battle.Intro
 
         // PRIVATE METHODS — Sequence
 
-        private IEnumerator RunIntroSequence(Action onSwordDrawn, Action onComplete)
+        private IEnumerator RunIntroSequence()
         {
             _tauntEnded = false;
 
@@ -207,22 +248,21 @@ namespace MightyHeroes.Gameplay.Battle.Intro
             StartLocomotion();
 
             // Hero walk and camera slow-orbit run in parallel — neither blocks the other.
-            Tween walkTween = null;
             if (_heroRoot != null && _heroBattlePosition != null && walkDuration > 0f)
             {
-                walkTween = _heroRoot
+                _walkTween = _heroRoot
                     .DOMove(_heroBattlePosition.position, walkDuration)
                     .SetEase(Ease.Linear);
 
-                TweenOrbitTo(_tauntPose, walkDuration, _slowOrbitEase);
+                _orbitTween = TweenOrbitTo(_tauntPose, walkDuration, _slowOrbitEase);
             }
             else if (_orbitCameraRig != null)
             {
                 _orbitCameraRig.SetImmediate(_tauntPose.Yaw, _tauntPose.Pitch, _tauntPose.Distance);
             }
 
-            if (walkTween != null)
-                yield return walkTween.WaitForCompletion();
+            if (_walkTween != null)
+                yield return _walkTween.WaitForCompletion();
 
             GameLogger.Log(LogSourceType.BattleSystem, "Intro Phase 1 — hero walk complete.");
 
@@ -250,33 +290,181 @@ namespace MightyHeroes.Gameplay.Battle.Intro
             GameLogger.Log(LogSourceType.BattleSystem,
                 $"Intro Phase 3 — fast orbit to enemy reveal. duration={_config.FastOrbitDuration:F2}");
 
-            Tween fastOrbitTween = TweenOrbitTo(_enemyRevealPose, _config.FastOrbitDuration, _fastOrbitEase);
+            _orbitTween = TweenOrbitTo(_enemyRevealPose, _config.FastOrbitDuration, _fastOrbitEase);
 
-            if (fastOrbitTween != null)
-                yield return fastOrbitTween.WaitForCompletion();
+            if (_orbitTween != null)
+                yield return _orbitTween.WaitForCompletion();
             else
                 yield return new WaitForSeconds(_config.FastOrbitDuration);
 
             GameLogger.Log(LogSourceType.BattleSystem, "Intro Phase 3 — enemy reveal complete.");
 
+            SetSkippable(false);
             SetCameraPriorities(introActive: false, battleActive: true);
             GameLogger.Log(LogSourceType.BattleSystem, "Intro Phase 4 — swapped to battle camera.");
 
+            yield return CompleteIntro(_config.SweepBackDuration);
+        }
+
+        /// <summary>
+        /// Final step shared by the normal end and the skip: draws the sword,
+        /// reveals the puzzle, waits for the camera handoff and fires the callbacks.
+        /// </summary>
+        /// <param name="handoffDuration">Seconds to wait for the camera to settle on the battle camera.</param>
+        private IEnumerator CompleteIntro(float handoffDuration)
+        {
             if (_swordProp != null)
                 _swordProp.SetActive(true);
 
-            onSwordDrawn?.Invoke();
-
-            GameLogger.Log(LogSourceType.BattleSystem,
-                $"About to reveal puzzle: rect null={_puzzleRect == null} canvasGroup null={_puzzleCanvasGroup == null}");
+            _onSwordDrawn?.Invoke();
 
             if (_puzzleRect != null || _puzzleCanvasGroup != null)
                 RevealPuzzle();
 
-            yield return new WaitForSeconds(_config.SweepBackDuration);
+            yield return new WaitForSeconds(handoffDuration);
+
+            RestoreBrainBlend();
+            _introCoroutine = null;
 
             GameLogger.Log(LogSourceType.BattleSystem, "BattleIntroController: intro complete.");
-            onComplete?.Invoke();
+            _onComplete?.Invoke();
+        }
+
+        // PRIVATE METHODS — Skip
+
+        /// <summary>
+        /// Skips the rest of the intro: stops the sequence and its tweens, puts the
+        /// hero at the battle position in idle, blends quickly to the battle camera
+        /// and runs the shared completion step.
+        /// </summary>
+        private void SkipIntro()
+        {
+            SetSkippable(false);
+
+            if (_introCoroutine != null)
+                StopCoroutine(_introCoroutine);
+
+            KillSequenceTweens();
+
+            GameLogger.Log(LogSourceType.BattleSystem, "BattleIntroController: intro skipped.");
+
+            if (_heroRoot != null && _heroBattlePosition != null)
+                _heroRoot.position = _heroBattlePosition.position;
+
+            if (_heroAnimator != null)
+            {
+                _heroAnimator.SetFloat(AnimLocomotionBlend, 0f);
+                _heroAnimator.ResetTrigger(AnimTaunt);
+                StopLocomotion();
+            }
+
+            if (_isTaunting)
+                EndTaunt();
+
+            OverrideBrainBlend(_config.SkipCameraBlendDuration);
+            SetCameraPriorities(introActive: false, battleActive: true);
+
+            _introCoroutine = StartCoroutine(CompleteIntro(_config.SkipCameraBlendDuration));
+        }
+
+        /// <summary>
+        /// True on the frame a mouse click or a new touch begins. Uses the legacy
+        /// input API like the rest of the battle input; with touch, Unity also
+        /// reports the first touch as mouse button 0.
+        /// </summary>
+        private static bool IsSkipInputPressed()
+        {
+            if (UnityEngine.Input.GetMouseButtonDown(0))
+                return true;
+
+            return UnityEngine.Input.touchCount > 0 && UnityEngine.Input.GetTouch(0).phase == TouchPhase.Began;
+        }
+
+        /// <summary>Turns skipping on or off and shows or hides the hint with it.</summary>
+        private void SetSkippable(bool isSkippable)
+        {
+            _isSkippable = isSkippable;
+
+            if (isSkippable)
+                ShowSkipHint();
+            else
+                HideSkipHint();
+        }
+
+        /// <summary>Kills the walk, orbit and locomotion blend tweens of the sequence.</summary>
+        private void KillSequenceTweens()
+        {
+            _walkTween?.Kill();
+            _orbitTween?.Kill();
+            _locomotionBlendTween?.Kill();
+
+            _walkTween = null;
+            _orbitTween = null;
+            _locomotionBlendTween = null;
+        }
+
+        /// <summary>Temporarily replaces the brain's default blend with a short one.</summary>
+        private void OverrideBrainBlend(float duration)
+        {
+            if (_brain == null)
+            {
+                Camera mainCamera = Camera.main;
+                _brain = mainCamera != null ? mainCamera.GetComponent<CinemachineBrain>() : null;
+            }
+
+            if (_brain == null)
+                return;
+
+            if (!_isBlendOverridden)
+                _originalDefaultBlend = _brain.DefaultBlend;
+
+            _brain.DefaultBlend = new CinemachineBlendDefinition(CinemachineBlendDefinition.Styles.EaseInOut, duration);
+            _isBlendOverridden = true;
+        }
+
+        /// <summary>Restores the brain's default blend if it was overridden by a skip.</summary>
+        private void RestoreBrainBlend()
+        {
+            if (!_isBlendOverridden || _brain == null)
+                return;
+
+            _brain.DefaultBlend = _originalDefaultBlend;
+            _isBlendOverridden = false;
+        }
+
+        // PRIVATE METHODS — Skip hint
+
+        private void HideSkipHintImmediate()
+        {
+            if (_skipHintGroup == null)
+                return;
+
+            _skipHintGroup.alpha = 0f;
+            _skipHintGroup.interactable = false;
+            _skipHintGroup.blocksRaycasts = false;
+        }
+
+        /// <summary>Fades the hint in, then pulses its alpha until it is hidden.</summary>
+        private void ShowSkipHint()
+        {
+            if (_skipHintGroup == null)
+                return;
+
+            _skipHintTween?.Kill();
+
+            Sequence sequence = DOTween.Sequence();
+            sequence.Append(_skipHintGroup.DOFade(1f, SkipHintFadeDuration));
+            sequence.Append(_skipHintGroup.DOFade(SkipHintPulseMinAlpha, SkipHintPulseDuration).SetEase(Ease.InOutSine).SetLoops(-1, LoopType.Yoyo));
+            _skipHintTween = sequence;
+        }
+
+        private void HideSkipHint()
+        {
+            if (_skipHintGroup == null)
+                return;
+
+            _skipHintTween?.Kill();
+            _skipHintTween = _skipHintGroup.DOFade(0f, SkipHintFadeDuration);
         }
 
         /// <summary>
@@ -313,10 +501,10 @@ namespace MightyHeroes.Gameplay.Battle.Intro
             if (_heroAnimator == null)
                 yield break;
 
-            Tween blendTween = DOVirtual.Float(1f, 0f, LocomotionBlendOutDuration,
+            _locomotionBlendTween = DOVirtual.Float(1f, 0f, LocomotionBlendOutDuration,
                 value => _heroAnimator.SetFloat(AnimLocomotionBlend, value));
 
-            yield return blendTween.WaitForCompletion();
+            yield return _locomotionBlendTween.WaitForCompletion();
         }
 
         // PRIVATE METHODS — Hero animation
@@ -348,6 +536,7 @@ namespace MightyHeroes.Gameplay.Battle.Intro
             if (_heroAnimator == null)
                 return;
 
+            _isTaunting = true;
             BlendLowerBodyLock(1f, _lowerBodyLockBlendInDuration);
 
             _heroAnimator.SetInteger(AnimTauntVariant, 1);
@@ -363,6 +552,7 @@ namespace MightyHeroes.Gameplay.Battle.Intro
             if (_heroAnimator == null)
                 return;
 
+            _isTaunting = false;
             _heroAnimator.SetInteger(AnimTauntVariant, 0);
 
             BlendLowerBodyLock(0f, _lowerBodyLockBlendOutDuration);

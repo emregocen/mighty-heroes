@@ -19,6 +19,7 @@ using MightyHeroes.Gameplay.Hero.Input;
 using MightyHeroes.Gameplay.Hero.Presentation;
 using MightyHeroes.Gameplay.Hero.StateMachine;
 using MightyHeroes.Gameplay.Puzzle;
+using MightyHeroes.Gameplay.Ultimate;
 using MightyHeroes.UI.Battle;
 using MightyHeroes.UI.Battle.Presenters;
 using MightyHeroes.UI.Battle.Views;
@@ -137,6 +138,7 @@ namespace MightyHeroes.Core.Battle
         private FloatingTextPresenter _floatingTextPresenter;
         private StatusIconPresenter _statusIconPresenter;
         private UltimateGaugePresenter _ultimateGaugePresenter;
+        private UltimateTileHighlightPresenter _ultimateTileHighlightPresenter;
         private CombatFeedbackPresenter _combatFeedbackPresenter;
         private TargetMarkerPresenter _targetMarkerPresenter;
 
@@ -629,13 +631,21 @@ namespace MightyHeroes.Core.Battle
         }
 
         /// <summary>
-        /// Creates the ultimate gauge presenter for the hero's HUD bar. Skipped
+        /// Creates the ultimate gauge presenter for the hero's HUD bar (skipped
         /// when the hero has no gauge view; the presenter hides the view itself
-        /// when the hero has no ultimate. Must run after InitializeHero.
+        /// when the hero has no ultimate) and the affinity tile highlight
+        /// presenter (skipped when the hero has no ultimate or there is no grid).
+        /// Must run after InitializeHero.
         /// </summary>
         private void InitializeUltimateGauge()
         {
-            if (_heroComponent == null || _heroComponent.UltimateGaugeView == null)
+            if (_heroComponent == null)
+                return;
+
+            if (_heroComponent.UltimateGauge != null && _puzzleController != null && _puzzleController.Grid != null)
+                _ultimateTileHighlightPresenter = new UltimateTileHighlightPresenter(_eventHub, _puzzleController.Grid, _heroComponent.EntityId, _heroComponent.UltimateGauge);
+
+            if (_heroComponent.UltimateGaugeView == null)
                 return;
 
             _ultimateGaugePresenter = new UltimateGaugePresenter(_eventHub, _heroComponent.UltimateGaugeView, _heroComponent.EntityId, _heroComponent.UltimateGauge);
@@ -683,10 +693,18 @@ namespace MightyHeroes.Core.Battle
             _combatFeedbackPresenter = new CombatFeedbackPresenter(_eventHub, _combatFeedbackData, _cameraShaker, _hitVfxPlayer, entityLocator, _heroComponent.EntityId);
 
             if (_killCamController != null)
+            {
                 _killCamController.Initialize(_eventHub, _combatFeedbackData, entityLocator);
+                _killCamController.SetDebugPreviewSource(() => _heroComponent.EntityId, () => _battleFormation.CurrentTarget != null ? _battleFormation.CurrentTarget.EntityId : -1);
+            }
 
             if (_ultimateCameraController != null)
                 _ultimateCameraController.Initialize(_eventHub);
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            int tier3MatchCount = _actionTierData != null ? _actionTierData.Tier3MinMatch : 9;
+            gameObject.AddComponent<MightyHeroes.Gameplay.Battle.DevTools.BattleDebugHotkeys>().Initialize(_eventHub, _heroComponent, _combatFeedbackPresenter, tier3MatchCount);
+#endif
         }
 
         // PRIVATE METHODS — Disposal
@@ -813,11 +831,14 @@ namespace MightyHeroes.Core.Battle
             _combatFeedbackPresenter = null;
         }
 
-        /// <summary>Disposes the ultimate gauge presenter to unregister its event handlers.</summary>
+        /// <summary>Disposes the ultimate gauge and tile highlight presenters to unregister their event handlers.</summary>
         private void DisposeUltimateGauge()
         {
             _ultimateGaugePresenter?.Dispose();
             _ultimateGaugePresenter = null;
+
+            _ultimateTileHighlightPresenter?.Dispose();
+            _ultimateTileHighlightPresenter = null;
         }
 
         /// <summary>Disposes the status icon presenter to unregister its event handlers.</summary>

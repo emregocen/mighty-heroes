@@ -37,6 +37,7 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
         private readonly ICombatEntityLocator _entityLocator;
         private readonly int _heroEntityId;
         private bool _isUltimateActive;
+        private bool _isKillMomentForced;
         private bool _isDisposed;
 
         // CONSTRUCTOR
@@ -76,6 +77,16 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
             _eventHub.HeroEvents.UltimateStartedEvent.Unregister(OnUltimateStarted);
             _eventHub.HeroEvents.UltimateEndedEvent.Unregister(OnUltimateEnded);
             _isDisposed = true;
+        }
+
+        /// <summary>
+        /// Development only: the next final hero hit requests the kill moment
+        /// even if the target survives or the tier is below KillMomentMinTier.
+        /// Used by the debug hotkeys to preview the kill-cam.
+        /// </summary>
+        public void ForceNextKillMoment()
+        {
+            _isKillMomentForced = true;
         }
 
         // PRIVATE METHODS
@@ -129,6 +140,13 @@ namespace MightyHeroes.Gameplay.Combat.Feedback
         /// </summary>
         private void RequestKillMoment(CombatHitResolvedPayload payload, bool isHeroHit, bool isFinalHit)
         {
+            if (_isKillMomentForced && isHeroHit && isFinalHit)
+            {
+                _isKillMomentForced = false;
+                _eventHub.CombatEvents.KillCamRequestedEvent.Raise(new KillCamRequestedPayload(payload.AttackerId, payload.TargetId));
+                return;
+            }
+
             if (_isUltimateActive || !isHeroHit || !isFinalHit || payload.TotalSteps < _data.KillMomentMinTier)
                 return;
 

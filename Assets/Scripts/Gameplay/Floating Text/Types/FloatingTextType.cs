@@ -15,5 +15,6 @@ namespace MightyHeroes.Gameplay.FloatingText.Types
         Absorbed = 5,
         ShieldGain = 6,
         AttackBuff = 7,
+        UltimateReady = 8,
     }
 }

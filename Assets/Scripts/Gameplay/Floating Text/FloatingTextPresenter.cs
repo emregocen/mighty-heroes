@@ -4,6 +4,7 @@ using MightyHeroes.Core.EventSystem;
 using MightyHeroes.Gameplay.Combat.Payloads;
 using MightyHeroes.Gameplay.Health.Payloads;
 using MightyHeroes.Gameplay.Health.Types;
+using MightyHeroes.Gameplay.Ultimate.Payloads;
 using UnityEngine;
 
 namespace MightyHeroes.Gameplay.FloatingText
@@ -72,6 +73,7 @@ namespace MightyHeroes.Gameplay.FloatingText
             _eventHub.HealthEvents.EntityDiedEvent.Register(OnEntityDied);
             _eventHub.HealthEvents.ShieldChangedEvent.Register(OnShieldChanged);
             _eventHub.CombatEvents.AttackBuffChangedEvent.Register(OnAttackBuffChanged);
+            _eventHub.HeroEvents.UltimateGaugeChangedEvent.Register(OnUltimateGaugeChanged);
         }
 
         private void UnregisterEvents()
@@ -81,9 +83,17 @@ namespace MightyHeroes.Gameplay.FloatingText
             _eventHub.HealthEvents.EntityDiedEvent.Unregister(OnEntityDied);
             _eventHub.HealthEvents.ShieldChangedEvent.Unregister(OnShieldChanged);
             _eventHub.CombatEvents.AttackBuffChangedEvent.Unregister(OnAttackBuffChanged);
+            _eventHub.HeroEvents.UltimateGaugeChangedEvent.Unregister(OnUltimateGaugeChanged);
         }
 
         // EVENT HANDLERS
+
+        /// <summary>Shows the ultimate ready callout each time the gauge becomes full.</summary>
+        private void OnUltimateGaugeChanged(UltimateGaugeChangedPayload payload)
+        {
+            if (payload.BecameFull)
+                _service.ShowUltimateReady();
+        }
 
         /// <summary>
         /// Shows the hit split by where it landed, so every hit produces feedback:

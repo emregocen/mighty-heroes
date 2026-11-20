@@ -94,6 +94,15 @@ namespace MightyHeroes.Gameplay.FloatingText
             PlayWorldStacked(entityId, FloatingTextType.Overkill, worldPosition, "OVERKILL");
         }
 
+        /// <summary>Shows the "ULTIMATE READY!" callout at the fixed screen-space anchor.</summary>
+        public void ShowUltimateReady()
+        {
+            FloatingTextConfig.TypeSettings settings = _config.GetSettings(FloatingTextType.UltimateReady);
+            FloatingTextScreenView view = _screenPool.Acquire();
+
+            view.Play("ULTIMATE READY!", settings, OnScreenViewReturned);
+        }
+
         /// <summary>Shows a combo callout ("COMBO x2", etc.) at the fixed screen-space combo anchor.</summary>
         public void ShowCombo(string text)
         {

@@ -20,6 +20,9 @@ namespace MightyHeroes.Gameplay.Puzzle
 
         public EventHub EventHub { get; private set; }
 
+        /// <summary>The puzzle grid, for battle-side presenters that highlight tiles.</summary>
+        public GameGrid Grid => grid;
+
         /// <summary>
         ///     Sets up the grid and runs the puzzle loop for the lifetime of the battle.
         ///     The loop only advances while IsPlayable is true (hero input window).
