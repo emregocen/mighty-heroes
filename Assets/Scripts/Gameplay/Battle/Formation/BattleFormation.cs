@@ -23,6 +23,11 @@ namespace MightyHeroes.Gameplay.Battle.Formation
     /// </summary>
     public sealed class BattleFormation : IBattleField, IFormation
     {
+        // CONSTANTS
+
+        private const int ScreenDirectionRight = 1;
+        private const int ScreenDirectionLeft = -1;
+
         // FIELDS
 
         /// <summary>
@@ -125,35 +130,23 @@ namespace MightyHeroes.Gameplay.Battle.Formation
         // PUBLIC METHODS — Target Selection
 
         /// <summary>
-        /// Selects the enemy to the right of the current target within the front line.
-        /// Wraps around to the leftmost alive enemy if no alive enemy exists to the right.
-        /// Call this from the UI right-arrow button handler.
+        /// Selects the alive front-line enemy that is next to the right of the
+        /// current target on screen. Wraps around to the leftmost one.
+        /// Used by the E key and the right arrow button.
         /// </summary>
         public void SelectNextTarget()
         {
-            BattleLine front = FrontLine;
-            if (front == null || _currentTarget == null)
-                return;
-
-            EnemyComponent next = front.GetNextAliveEnemy(_currentTarget);
-            if (next != null)
-                SetTarget(next);
+            SelectTargetOnScreen(ScreenDirectionRight);
         }
 
         /// <summary>
-        /// Selects the enemy to the left of the current target within the front line.
-        /// Wraps around to the rightmost alive enemy if no alive enemy exists to the left.
-        /// Call this from the UI left-arrow button handler.
+        /// Selects the alive front-line enemy that is next to the left of the
+        /// current target on screen. Wraps around to the rightmost one.
+        /// Used by the Q key and the left arrow button.
         /// </summary>
         public void SelectPreviousTarget()
         {
-            BattleLine front = FrontLine;
-            if (front == null || _currentTarget == null)
-                return;
-
-            EnemyComponent previous = front.GetPreviousAliveEnemy(_currentTarget);
-            if (previous != null)
-                SetTarget(previous);
+            SelectTargetOnScreen(ScreenDirectionLeft);
         }
 
         /// <summary>
@@ -276,6 +269,66 @@ namespace MightyHeroes.Gameplay.Battle.Formation
         }
 
         // PRIVATE METHODS
+
+        /// <summary>
+        /// Moves the target to the closest alive front-line enemy in the given
+        /// screen direction. Left and right come from the enemies' screen
+        /// positions, so they always match what the player sees, whatever the
+        /// slot indices in the formation data are. When nothing lies in that
+        /// direction, wraps to the farthest enemy on the other side.
+        /// Falls back to slot order when no main camera is available.
+        /// </summary>
+        /// <param name="direction">ScreenDirectionRight or ScreenDirectionLeft.</param>
+        private void SelectTargetOnScreen(int direction)
+        {
+            BattleLine front = FrontLine;
+
+            if (front == null || _currentTarget == null)
+                return;
+
+            Camera camera = Camera.main;
+
+            if (camera == null)
+            {
+                EnemyComponent fallback = direction > 0 ? front.GetNextAliveEnemy(_currentTarget) : front.GetPreviousAliveEnemy(_currentTarget);
+
+                if (fallback != null)
+                    SetTarget(fallback);
+
+                return;
+            }
+
+            float currentX = camera.WorldToScreenPoint(_currentTarget.transform.position).x;
+
+            EnemyComponent closest = null;
+            float closestDistance = float.MaxValue;
+            EnemyComponent wrapTarget = null;
+            float wrapDistance = 0f;
+
+            foreach (EnemyComponent enemy in front.Enemies)
+            {
+                if (enemy == null || !enemy.IsAlive || enemy == _currentTarget)
+                    continue;
+
+                float offset = (camera.WorldToScreenPoint(enemy.transform.position).x - currentX) * direction;
+
+                if (offset > 0f && offset < closestDistance)
+                {
+                    closest = enemy;
+                    closestDistance = offset;
+                }
+                else if (offset <= 0f && -offset >= wrapDistance)
+                {
+                    wrapTarget = enemy;
+                    wrapDistance = -offset;
+                }
+            }
+
+            EnemyComponent next = closest != null ? closest : wrapTarget;
+
+            if (next != null)
+                SetTarget(next);
+        }
 
         /// <summary>
         /// Sets the current active enemy target and notifies presentation listeners.
