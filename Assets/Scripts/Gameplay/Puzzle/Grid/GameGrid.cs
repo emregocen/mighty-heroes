@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using MightyHeroes.Gameplay.Common.Actions;
 using MightyHeroes.Gameplay.Puzzle.Core;
 using MightyHeroes.Gameplay.Puzzle.Extensions;
 using UnityEngine;
@@ -24,6 +25,8 @@ namespace MightyHeroes.Gameplay.Puzzle.Grid
 
         [Tooltip("Grayscale tile body sprites. One is picked at random for every spawned tile. Empty keeps the prefab sprite.")]
         [SerializeField] private List<Sprite> _bodyVariants = new();
+
+        private ActionType _highlightedTileType = ActionType.None;
 
         private GameGridInput gridInput;
         private GameGridMovement gridMovement;
@@ -139,6 +142,19 @@ namespace MightyHeroes.Gameplay.Puzzle.Grid
         }
 
         /// <summary>
+        /// Highlights (pulsing glow) every tile of the given type, including tiles
+        /// spawned later. ActionType.None clears the highlight.
+        /// </summary>
+        /// <param name="tileType">Tile type to highlight, or None.</param>
+        public void SetHighlightedTileType(ActionType tileType)
+        {
+            _highlightedTileType = tileType;
+
+            foreach (GameGridElement element in Elements)
+                element.SetHighlighted(tileType != ActionType.None && element.TileType == tileType);
+        }
+
+        /// <summary>
         /// Gives the element a random tile type (color, action, icon) and a
         /// random body variant. Used on the initial grid setup and on respawn.
         /// </summary>
@@ -146,6 +162,7 @@ namespace MightyHeroes.Gameplay.Puzzle.Grid
         public void ApplyRandomAppearance(GameGridElement element)
         {
             element.ApplyType(elementTypes.GetRandom());
+            element.SetHighlighted(_highlightedTileType != ActionType.None && element.TileType == _highlightedTileType);
 
             if (_bodyVariants.Count > 0)
                 element.SetBodySprite(_bodyVariants.GetRandom());

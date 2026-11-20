@@ -18,6 +18,11 @@ namespace MightyHeroes.Gameplay.Battle
     /// blend. If the ultimate ends the battle, the victory camera (priority 20)
     /// takes over directly from this camera.
     ///
+    /// On UltimateHitEvent (the effect frame) a short global slow motion plays:
+    /// time scale drops to HitSlowMotionTimeScale for HitSlowMotionHoldDuration
+    /// real seconds, then eases back over HitSlowMotionRecoverDuration. Time
+    /// scale is always restored, including on ultimate end and on disable.
+    ///
     /// Brain blend settings are overridden only during the two blends and are
     /// always restored. The ultimate camera needs a CinemachineImpulseListener
     /// for camera shake during the ultimate.
@@ -58,6 +63,13 @@ namespace MightyHeroes.Gameplay.Battle
         [Tooltip("The ultimate camera is released after this many seconds even if the ultimate never ends.")]
         [SerializeField, Min(0.5f)] private float _maxHoldDuration = 5f;
 
+        [Header("Hit Slow Motion (real seconds)")]
+        [Tooltip("Time scale at the ultimate's effect frame. 1 disables the slow motion.")]
+        [SerializeField, Range(0.05f, 1f)] private float _hitSlowMotionTimeScale = 0.3f;
+
+        [SerializeField, Min(0f)] private float _hitSlowMotionHoldDuration = 0.35f;
+        [SerializeField, Min(0f)] private float _hitSlowMotionRecoverDuration = 0.25f;
+
         private EventHub _eventHub;
         private CinemachineBrain _brain;
         private Camera _outputCamera;
@@ -65,11 +77,14 @@ namespace MightyHeroes.Gameplay.Battle
         private bool _isActive;
         private Coroutine _holdRoutine;
         private Coroutine _blendRestoreRoutine;
+        private Coroutine _slowMotionRoutine;
+        private float _originalFixedDeltaTime;
 
         // UNITY CALLBACKS
 
         private void OnDisable()
         {
+            RestoreTimeScale();
             RestoreBrain();
         }
 
@@ -99,8 +114,10 @@ namespace MightyHeroes.Gameplay.Battle
             _ultimateCamera.Priority = PriorityInactive;
             _ultimateCamera.StandbyUpdate = CinemachineVirtualCameraBase.StandbyUpdateMode.Always;
             _originalDefaultBlend = _brain.DefaultBlend;
+            _originalFixedDeltaTime = Time.fixedDeltaTime;
 
             _eventHub.HeroEvents.UltimateStartedEvent.Register(OnUltimateStarted);
+            _eventHub.HeroEvents.UltimateHitEvent.Register(OnUltimateHit);
             _eventHub.HeroEvents.UltimateEndedEvent.Register(OnUltimateEnded);
         }
 
@@ -112,6 +129,7 @@ namespace MightyHeroes.Gameplay.Battle
                 return;
 
             _eventHub.HeroEvents.UltimateStartedEvent.Unregister(OnUltimateStarted);
+            _eventHub.HeroEvents.UltimateHitEvent.Unregister(OnUltimateHit);
             _eventHub.HeroEvents.UltimateEndedEvent.Unregister(OnUltimateEnded);
         }
 
@@ -151,6 +169,45 @@ namespace MightyHeroes.Gameplay.Battle
                 _brain.DefaultBlend = _originalDefaultBlend;
         }
 
+        /// <summary>Applies time scale and keeps the physics step proportional.</summary>
+        private void SetTimeScale(float timeScale)
+        {
+            Time.timeScale = timeScale;
+
+            if (_originalFixedDeltaTime > 0f)
+                Time.fixedDeltaTime = _originalFixedDeltaTime * timeScale;
+        }
+
+        /// <summary>Stops the slow motion and restores normal time.</summary>
+        private void RestoreTimeScale()
+        {
+            if (_slowMotionRoutine == null)
+                return;
+
+            StopCoroutine(_slowMotionRoutine);
+            _slowMotionRoutine = null;
+            SetTimeScale(1f);
+        }
+
+        /// <summary>Holds the hit slow motion, then eases back to normal speed.</summary>
+        private IEnumerator RunHitSlowMotion()
+        {
+            SetTimeScale(_hitSlowMotionTimeScale);
+            yield return new WaitForSecondsRealtime(_hitSlowMotionHoldDuration);
+
+            float elapsed = 0f;
+
+            while (elapsed < _hitSlowMotionRecoverDuration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                SetTimeScale(Mathf.Lerp(_hitSlowMotionTimeScale, 1f, Mathf.SmoothStep(0f, 1f, elapsed / _hitSlowMotionRecoverDuration)));
+                yield return null;
+            }
+
+            SetTimeScale(1f);
+            _slowMotionRoutine = null;
+        }
+
         private void RestartRoutine(ref Coroutine routine, IEnumerator body)
         {
             if (routine != null)
@@ -186,8 +243,18 @@ namespace MightyHeroes.Gameplay.Battle
             RestartRoutine(ref _holdRoutine, ReleaseAfterMaxHold());
         }
 
+        private void OnUltimateHit(UltimateHitPayload payload)
+        {
+            if (_hitSlowMotionTimeScale >= 1f)
+                return;
+
+            RestartRoutine(ref _slowMotionRoutine, RunHitSlowMotion());
+        }
+
         private void OnUltimateEnded(UltimateEndedPayload payload)
         {
+            RestoreTimeScale();
+
             if (_holdRoutine != null)
             {
                 StopCoroutine(_holdRoutine);

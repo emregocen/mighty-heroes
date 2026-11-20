@@ -29480,6 +29480,9 @@ MonoBehaviour:
   _blendInDuration: 0.45
   _blendOutDuration: 0.7
   _maxHoldDuration: 5
+  _hitSlowMotionTimeScale: 0.3
+  _hitSlowMotionHoldDuration: 0.35
+  _hitSlowMotionRecoverDuration: 0.25
 --- !u!1001 &235116311
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -69049,6 +69052,30 @@ PrefabInstance:
     - target: {fileID: 263712871216239374, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
       propertyPath: m_text
       value: 'PLAYER TURN! '
+      objectReference: {fileID: 0}
+    - target: {fileID: 263712871216239374, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
+      propertyPath: m_fontSize
+      value: 82
+      objectReference: {fileID: 0}
+    - target: {fileID: 263712871216239374, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 7f15c7109ce904b9ab42219b68b01a26, type: 2}
+    - target: {fileID: 263712871216239374, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
+      propertyPath: m_fontStyle
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 263712871216239374, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 82
+      objectReference: {fileID: 0}
+    - target: {fileID: 263712871216239374, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 8441801272267897955, guid: 7f15c7109ce904b9ab42219b68b01a26, type: 2}
+    - target: {fileID: 263712871216239374, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 265717756944648698, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
       propertyPath: _slider

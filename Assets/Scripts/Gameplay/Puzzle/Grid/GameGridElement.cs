@@ -18,6 +18,23 @@ namespace MightyHeroes.Gameplay.Puzzle.Grid
         /// <summary>Icon shadow offset in tile units (UI Shadow "Effect Distance" equivalent).</summary>
         private static readonly Vector2 IconShadowEffectDistance = new Vector2(0.02f, -0.025f);
 
+        /// <summary>Glow pulse speed in radians per second (shared clock, so all glowing tiles pulse together).</summary>
+        private const float GlowPulseSpeed = 5f;
+
+        /// <summary>Glow alpha range while highlighted.</summary>
+        private const float GlowMinAlpha = 0.7f;
+        private const float GlowMaxAlpha = 1f;
+
+        /// <summary>How far the glow color is pushed from the tile color toward white, so it reads against its own tile.</summary>
+        private const float GlowWhiteBlend = 0.8f;
+
+        /// <summary>Glow scale range, as a multiplier of the glow's prefab scale.</summary>
+        private const float GlowMinScale = 0.85f;
+        private const float GlowMaxScale = 1.0f;
+
+        /// <summary>Extra body scale at the top of the pulse, so highlighted tiles also "breathe".</summary>
+        private const float BodyPulseScale = 0.04f;
+
         // FIELDS
 
         [SerializeField] private SpriteRenderer spriteRenderer;
@@ -28,7 +45,13 @@ namespace MightyHeroes.Gameplay.Puzzle.Grid
         [Tooltip("Renderer for the icon shadow. Uses the icon sprite; must sort between the body and the icon.")]
         [SerializeField] private SpriteRenderer _iconShadowRenderer;
 
+        [Tooltip("Optional soft halo behind the body, shown while this tile type is highlighted (e.g. ultimate ready). Must sort below the body.")]
+        [SerializeField] private SpriteRenderer _glowRenderer;
+
         private float CellSize = 1f;
+        private bool _isHighlighted;
+        private Vector3 _glowBaseScale = Vector3.one;
+        private Vector3 _bodyBaseScale = Vector3.one;
 
         /// <summary>
         ///     Gets whether the element is moving or not
@@ -70,6 +93,30 @@ namespace MightyHeroes.Gameplay.Puzzle.Grid
         }
 
         /// <summary>
+        /// Turns the pulsing glow behind the tile on or off. The glow uses the
+        /// tile color. Does nothing when no glow renderer is assigned.
+        /// </summary>
+        /// <param name="isHighlighted">True to show the glow.</param>
+        public void SetHighlighted(bool isHighlighted)
+        {
+            _isHighlighted = isHighlighted;
+
+            if (_glowRenderer == null)
+                return;
+
+            _glowRenderer.enabled = isHighlighted;
+
+            if (isHighlighted)
+            {
+                UpdateGlow();
+                return;
+            }
+
+            _glowRenderer.transform.localScale = _glowBaseScale;
+            spriteRenderer.transform.localScale = _bodyBaseScale;
+        }
+
+        /// <summary>
         /// Replaces the tile body sprite (used for random body variants).
         /// A null sprite keeps the current one.
         /// </summary>
@@ -78,6 +125,23 @@ namespace MightyHeroes.Gameplay.Puzzle.Grid
         {
             if (bodySprite != null)
                 spriteRenderer.sprite = bodySprite;
+        }
+
+        /// <summary>
+        /// Pulses the glow on a shared clock: alpha and size grow together, the
+        /// color is the tile color lifted toward white, and the body scales up
+        /// slightly at the top of the pulse.
+        /// </summary>
+        private void UpdateGlow()
+        {
+            float pulse = (Mathf.Sin(Time.time * GlowPulseSpeed) + 1f) * 0.5f;
+
+            Color glowColor = Color.Lerp(Color, Color.white, GlowWhiteBlend);
+            glowColor.a = Mathf.Lerp(GlowMinAlpha, GlowMaxAlpha, pulse);
+            _glowRenderer.color = glowColor;
+            _glowRenderer.transform.localScale = _glowBaseScale * Mathf.Lerp(GlowMinScale, GlowMaxScale, pulse);
+
+            spriteRenderer.transform.localScale = _bodyBaseScale * (1f + BodyPulseScale * pulse);
         }
 
         /// <summary>Positions the shadow at the icon position plus the constant effect distance.</summary>
@@ -112,6 +176,21 @@ namespace MightyHeroes.Gameplay.Puzzle.Grid
             IsMoving = true;
 
             StartCoroutine(transform.MoveCoroutine(targetPos, time, () => { IsMoving = false; }));
+        }
+
+        private void Awake()
+        {
+            if (_glowRenderer != null)
+                _glowBaseScale = _glowRenderer.transform.localScale;
+
+            if (spriteRenderer != null)
+                _bodyBaseScale = spriteRenderer.transform.localScale;
+        }
+
+        private void Update()
+        {
+            if (_isHighlighted && _glowRenderer != null)
+                UpdateGlow();
         }
 
         /// <summary>
