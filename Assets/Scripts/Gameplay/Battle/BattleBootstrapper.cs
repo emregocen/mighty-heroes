@@ -85,6 +85,9 @@ namespace MightyHeroes.Core.Battle
         [Tooltip("Level played when the battle scene is started directly (no level selected from the menu), e.g. from the Editor.")]
         [SerializeField, Min(0)] private int _fallbackLevelIndex;
 
+        [Tooltip("Default enemy formation distances. A level can override it.")]
+        [SerializeField] private FormationLayoutConfig _defaultFormationLayout;
+
         [Header("Enemy Formation")]
         [Tooltip("Filled at runtime from the level. Only used as a fallback when no level catalog is assigned.")]
         [SerializeField] private EnemyFormationConfig[] _enemyFormation;
@@ -331,46 +334,94 @@ namespace MightyHeroes.Core.Battle
         }
 
         /// <summary>
-        /// Spawns the current level's enemies at the battle site's anchors, applies
-        /// each EnemyData's stats and replaces the Enemy Formation list with the
-        /// spawned instances. Placements with a missing enemy, prefab or anchor
-        /// are skipped with an error.
+        /// Spawns the current level's enemies laid out relative to the hero
+        /// battle position (FormationLayoutConfig: front row distance, row
+        /// spacing, centered slots), facing the hero at the hero's height, then
+        /// applies each EnemyData's stats and replaces the Enemy Formation list
+        /// with the spawned instances.
         /// </summary>
         private void SpawnLevelEnemies()
         {
             if (CurrentLevel == null)
                 return;
 
-            if (_battleSite == null)
+            Transform battlePosition = _battleSite != null ? _battleSite.HeroBattlePosition : null;
+
+            if (battlePosition == null)
             {
-                GameLogger.Error(LogSourceType.BattleSystem, "BattleBootstrapper.SpawnLevelEnemies: no battle site, level enemies are not spawned.");
+                GameLogger.Error(LogSourceType.BattleSystem, "BattleBootstrapper.SpawnLevelEnemies: no battle site hero position, level enemies are not spawned.");
                 return;
             }
 
-            List<EnemyFormationConfig> spawned = new List<EnemyFormationConfig>(CurrentLevel.Enemies.Count);
+            FormationLayoutConfig layout = CurrentLevel.FormationLayout != null ? CurrentLevel.FormationLayout : _defaultFormationLayout;
 
-            foreach (LevelEnemySlot slot in CurrentLevel.Enemies)
+            if (layout == null)
             {
-                if (slot.Enemy == null || slot.Enemy.Prefab == null)
+                GameLogger.Error(LogSourceType.BattleSystem, "BattleBootstrapper.SpawnLevelEnemies: no FormationLayoutConfig assigned.");
+                return;
+            }
+
+            List<LevelEnemySlot> slots = new List<LevelEnemySlot>(CurrentLevel.Enemies);
+            slots.Sort((a, b) => a.RowIndex != b.RowIndex ? a.RowIndex.CompareTo(b.RowIndex) : a.SlotIndex.CompareTo(b.SlotIndex));
+
+            List<EnemyFormationConfig> spawned = new List<EnemyFormationConfig>(slots.Count);
+            int rowStart = 0;
+
+            while (rowStart < slots.Count)
+            {
+                int rowIndex = slots[rowStart].RowIndex;
+                int rowEnd = rowStart;
+
+                while (rowEnd < slots.Count && slots[rowEnd].RowIndex == rowIndex)
+                    rowEnd++;
+
+                int rowCount = rowEnd - rowStart;
+
+                for (int i = 0; i < rowCount; i++)
                 {
-                    GameLogger.Error(LogSourceType.BattleSystem, $"Level '{CurrentLevel.DisplayName}': enemy or prefab missing at row {slot.RowIndex} slot {slot.SlotIndex}.");
-                    continue;
+                    LevelEnemySlot slot = slots[rowStart + i];
+                    EnemyComponent enemy = SpawnFormationEnemy(slot, battlePosition, layout, i, rowCount);
+
+                    if (enemy != null)
+                        spawned.Add(new EnemyFormationConfig { Enemy = enemy, RowIndex = rowIndex, ColumnIndex = i });
                 }
 
-                if (!_battleSite.TryGetEnemyAnchor(slot.RowIndex, slot.SlotIndex, out Transform anchor))
-                {
-                    GameLogger.Error(LogSourceType.BattleSystem, $"Level '{CurrentLevel.DisplayName}': no anchor for row {slot.RowIndex} slot {slot.SlotIndex}.");
-                    continue;
-                }
-
-                EnemyComponent enemy = Instantiate(slot.Enemy.Prefab, anchor.position, anchor.rotation);
-                enemy.name = $"{slot.Enemy.DisplayName} [{slot.RowIndex},{slot.SlotIndex}]";
-                enemy.SetStatsData(slot.Enemy.Stats);
-
-                spawned.Add(new EnemyFormationConfig { Enemy = enemy, RowIndex = slot.RowIndex, ColumnIndex = slot.SlotIndex });
+                rowStart = rowEnd;
             }
 
             _enemyFormation = spawned.ToArray();
+        }
+
+        /// <summary>
+        /// Spawns one enemy at its computed formation position: rows ahead of
+        /// the hero along the battle position's forward axis, the row centered
+        /// sideways (the hero's right is right on screen), plus the slot's
+        /// optional offset. Returns null when the enemy or prefab is missing.
+        /// </summary>
+        private EnemyComponent SpawnFormationEnemy(LevelEnemySlot slot, Transform battlePosition, FormationLayoutConfig layout, int orderInRow, int rowCount)
+        {
+            if (slot.Enemy == null || slot.Enemy.Prefab == null)
+            {
+                GameLogger.Error(LogSourceType.BattleSystem, $"Level '{CurrentLevel.DisplayName}': enemy or prefab missing at row {slot.RowIndex} slot {slot.SlotIndex}.");
+                return null;
+            }
+
+            Vector3 forward = Vector3.ProjectOnPlane(battlePosition.forward, Vector3.up).normalized;
+            Vector3 right = Vector3.Cross(Vector3.up, forward);
+
+            float distance = layout.FrontRowDistance + slot.RowIndex * layout.RowSpacing;
+            float sideways = (orderInRow - (rowCount - 1) * 0.5f) * layout.SlotSpacing;
+            Vector3 offset = slot.PositionOffset;
+
+            Vector3 position = battlePosition.position + forward * (distance - offset.z) + right * (sideways + offset.x) + Vector3.up * offset.y;
+            Vector3 toHero = Vector3.ProjectOnPlane(battlePosition.position - position, Vector3.up);
+            Quaternion rotation = toHero.sqrMagnitude > 0.0001f ? Quaternion.LookRotation(toHero) : Quaternion.LookRotation(-forward);
+
+            EnemyComponent enemy = Instantiate(slot.Enemy.Prefab, position, rotation);
+            enemy.name = $"{slot.Enemy.DisplayName} [{slot.RowIndex},{orderInRow}]";
+            enemy.SetStatsData(slot.Enemy.Stats);
+
+            return enemy;
         }
 
         // PRIVATE METHODS — Initialization

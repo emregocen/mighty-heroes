@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using MightyHeroes.Gameplay.Battle.Formation;
 using MightyHeroes.Gameplay.Common.Actions;
 using UnityEngine;
 
@@ -40,7 +41,10 @@ namespace MightyHeroes.Gameplay.Levels
         [SerializeField] private List<ActionType> _tileTypes = new List<ActionType> { ActionType.Attack, ActionType.Shield, ActionType.Heal };
 
         [Header("Enemies")]
-        [Tooltip("Enemy placements. Row 0 is the front row.")]
+        [Tooltip("Optional. Distances for this level's formation. Empty uses the battle default.")]
+        [SerializeField] private FormationLayoutConfig _formationLayout;
+
+        [Tooltip("Enemy placements. Row 0 is the front row; slot order is left to right on screen.")]
         [SerializeField] private List<LevelEnemySlot> _enemies = new List<LevelEnemySlot>();
 
         // PROPERTIES
@@ -62,6 +66,9 @@ namespace MightyHeroes.Gameplay.Levels
 
         /// <summary>Tile types that can spawn on the board.</summary>
         public IReadOnlyList<ActionType> TileTypes => _tileTypes;
+
+        /// <summary>Formation distances for this level, or null to use the battle default.</summary>
+        public FormationLayoutConfig FormationLayout => _formationLayout;
 
         /// <summary>Enemy placements of the level.</summary>
         public IReadOnlyList<LevelEnemySlot> Enemies => _enemies;
