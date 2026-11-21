@@ -220,7 +220,8 @@ namespace MightyHeroes.Gameplay.Battle.Intro
 
         /// <summary>
         /// Sets the hero's intro start and battle positions from the battle site
-        /// and turns the hero to the battle facing. Called by BattleBootstrapper
+        /// and turns the hero to the battle facing; also turns the intro orbit so
+        /// its poses are relative to that facing. Called by BattleBootstrapper
         /// before Initialize. Without it the hero stays where the scene placed him.
         /// </summary>
         /// <param name="introPosition">Where the intro walk starts.</param>
@@ -234,6 +235,12 @@ namespace MightyHeroes.Gameplay.Battle.Intro
 
             if (_heroRoot != null)
                 _heroRoot.rotation = battleRotation;
+
+            // Orbit poses are relative to the hero's front, so the intro shots
+            // look the same at every site. Yaw 0 must be in front of the hero:
+            // the rig's base direction is "back", so offset by 180 degrees.
+            if (_orbitCameraRig != null)
+                _orbitCameraRig.ReferenceYaw = battleRotation.eulerAngles.y - 180f;
         }
 
         // IIntroSignalReceiver
