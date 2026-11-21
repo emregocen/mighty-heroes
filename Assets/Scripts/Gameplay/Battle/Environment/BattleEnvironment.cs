@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using MightyHeroes.Core.Logging;
 using UnityEngine;
 
 namespace MightyHeroes.Gameplay.Battle.Environment
@@ -8,20 +10,31 @@ namespace MightyHeroes.Gameplay.Battle.Environment
     /// environment scene holds only art, lighting and battle sites; all battle
     /// systems live in BattleScene, which is loaded additively on top of it.
     ///
-    /// Lists the battle sites of the scene and the large sections that a site
-    /// may switch on or off. When a site lists its own sections, all listed
-    /// environment sections are disabled first and only the site's sections
-    /// are enabled, so the device does not render the whole dungeon.
+    /// Battle sites are found automatically: every BattleSite in this object's
+    /// children (active or not) is available, there is no list to maintain.
+    /// Site ids must be unique; a duplicate is reported and ignored.
+    ///
+    /// Also lists the large sections that a site may switch on or off. When a
+    /// site lists its own sections, all listed environment sections are
+    /// disabled first and only the site's sections are enabled, so the device
+    /// does not render the whole dungeon.
     /// </summary>
     public sealed class BattleEnvironment : MonoBehaviour
     {
         // FIELDS
 
-        [Tooltip("Battle sites in this environment.")]
-        [SerializeField] private BattleSite[] _sites = Array.Empty<BattleSite>();
-
         [Tooltip("All large sections of the environment that sites may switch on or off. Optional.")]
         [SerializeField] private GameObject[] _sections = Array.Empty<GameObject>();
+
+        private readonly Dictionary<string, BattleSite> _sitesById = new Dictionary<string, BattleSite>();
+        private BattleSite _firstSite;
+
+        // UNITY CALLBACKS
+
+        private void Awake()
+        {
+            CollectSites();
+        }
 
         // PUBLIC METHODS
 
@@ -30,21 +43,16 @@ namespace MightyHeroes.Gameplay.Battle.Environment
         /// <param name="site">The site when found.</param>
         public bool TryGetSite(string siteId, out BattleSite site)
         {
-            site = null;
+            if (_firstSite == null)
+                CollectSites();
 
-            foreach (BattleSite candidate in _sites)
+            if (string.IsNullOrEmpty(siteId))
             {
-                if (candidate == null)
-                    continue;
-
-                if (string.IsNullOrEmpty(siteId) || candidate.SiteId == siteId)
-                {
-                    site = candidate;
-                    return true;
-                }
+                site = _firstSite;
+                return site != null;
             }
 
-            return false;
+            return _sitesById.TryGetValue(siteId, out site);
         }
 
         /// <summary>
@@ -67,6 +75,29 @@ namespace MightyHeroes.Gameplay.Battle.Environment
             {
                 if (section != null)
                     section.SetActive(true);
+            }
+        }
+
+        // PRIVATE METHODS
+
+        /// <summary>Registers every BattleSite in the children by its id.</summary>
+        private void CollectSites()
+        {
+            _sitesById.Clear();
+            _firstSite = null;
+
+            foreach (BattleSite site in GetComponentsInChildren<BattleSite>(true))
+            {
+                if (_firstSite == null)
+                    _firstSite = site;
+
+                if (_sitesById.ContainsKey(site.SiteId))
+                {
+                    GameLogger.Error(LogSourceType.BattleSystem, $"BattleEnvironment: duplicate site id '{site.SiteId}' on '{site.name}', ignored.");
+                    continue;
+                }
+
+                _sitesById.Add(site.SiteId, site);
             }
         }
     }

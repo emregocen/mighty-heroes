@@ -14,11 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _displayName: Battle 3
   _environmentSceneName: Env_Dungeon
-  _battleSiteId: Site_03
+  _battleSiteId: Site_05
   _boardRows: 4
   _boardColumns: 7
   _tileTypes: 01000000050000000400000003000000i
-  _formationLayout: {fileID: 0}
   _enemies:
   - _enemy: {fileID: 11400000, guid: 4948a895a21a4f7f890b2dd06bfea087, type: 2}
     _rowIndex: 0
@@ -26,13 +25,9 @@ MonoBehaviour:
     _positionOffset: {x: 0, y: 0, z: 0}
   - _enemy: {fileID: 11400000, guid: 4948a895a21a4f7f890b2dd06bfea087, type: 2}
     _rowIndex: 0
-    _slotIndex: 1
+    _slotIndex: 2
     _positionOffset: {x: 0, y: 0, z: 0}
   - _enemy: {fileID: 11400000, guid: edb026fa3f9d4d15a08b695177c68aa4, type: 2}
-    _rowIndex: 1
-    _slotIndex: 0
-    _positionOffset: {x: 0, y: 0, z: 0}
-  - _enemy: {fileID: 11400000, guid: 4948a895a21a4f7f890b2dd06bfea087, type: 2}
     _rowIndex: 0
-    _slotIndex: 2
+    _slotIndex: 1
     _positionOffset: {x: 0, y: 0, z: 0}

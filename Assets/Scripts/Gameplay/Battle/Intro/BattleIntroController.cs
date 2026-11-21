@@ -84,8 +84,6 @@ namespace MightyHeroes.Gameplay.Battle.Intro
 
         [Header("Hero")]
         [SerializeField] private Transform _heroRoot;
-        [SerializeField] private Transform _heroIntroStartPoint;
-        [SerializeField] private Transform _heroBattlePosition;
         [SerializeField] private Animator _heroAnimator;
 
         [Header("Hero Taunt Lower Body Lock")]
@@ -113,6 +111,9 @@ namespace MightyHeroes.Gameplay.Battle.Intro
         [SerializeField] private bool _puzzleHideBelow = true;
 
         private BattleIntroConfig _config;
+        private Vector3 _heroIntroPosition;
+        private Vector3 _heroBattlePosition;
+        private bool _hasHeroPositions;
         private Vector2 _puzzleHiddenPosition;
         private Vector2 _puzzleShownPosition;
         private bool _tauntEnded;
@@ -173,8 +174,8 @@ namespace MightyHeroes.Gameplay.Battle.Intro
             if (_config == null)
                 return;
 
-            if (_heroRoot != null && _heroIntroStartPoint != null)
-                _heroRoot.position = _heroIntroStartPoint.position;
+            if (_heroRoot != null && _hasHeroPositions)
+                _heroRoot.position = _heroIntroPosition;
 
             if (_swordProp != null)
                 _swordProp.SetActive(false);
@@ -218,24 +219,21 @@ namespace MightyHeroes.Gameplay.Battle.Intro
         }
 
         /// <summary>
-        /// Replaces the hero intro start and battle points with the battle site's
-        /// points and turns the hero to face like the battle point. Called by
-        /// BattleBootstrapper before Initialize. Null keeps the scene-assigned point.
+        /// Sets the hero's intro start and battle positions from the battle site
+        /// and turns the hero to the battle facing. Called by BattleBootstrapper
+        /// before Initialize. Without it the hero stays where the scene placed him.
         /// </summary>
-        /// <param name="introStartPoint">Where the intro walk starts.</param>
-        /// <param name="battlePosition">Where the hero fights; its rotation is applied to the hero.</param>
-        public void SetHeroPoints(Transform introStartPoint, Transform battlePosition)
+        /// <param name="introPosition">Where the intro walk starts.</param>
+        /// <param name="battlePosition">Where the hero walks to and fights.</param>
+        /// <param name="battleRotation">Hero facing during the battle.</param>
+        public void SetHeroPositions(Vector3 introPosition, Vector3 battlePosition, Quaternion battleRotation)
         {
-            if (introStartPoint != null)
-                _heroIntroStartPoint = introStartPoint;
+            _heroIntroPosition = introPosition;
+            _heroBattlePosition = battlePosition;
+            _hasHeroPositions = true;
 
-            if (battlePosition != null)
-            {
-                _heroBattlePosition = battlePosition;
-
-                if (_heroRoot != null)
-                    _heroRoot.rotation = battlePosition.rotation;
-            }
+            if (_heroRoot != null)
+                _heroRoot.rotation = battleRotation;
         }
 
         // IIntroSignalReceiver
@@ -260,8 +258,8 @@ namespace MightyHeroes.Gameplay.Battle.Intro
             GameLogger.Log(LogSourceType.BattleSystem, "Intro Phase 0 — camera settle.");
             yield return new WaitForSeconds(_config.CameraSettleDuration);
 
-            float walkDistance = (_heroRoot != null && _heroBattlePosition != null)
-                ? Vector3.Distance(_heroRoot.position, _heroBattlePosition.position)
+            float walkDistance = (_heroRoot != null && _hasHeroPositions)
+                ? Vector3.Distance(_heroRoot.position, _heroBattlePosition)
                 : 0f;
 
             float walkDuration = walkDistance / Mathf.Max(_config.HeroWalkSpeed, 0.01f);
@@ -272,10 +270,10 @@ namespace MightyHeroes.Gameplay.Battle.Intro
             StartLocomotion();
 
             // Hero walk and camera slow-orbit run in parallel — neither blocks the other.
-            if (_heroRoot != null && _heroBattlePosition != null && walkDuration > 0f)
+            if (_heroRoot != null && _hasHeroPositions && walkDuration > 0f)
             {
                 _walkTween = _heroRoot
-                    .DOMove(_heroBattlePosition.position, walkDuration)
+                    .DOMove(_heroBattlePosition, walkDuration)
                     .SetEase(Ease.Linear);
 
                 _orbitTween = TweenOrbitTo(_tauntPose, walkDuration, _slowOrbitEase);
@@ -372,8 +370,8 @@ namespace MightyHeroes.Gameplay.Battle.Intro
 
             GameLogger.Log(LogSourceType.BattleSystem, "BattleIntroController: intro skipped.");
 
-            if (_heroRoot != null && _heroBattlePosition != null)
-                _heroRoot.position = _heroBattlePosition.position;
+            if (_heroRoot != null && _hasHeroPositions)
+                _heroRoot.position = _heroBattlePosition;
 
             if (_heroAnimator != null)
             {

@@ -3160,7 +3160,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66afb36c53dcd49d0b368d8017010c79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TextStyleView
-  _text: {fileID: 628810072}
   _style: {fileID: 11400000, guid: 390519ec0437e4156b8182628e5afe3b, type: 2}
 --- !u!114 &628810072
 MonoBehaviour:
@@ -3557,8 +3556,6 @@ MonoBehaviour:
   _slowOrbitEase: 4
   _fastOrbitEase: 7
   _heroRoot: {fileID: 1596662743}
-  _heroIntroStartPoint: {fileID: 0}
-  _heroBattlePosition: {fileID: 0}
   _heroAnimator: {fileID: 1596662745}
   _tauntLowerBodyLayerName: LowerBodyLock
   _lowerBodyLockBlendInDuration: 0.1

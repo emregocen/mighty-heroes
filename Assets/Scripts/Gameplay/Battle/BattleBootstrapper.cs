@@ -79,7 +79,7 @@ namespace MightyHeroes.Core.Battle
         [SerializeField] private ActionTierData _actionTierData;
 
         [Header("Level")]
-        [Tooltip("Levels in play order. When empty, the enemies listed in Enemy Formation (placed in the scene) are used instead.")]
+        [Tooltip("Levels in play order. Required: every battle is built from a level.")]
         [SerializeField] private LevelCatalogData _levelCatalog;
 
         [Tooltip("Level played when the battle scene is started directly (no level selected from the menu), e.g. from the Editor.")]
@@ -88,9 +88,6 @@ namespace MightyHeroes.Core.Battle
         [Tooltip("Default enemy formation distances. A level can override it.")]
         [SerializeField] private FormationLayoutConfig _defaultFormationLayout;
 
-        [Header("Enemy Formation")]
-        [Tooltip("Filled at runtime from the level. Only used as a fallback when no level catalog is assigned.")]
-        [SerializeField] private EnemyFormationConfig[] _enemyFormation;
 
         [Header("Battle Timer")]
         [Tooltip("Optional. When empty, no timer is created for this battle.")]
@@ -148,6 +145,7 @@ namespace MightyHeroes.Core.Battle
 
         private readonly List<EnemyStateMachine> _enemyStateMachines = new List<EnemyStateMachine>();
 
+        private EnemyFormationConfig[] _enemyFormation = System.Array.Empty<EnemyFormationConfig>();
         private BattleEnvironment _battleEnvironment;
         private BattleSite _battleSite;
 
@@ -274,14 +272,13 @@ namespace MightyHeroes.Core.Battle
 
         /// <summary>
         /// Picks the level to play: the one selected in LevelSession, otherwise
-        /// FallbackLevelIndex. Without a catalog no level is used and the
-        /// scene-placed Enemy Formation stays in effect.
+        /// FallbackLevelIndex. Without a catalog the battle has no enemies.
         /// </summary>
         private void ResolveCurrentLevel()
         {
             if (_levelCatalog == null || _levelCatalog.Count == 0)
             {
-                GameLogger.Log(LogSourceType.BattleSystem, "BattleBootstrapper: no level catalog, using the scene enemy formation.");
+                GameLogger.Error(LogSourceType.BattleSystem, "BattleBootstrapper: Level Catalog is missing or empty; the battle has no level.");
                 return;
             }
 
@@ -297,7 +294,8 @@ namespace MightyHeroes.Core.Battle
         /// <summary>
         /// Finds the environment scene's BattleEnvironment and the level's battle
         /// site, activates the site's sections and places the hero at the site's
-        /// battle position (the intro then moves him to its start point).
+        /// battle position facing the enemies (the intro then moves him to the
+        /// site's intro position).
         /// The environment scene must already be loaded: BattleLoader loads it
         /// before BattleScene; in the Editor open it together with BattleScene.
         /// </summary>
@@ -322,13 +320,11 @@ namespace MightyHeroes.Core.Battle
 
             _battleEnvironment.ActivateSite(_battleSite);
 
-            Transform battlePosition = _battleSite.HeroBattlePosition;
-
-            if (battlePosition != null && _heroComponent != null)
-                _heroComponent.transform.SetPositionAndRotation(battlePosition.position, battlePosition.rotation);
+            if (_heroComponent != null)
+                _heroComponent.transform.SetPositionAndRotation(_battleSite.HeroBattlePosition, _battleSite.HeroBattleRotation);
 
             if (_battleIntroController != null)
-                _battleIntroController.SetHeroPoints(_battleSite.HeroIntroStartPoint, battlePosition);
+                _battleIntroController.SetHeroPositions(_battleSite.HeroIntroPosition, _battleSite.HeroBattlePosition, _battleSite.HeroBattleRotation);
 
             GameLogger.Log(LogSourceType.BattleSystem, $"BattleBootstrapper: battle site '{_battleSite.SiteId}'.");
         }
@@ -337,7 +333,7 @@ namespace MightyHeroes.Core.Battle
         /// Spawns the current level's enemies laid out relative to the hero
         /// battle position (FormationLayoutConfig: front row distance, row
         /// spacing, centered slots), facing the hero at the hero's height, then
-        /// applies each EnemyData's stats and replaces the Enemy Formation list
+        /// applies each EnemyData's stats and fills the runtime formation list
         /// with the spawned instances.
         /// </summary>
         private void SpawnLevelEnemies()
@@ -345,15 +341,13 @@ namespace MightyHeroes.Core.Battle
             if (CurrentLevel == null)
                 return;
 
-            Transform battlePosition = _battleSite != null ? _battleSite.HeroBattlePosition : null;
-
-            if (battlePosition == null)
+            if (_battleSite == null)
             {
-                GameLogger.Error(LogSourceType.BattleSystem, "BattleBootstrapper.SpawnLevelEnemies: no battle site hero position, level enemies are not spawned.");
+                GameLogger.Error(LogSourceType.BattleSystem, "BattleBootstrapper.SpawnLevelEnemies: no battle site, level enemies are not spawned.");
                 return;
             }
 
-            FormationLayoutConfig layout = CurrentLevel.FormationLayout != null ? CurrentLevel.FormationLayout : _defaultFormationLayout;
+            FormationLayoutConfig layout = _defaultFormationLayout;
 
             if (layout == null)
             {
@@ -380,7 +374,7 @@ namespace MightyHeroes.Core.Battle
                 for (int i = 0; i < rowCount; i++)
                 {
                     LevelEnemySlot slot = slots[rowStart + i];
-                    EnemyComponent enemy = SpawnFormationEnemy(slot, battlePosition, layout, i, rowCount);
+                    EnemyComponent enemy = SpawnFormationEnemy(slot, layout, i, rowCount);
 
                     if (enemy != null)
                         spawned.Add(new EnemyFormationConfig { Enemy = enemy, RowIndex = rowIndex, ColumnIndex = i });
@@ -394,11 +388,11 @@ namespace MightyHeroes.Core.Battle
 
         /// <summary>
         /// Spawns one enemy at its computed formation position: rows ahead of
-        /// the hero along the battle position's forward axis, the row centered
+        /// the hero along the battle site's forward axis, the row centered
         /// sideways (the hero's right is right on screen), plus the slot's
         /// optional offset. Returns null when the enemy or prefab is missing.
         /// </summary>
-        private EnemyComponent SpawnFormationEnemy(LevelEnemySlot slot, Transform battlePosition, FormationLayoutConfig layout, int orderInRow, int rowCount)
+        private EnemyComponent SpawnFormationEnemy(LevelEnemySlot slot, FormationLayoutConfig layout, int orderInRow, int rowCount)
         {
             if (slot.Enemy == null || slot.Enemy.Prefab == null)
             {
@@ -406,15 +400,16 @@ namespace MightyHeroes.Core.Battle
                 return null;
             }
 
-            Vector3 forward = Vector3.ProjectOnPlane(battlePosition.forward, Vector3.up).normalized;
+            Vector3 heroPosition = _battleSite.HeroBattlePosition;
+            Vector3 forward = _battleSite.Forward;
             Vector3 right = Vector3.Cross(Vector3.up, forward);
 
             float distance = layout.FrontRowDistance + slot.RowIndex * layout.RowSpacing;
             float sideways = (orderInRow - (rowCount - 1) * 0.5f) * layout.SlotSpacing;
             Vector3 offset = slot.PositionOffset;
 
-            Vector3 position = battlePosition.position + forward * (distance - offset.z) + right * (sideways + offset.x) + Vector3.up * offset.y;
-            Vector3 toHero = Vector3.ProjectOnPlane(battlePosition.position - position, Vector3.up);
+            Vector3 position = heroPosition + forward * (distance - offset.z) + right * (sideways + offset.x) + Vector3.up * offset.y;
+            Vector3 toHero = Vector3.ProjectOnPlane(heroPosition - position, Vector3.up);
             Quaternion rotation = toHero.sqrMagnitude > 0.0001f ? Quaternion.LookRotation(toHero) : Quaternion.LookRotation(-forward);
 
             EnemyComponent enemy = Instantiate(slot.Enemy.Prefab, position, rotation);
