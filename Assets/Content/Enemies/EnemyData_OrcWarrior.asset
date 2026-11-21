@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 646af32570ca44b939362d9cdf87a554, type: 3}
+  m_Name: EnemyData_OrcWarrior
+  m_EditorClassIdentifier: 
+  _displayName: Orc Warrior
+  _prefab: {fileID: 763958437473869267, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
+  _stats: {fileID: 11400000, guid: 34507aa8bc2bc47ffad007d1f70330ae, type: 2}

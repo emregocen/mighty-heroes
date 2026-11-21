@@ -67,6 +67,9 @@ namespace MightyHeroes.Gameplay.Hero.Presentation
         /// <summary>True while a heal or ultimate clip plays in place; focus changes are queued.</summary>
         private bool _isInPlaceActionPlaying;
 
+        /// <summary>True while the battle intro plays; the hero faces his walk direction and focus is queued.</summary>
+        private bool _isIntroPlaying;
+
         private Sequence _lookAtSequence;
         private Tween _rootRotationTween;
         private Tween _returnFocusTween;
@@ -95,6 +98,7 @@ namespace MightyHeroes.Gameplay.Hero.Presentation
         /// Gets whether hero attack movement currently owns root rotation.
         /// </summary>
         private bool IsMovementLocked =>
+            _isIntroPlaying ||
             _isInPlaceActionPlaying ||
             (_attackMovementController != null &&
              (_attackMovementController.IsAttacking ||
@@ -438,6 +442,57 @@ namespace MightyHeroes.Gameplay.Hero.Presentation
                 _lookAtSuppressBlendDuration);
         }
         
+        /// <summary>
+        /// Called before the battle intro starts. The hero keeps facing his walk
+        /// direction: look-at IK is off and target focus is queued until the
+        /// intro ends.
+        /// </summary>
+        public void NotifyIntroStarted()
+        {
+            _isIntroPlaying = true;
+            _lookAtScaleTween?.Kill();
+            _lookAtWeightScale = 0f;
+        }
+
+        /// <summary>
+        /// Called when the hero stops walking in the intro (taunt start). Turns
+        /// look-at IK back on toward the selected target so the taunt is aimed
+        /// at the enemies, while the root keeps facing forward until the intro ends.
+        /// </summary>
+        public void NotifyIntroWalkEnded()
+        {
+            if (!_isIntroPlaying || ActiveTargetFocus == null)
+                return;
+
+            _currentTargetFocus = ActiveTargetFocus;
+
+            if (!_hasLookPosition)
+            {
+                _currentLookPosition = _currentTargetFocus.position;
+                _hasLookPosition = true;
+            }
+
+            StartLookAtBlend();
+            BlendLookAtScale(1f);
+        }
+
+        /// <summary>
+        /// Called when the battle intro ends (battle stance). Fades look-at IK in
+        /// and turns the hero toward the selected target.
+        /// </summary>
+        public void NotifyIntroEnded()
+        {
+            if (!_isIntroPlaying)
+                return;
+
+            _isIntroPlaying = false;
+            _hasQueuedFocusAfterRetreat = false;
+            BlendLookAtScale(1f);
+
+            if (ActiveTargetFocus != null)
+                FocusTarget(ActiveTargetFocus);
+        }
+
         public void NotifyVictoryStarted()
         {
             _lookAtSequence?.Kill();

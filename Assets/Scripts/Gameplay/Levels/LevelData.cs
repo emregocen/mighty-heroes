@@ -11,6 +11,9 @@ namespace MightyHeroes.Gameplay.Levels
     /// Colors and icons of the tile types come from the grid's element type list;
     /// the level only selects which of them are used.
     ///
+    /// Location: the environment scene (loaded first; BattleScene is loaded
+    /// additively on top) and the battle site inside it.
+    ///
     /// Data only. Read by the battle setup through LevelSession.
     /// </summary>
     [CreateAssetMenu(fileName = "LevelData_New", menuName = "Mighty Heroes/Content/Level Data")]
@@ -21,6 +24,13 @@ namespace MightyHeroes.Gameplay.Levels
         [Header("Info")]
         [Tooltip("Name shown in UI, e.g. 'Battle 1'.")]
         [SerializeField] private string _displayName = "Battle";
+
+        [Header("Location")]
+        [Tooltip("Environment scene name, e.g. 'Env_Dungeon'. Must be in Build Settings. Empty plays in BattleScene alone.")]
+        [SerializeField] private string _environmentSceneName = "Env_Dungeon";
+
+        [Tooltip("Battle site id inside the environment scene, e.g. 'Entrance'. Empty uses the first site.")]
+        [SerializeField] private string _battleSiteId;
 
         [Header("Board")]
         [SerializeField, Range(3, 8)] private int _boardRows = 4;
@@ -37,6 +47,12 @@ namespace MightyHeroes.Gameplay.Levels
 
         /// <summary>Name shown in UI.</summary>
         public string DisplayName => _displayName;
+
+        /// <summary>Environment scene name, or empty to play in BattleScene alone.</summary>
+        public string EnvironmentSceneName => _environmentSceneName;
+
+        /// <summary>Battle site id inside the environment scene; empty uses the first site.</summary>
+        public string BattleSiteId => _battleSiteId;
 
         /// <summary>Puzzle board row count.</summary>
         public int BoardRows => _boardRows;

@@ -174,7 +174,7 @@ namespace MightyHeroes.Gameplay.Battle.Formation
         /// automatically selected: prefers the slot to the right,
         /// falls back to the left within the same line.
         /// If the line is fully cleared, SelectDefaultTarget picks
-        /// the first alive enemy in the new front line.
+        /// the middle alive enemy in the new front line.
         ///
         /// Must be called by BattleBootstrapper.OnEntityDied
         /// before updating TurnContext alive count.
@@ -341,9 +341,42 @@ namespace MightyHeroes.Gameplay.Battle.Formation
             CurrentTargetFocusChanged?.Invoke(CurrentTargetFocus);
         }
 
+        /// <summary>
+        /// Selects the alive front-line enemy closest to the middle of the row
+        /// (the one straight ahead of the hero in a centered formation), so the
+        /// hero does not start the battle turned toward a side enemy.
+        /// </summary>
         private void SelectDefaultTarget()
         {
-            SetTarget(FrontLine?.GetFirstAliveEnemy());
+            BattleLine front = FrontLine;
+
+            if (front == null)
+            {
+                SetTarget(null);
+                return;
+            }
+
+            float middle = (front.Enemies.Count - 1) * 0.5f;
+            EnemyComponent best = null;
+            float bestDistance = float.MaxValue;
+
+            for (int i = 0; i < front.Enemies.Count; i++)
+            {
+                EnemyComponent enemy = front.Enemies[i];
+
+                if (enemy == null || !enemy.IsAlive)
+                    continue;
+
+                float distance = Mathf.Abs(i - middle);
+
+                if (distance < bestDistance)
+                {
+                    best = enemy;
+                    bestDistance = distance;
+                }
+            }
+
+            SetTarget(best);
         }
     }
 }

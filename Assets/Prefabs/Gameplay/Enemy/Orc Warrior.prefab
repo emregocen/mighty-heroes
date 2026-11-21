@@ -31,134 +31,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2065391164795600621}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &894996771361820372
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 8869803504718424537}
-  - component: {fileID: 5128945737081805030}
-  m_Layer: 0
-  m_Name: Container
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &8869803504718424537
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 894996771361820372}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2148654198961802487}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 110, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &5128945737081805030
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 894996771361820372}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.HorizontalLayoutGroup
-  m_Padding:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
-  m_ChildAlignment: 3
-  m_Spacing: 0
-  m_ChildForceExpandWidth: 0
-  m_ChildForceExpandHeight: 0
-  m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
-  m_ChildScaleWidth: 1
-  m_ChildScaleHeight: 1
-  m_ReverseArrangement: 0
---- !u!1 &1601593077624785821
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2148654198961802487}
-  - component: {fileID: 7222201003006662325}
-  - component: {fileID: 3567486773639168546}
-  m_Layer: 0
-  m_Name: Action Point
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &2148654198961802487
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1601593077624785821}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 8869803504718424537}
-  m_Father: {fileID: 5481086808058647312}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 250, y: 25}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!225 &7222201003006662325
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1601593077624785821}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
---- !u!114 &3567486773639168546
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1601593077624785821}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a7b40fed3eea4bdb9308c15efafb3a6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.UI.Battle.Views.ActionPointView
-  _pipContainer: {fileID: 8869803504718424537}
-  _pipPrefab: {fileID: 0}
-  _valueText: {fileID: 0}
-  _canvasGroup: {fileID: 7222201003006662325}
 --- !u!1 &1640004556232713925
 GameObject:
   m_ObjectHideFlags: 0
@@ -302,6 +174,7 @@ MonoBehaviour:
   _healthBarView: {fileID: 2256001335267900904}
   _shieldBarView: {fileID: 7807779854918614300}
   _actionPointView: {fileID: 3567486773639168546}
+  _statusIconBarView: {fileID: 0}
 --- !u!114 &5864153714178975477
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -315,7 +188,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Equipment.Views.CharacterWeaponView
   _weaponSocket: {fileID: 2964138532775437724}
-  _defaultWeapon: {fileID: 11400000, guid: 47fa313ceaeaf4f2596a38d4238500d1, type: 2}
+  _defaultWeapon: {fileID: 11400000, guid: fd235e3c514a7481da144c8ae5713a44, type: 2}
 --- !u!1 &4020443688630764940
 GameObject:
   m_ObjectHideFlags: 0
@@ -461,7 +334,7 @@ RectTransform:
   m_GameObject: {fileID: 5626587258015740388}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.003, y: 0.003, z: 0.003}
+  m_LocalScale: {x: 0.004, y: 0.004, z: 0.004}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5064655853145641035}
@@ -471,7 +344,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 2.4}
+  m_AnchoredPosition: {x: 0, y: 2.5}
   m_SizeDelta: {x: 120, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &1343961333885156695
@@ -1108,3 +981,116 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 1384280946776679044, guid: 0c4662cffd0921c409773873bc3a2da6, type: 3}
   m_PrefabInstance: {fileID: 4914691222878147658}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &6952524439774326175
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 5481086808058647312}
+    m_Modifications:
+    - target: {fileID: 8522592045111748098, guid: 794b87d30079f4ce59726efe203c7ea7, type: 3}
+      propertyPath: m_Name
+      value: Action Point
+      objectReference: {fileID: 0}
+    - target: {fileID: 9056133812001268072, guid: 794b87d30079f4ce59726efe203c7ea7, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 9056133812001268072, guid: 794b87d30079f4ce59726efe203c7ea7, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 9056133812001268072, guid: 794b87d30079f4ce59726efe203c7ea7, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9056133812001268072, guid: 794b87d30079f4ce59726efe203c7ea7, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9056133812001268072, guid: 794b87d30079f4ce59726efe203c7ea7, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9056133812001268072, guid: 794b87d30079f4ce59726efe203c7ea7, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9056133812001268072, guid: 794b87d30079f4ce59726efe203c7ea7, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 250
+      objectReference: {fileID: 0}
+    - target: {fileID: 9056133812001268072, guid: 794b87d30079f4ce59726efe203c7ea7, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 9056133812001268072, guid: 794b87d30079f4ce59726efe203c7ea7, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9056133812001268072, guid: 794b87d30079f4ce59726efe203c7ea7, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9056133812001268072, guid: 794b87d30079f4ce59726efe203c7ea7, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9056133812001268072, guid: 794b87d30079f4ce59726efe203c7ea7, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9056133812001268072, guid: 794b87d30079f4ce59726efe203c7ea7, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9056133812001268072, guid: 794b87d30079f4ce59726efe203c7ea7, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9056133812001268072, guid: 794b87d30079f4ce59726efe203c7ea7, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9056133812001268072, guid: 794b87d30079f4ce59726efe203c7ea7, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9056133812001268072, guid: 794b87d30079f4ce59726efe203c7ea7, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9056133812001268072, guid: 794b87d30079f4ce59726efe203c7ea7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9056133812001268072, guid: 794b87d30079f4ce59726efe203c7ea7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9056133812001268072, guid: 794b87d30079f4ce59726efe203c7ea7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 794b87d30079f4ce59726efe203c7ea7, type: 3}
+--- !u!224 &2148654198961802487 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 9056133812001268072, guid: 794b87d30079f4ce59726efe203c7ea7, type: 3}
+  m_PrefabInstance: {fileID: 6952524439774326175}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3567486773639168546 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5908184456938827709, guid: 794b87d30079f4ce59726efe203c7ea7, type: 3}
+  m_PrefabInstance: {fileID: 6952524439774326175}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a7b40fed3eea4bdb9308c15efafb3a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.UI.Battle.Views.ActionPointView

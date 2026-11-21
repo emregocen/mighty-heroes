@@ -60,6 +60,9 @@ namespace MightyHeroes.Gameplay.Battle.Intro
 
         // FIELDS
 
+        /// <summary>Raised when the hero stops walking and the taunt starts.</summary>
+        public event Action TauntStarted;
+
         [Header("Cameras")]
         [SerializeField] private CinemachineCamera _introCamera;
         [SerializeField] private OrbitCameraRig _orbitCameraRig;
@@ -212,6 +215,27 @@ namespace MightyHeroes.Gameplay.Battle.Intro
             SetSkippable(true);
 
             _introCoroutine = StartCoroutine(RunIntroSequence());
+        }
+
+        /// <summary>
+        /// Replaces the hero intro start and battle points with the battle site's
+        /// points and turns the hero to face like the battle point. Called by
+        /// BattleBootstrapper before Initialize. Null keeps the scene-assigned point.
+        /// </summary>
+        /// <param name="introStartPoint">Where the intro walk starts.</param>
+        /// <param name="battlePosition">Where the hero fights; its rotation is applied to the hero.</param>
+        public void SetHeroPoints(Transform introStartPoint, Transform battlePosition)
+        {
+            if (introStartPoint != null)
+                _heroIntroStartPoint = introStartPoint;
+
+            if (battlePosition != null)
+            {
+                _heroBattlePosition = battlePosition;
+
+                if (_heroRoot != null)
+                    _heroRoot.rotation = battlePosition.rotation;
+            }
         }
 
         // IIntroSignalReceiver
@@ -537,6 +561,7 @@ namespace MightyHeroes.Gameplay.Battle.Intro
                 return;
 
             _isTaunting = true;
+            TauntStarted?.Invoke();
             BlendLowerBodyLock(1f, _lowerBodyLockBlendInDuration);
 
             _heroAnimator.SetInteger(AnimTauntVariant, 1);

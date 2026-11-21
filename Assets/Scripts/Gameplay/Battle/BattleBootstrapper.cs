@@ -4,12 +4,14 @@ using MightyHeroes.Battle.TurnFlow;
 using MightyHeroes.Core.EventSystem;
 using MightyHeroes.Core.Logging;
 using MightyHeroes.Gameplay.Battle;
+using MightyHeroes.Gameplay.Battle.Environment;
 using MightyHeroes.Gameplay.Battle.Formation;
 using MightyHeroes.Gameplay.Battle.Intro;
 using MightyHeroes.Gameplay.Battle.Targeting;
 using MightyHeroes.Gameplay.Combat;
 using MightyHeroes.Gameplay.Combat.Feedback;
 using MightyHeroes.Gameplay.Common.Actions;
+using MightyHeroes.Gameplay.Enemy;
 using MightyHeroes.Gameplay.Enemy.AI;
 using MightyHeroes.Gameplay.Enemy.StateMachine;
 using MightyHeroes.Gameplay.FloatingText;
@@ -18,6 +20,7 @@ using MightyHeroes.Gameplay.Hero.Actions;
 using MightyHeroes.Gameplay.Hero.Input;
 using MightyHeroes.Gameplay.Hero.Presentation;
 using MightyHeroes.Gameplay.Hero.StateMachine;
+using MightyHeroes.Gameplay.Levels;
 using MightyHeroes.Gameplay.Puzzle;
 using MightyHeroes.Gameplay.Ultimate;
 using MightyHeroes.UI.Battle;
@@ -75,7 +78,15 @@ namespace MightyHeroes.Core.Battle
         [SerializeField] private HeroTargetFocusController _heroTargetFocusController;
         [SerializeField] private ActionTierData _actionTierData;
 
+        [Header("Level")]
+        [Tooltip("Levels in play order. When empty, the enemies listed in Enemy Formation (placed in the scene) are used instead.")]
+        [SerializeField] private LevelCatalogData _levelCatalog;
+
+        [Tooltip("Level played when the battle scene is started directly (no level selected from the menu), e.g. from the Editor.")]
+        [SerializeField, Min(0)] private int _fallbackLevelIndex;
+
         [Header("Enemy Formation")]
+        [Tooltip("Filled at runtime from the level. Only used as a fallback when no level catalog is assigned.")]
         [SerializeField] private EnemyFormationConfig[] _enemyFormation;
 
         [Header("Battle Timer")]
@@ -134,6 +145,17 @@ namespace MightyHeroes.Core.Battle
 
         private readonly List<EnemyStateMachine> _enemyStateMachines = new List<EnemyStateMachine>();
 
+        private BattleEnvironment _battleEnvironment;
+        private BattleSite _battleSite;
+
+        // PROPERTIES
+
+        /// <summary>Level being played, or null when the scene-placed fallback formation is used.</summary>
+        public LevelData CurrentLevel { get; private set; }
+
+        /// <summary>Catalog index of the level being played, or -1 when no level is used.</summary>
+        public int CurrentLevelIndex { get; private set; } = -1;
+
         private FloatingTextService _floatingTextService;
         private FloatingTextPresenter _floatingTextPresenter;
         private StatusIconPresenter _statusIconPresenter;
@@ -153,6 +175,9 @@ namespace MightyHeroes.Core.Battle
 
             CreateEventHub();
             CreateBattleFormation();
+            ResolveCurrentLevel();
+            ResolveBattleSite();
+            SpawnLevelEnemies();
             InitializeHero();
             InitializeEnemies();
             InitializeTargetInput();
@@ -240,6 +265,112 @@ namespace MightyHeroes.Core.Battle
             {
                 config.Enemy?.RefreshHud();
             }
+        }
+
+        // PRIVATE METHODS — Level
+
+        /// <summary>
+        /// Picks the level to play: the one selected in LevelSession, otherwise
+        /// FallbackLevelIndex. Without a catalog no level is used and the
+        /// scene-placed Enemy Formation stays in effect.
+        /// </summary>
+        private void ResolveCurrentLevel()
+        {
+            if (_levelCatalog == null || _levelCatalog.Count == 0)
+            {
+                GameLogger.Log(LogSourceType.BattleSystem, "BattleBootstrapper: no level catalog, using the scene enemy formation.");
+                return;
+            }
+
+            int index = LevelSession.SelectedLevelIndex >= 0 ? LevelSession.SelectedLevelIndex : _fallbackLevelIndex;
+            index = Mathf.Clamp(index, 0, _levelCatalog.Count - 1);
+
+            CurrentLevelIndex = index;
+            CurrentLevel = _levelCatalog.Levels[index];
+
+            GameLogger.Log(LogSourceType.BattleSystem, $"BattleBootstrapper: playing level {index} '{(CurrentLevel != null ? CurrentLevel.DisplayName : "null")}'.");
+        }
+
+        /// <summary>
+        /// Finds the environment scene's BattleEnvironment and the level's battle
+        /// site, activates the site's sections and places the hero at the site's
+        /// battle position (the intro then moves him to its start point).
+        /// The environment scene must already be loaded: BattleLoader loads it
+        /// before BattleScene; in the Editor open it together with BattleScene.
+        /// </summary>
+        private void ResolveBattleSite()
+        {
+            if (CurrentLevel == null || string.IsNullOrEmpty(CurrentLevel.EnvironmentSceneName))
+                return;
+
+            _battleEnvironment = FindFirstObjectByType<BattleEnvironment>();
+
+            if (_battleEnvironment == null)
+            {
+                GameLogger.Error(LogSourceType.BattleSystem, $"BattleBootstrapper: environment '{CurrentLevel.EnvironmentSceneName}' is not loaded. Start from the main menu, or open it together with BattleScene in the Editor.");
+                return;
+            }
+
+            if (!_battleEnvironment.TryGetSite(CurrentLevel.BattleSiteId, out _battleSite))
+            {
+                GameLogger.Error(LogSourceType.BattleSystem, $"BattleBootstrapper: battle site '{CurrentLevel.BattleSiteId}' not found in '{CurrentLevel.EnvironmentSceneName}'.");
+                return;
+            }
+
+            _battleEnvironment.ActivateSite(_battleSite);
+
+            Transform battlePosition = _battleSite.HeroBattlePosition;
+
+            if (battlePosition != null && _heroComponent != null)
+                _heroComponent.transform.SetPositionAndRotation(battlePosition.position, battlePosition.rotation);
+
+            if (_battleIntroController != null)
+                _battleIntroController.SetHeroPoints(_battleSite.HeroIntroStartPoint, battlePosition);
+
+            GameLogger.Log(LogSourceType.BattleSystem, $"BattleBootstrapper: battle site '{_battleSite.SiteId}'.");
+        }
+
+        /// <summary>
+        /// Spawns the current level's enemies at the battle site's anchors, applies
+        /// each EnemyData's stats and replaces the Enemy Formation list with the
+        /// spawned instances. Placements with a missing enemy, prefab or anchor
+        /// are skipped with an error.
+        /// </summary>
+        private void SpawnLevelEnemies()
+        {
+            if (CurrentLevel == null)
+                return;
+
+            if (_battleSite == null)
+            {
+                GameLogger.Error(LogSourceType.BattleSystem, "BattleBootstrapper.SpawnLevelEnemies: no battle site, level enemies are not spawned.");
+                return;
+            }
+
+            List<EnemyFormationConfig> spawned = new List<EnemyFormationConfig>(CurrentLevel.Enemies.Count);
+
+            foreach (LevelEnemySlot slot in CurrentLevel.Enemies)
+            {
+                if (slot.Enemy == null || slot.Enemy.Prefab == null)
+                {
+                    GameLogger.Error(LogSourceType.BattleSystem, $"Level '{CurrentLevel.DisplayName}': enemy or prefab missing at row {slot.RowIndex} slot {slot.SlotIndex}.");
+                    continue;
+                }
+
+                if (!_battleSite.TryGetEnemyAnchor(slot.RowIndex, slot.SlotIndex, out Transform anchor))
+                {
+                    GameLogger.Error(LogSourceType.BattleSystem, $"Level '{CurrentLevel.DisplayName}': no anchor for row {slot.RowIndex} slot {slot.SlotIndex}.");
+                    continue;
+                }
+
+                EnemyComponent enemy = Instantiate(slot.Enemy.Prefab, anchor.position, anchor.rotation);
+                enemy.name = $"{slot.Enemy.DisplayName} [{slot.RowIndex},{slot.SlotIndex}]";
+                enemy.SetStatsData(slot.Enemy.Stats);
+
+                spawned.Add(new EnemyFormationConfig { Enemy = enemy, RowIndex = slot.RowIndex, ColumnIndex = slot.SlotIndex });
+            }
+
+            _enemyFormation = spawned.ToArray();
         }
 
         // PRIVATE METHODS — Initialization
@@ -368,6 +499,12 @@ namespace MightyHeroes.Core.Battle
                 GameLogger.Log(LogSourceType.BattleSystem,
                     "BattleBootstrapper.InitializeHeroTargetFocus skipped: HeroTargetFocusController reference is missing.");
                 return;
+            }
+
+            if (_battleIntroController != null && _battleIntroConfig != null)
+            {
+                _heroTargetFocusController.NotifyIntroStarted();
+                _battleIntroController.TauntStarted += _heroTargetFocusController.NotifyIntroWalkEnded;
             }
 
             _heroTargetFocusController.Initialize(_battleFormation, _eventHub);
@@ -628,6 +765,9 @@ namespace MightyHeroes.Core.Battle
         {
             if (_heroComponent != null)
                 _heroComponent.EnterBattleStance();
+
+            if (_heroTargetFocusController != null)
+                _heroTargetFocusController.NotifyIntroEnded();
         }
 
         /// <summary>
