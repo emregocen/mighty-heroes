@@ -583,7 +583,9 @@ namespace MightyHeroes.Core.Battle
 
         /// <summary>
         /// Initializes the puzzle controller with the shared battle EventHub
-        /// so puzzle results can publish gameplay events into the combat flow.
+        /// so puzzle results can publish gameplay events into the combat flow,
+        /// and applies the level's board size and tile types. Runs in Awake,
+        /// before PuzzleController.Start builds the grid.
         /// </summary>
         private void InitializePuzzleSystem()
         {
@@ -595,6 +597,9 @@ namespace MightyHeroes.Core.Battle
             }
 
             _puzzleController.Initialize(_eventHub);
+
+            if (CurrentLevel != null && _puzzleController.Grid != null)
+                _puzzleController.Grid.ConfigureBoard(CurrentLevel.BoardRows, CurrentLevel.BoardColumns, CurrentLevel.TileTypes);
         }
 
         /// <summary>

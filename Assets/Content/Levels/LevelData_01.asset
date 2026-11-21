@@ -16,8 +16,8 @@ MonoBehaviour:
   _environmentSceneName: Env_Dungeon
   _battleSiteId: Site_01
   _boardRows: 4
-  _boardColumns: 5
-  _tileTypes: 01000000050000000400000003000000i
+  _boardColumns: 7
+  _tileTypes: 010000000500000004000000i
   _enemies:
   - _enemy: {fileID: 11400000, guid: 4948a895a21a4f7f890b2dd06bfea087, type: 2}
     _rowIndex: 0
