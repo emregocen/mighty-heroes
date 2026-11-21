@@ -106,6 +106,22 @@ namespace MightyHeroes.Gameplay.Enemy
         // PUBLIC METHODS — Initialization
 
         /// <summary>
+        /// Replaces the stats this enemy fights with (for example a boss variant
+        /// defined in EnemyData) and rebuilds the runtime stats, which Awake
+        /// already created from the prefab's stats (action points, attack, ...).
+        /// Must be called before Initialize. Null keeps the prefab's stats.
+        /// </summary>
+        /// <param name="statsData">Stats to use.</param>
+        public void SetStatsData(EnemyStatsData statsData)
+        {
+            if (statsData == null)
+                return;
+
+            _enemyStatsData = statsData;
+            InitializeRuntimeStats();
+        }
+
+        /// <summary>
         /// Battle-scope entry point. Called by BattleBootstrapper.
         ///
         /// Order matters:

@@ -26,6 +26,11 @@ namespace MightyHeroes.Gameplay.Puzzle.Grid
         [Tooltip("Grayscale tile body sprites. One is picked at random for every spawned tile. Empty keeps the prefab sprite.")]
         [SerializeField] private List<Sprite> _bodyVariants = new();
 
+        [Tooltip("When a level sets fewer columns than the scene grid, tiles grow to keep the board width, up to this multiple of the scene cell size.")]
+        [SerializeField, Min(1f)] private float _maxCellScale = 1.25f;
+
+        private readonly List<GameGridElementType> _activeElementTypes = new();
+
         private ActionType _highlightedTileType = ActionType.None;
 
         private GameGridInput gridInput;
@@ -40,7 +45,7 @@ namespace MightyHeroes.Gameplay.Puzzle.Grid
         /// <summary>
         ///     Gets the list of available colors
         /// </summary>
-        public List<GameGridElementType> ElementTypes => elementTypes;
+        public List<GameGridElementType> ElementTypes => _activeElementTypes.Count > 0 ? _activeElementTypes : elementTypes;
 
         /// <summary>
         ///     Returns the center (worldposition) of the most left cell on the bottom
@@ -118,6 +123,52 @@ namespace MightyHeroes.Gameplay.Puzzle.Grid
         }
 
         /// <summary>
+        /// Applies a level's board settings. Must be called before SetUpGrid.
+        ///
+        /// Rows and columns replace the scene values. The scene grid's width is
+        /// the reference: cell size and spacing are scaled so the new column
+        /// count fills the same width, capped at MaxCellScale so a narrow board
+        /// does not get oversized tiles. Tile types limit which element types
+        /// spawn; colors and icons still come from the element type list.
+        /// Types without an element type entry are ignored; if none match,
+        /// all element types stay active.
+        /// </summary>
+        /// <param name="rows">Board row count.</param>
+        /// <param name="columns">Board column count.</param>
+        /// <param name="tileTypes">Tile types that can spawn, or null for all.</param>
+        public void ConfigureBoard(int rows, int columns, IReadOnlyList<ActionType> tileTypes)
+        {
+            float step = cellSize + cellSpacing;
+            float referenceWidth = (columnCount - 1) * step + cellSize;
+
+            rowCount = Mathf.Max(1, rows);
+            columnCount = Mathf.Max(1, columns);
+
+            float newWidth = (columnCount - 1) * step + cellSize;
+            float scale = Mathf.Min(referenceWidth / newWidth, _maxCellScale);
+
+            cellSize *= scale;
+            cellSpacing *= scale;
+
+            _activeElementTypes.Clear();
+
+            if (tileTypes == null)
+                return;
+
+            foreach (GameGridElementType elementType in elementTypes)
+            {
+                foreach (ActionType tileType in tileTypes)
+                {
+                    if (elementType.TileType == tileType)
+                    {
+                        _activeElementTypes.Add(elementType);
+                        break;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         ///     Creates all elements of the grid and sets them up
         /// </summary>
         public void SetUpGrid()
@@ -161,7 +212,7 @@ namespace MightyHeroes.Gameplay.Puzzle.Grid
         /// <param name="element">Element to set up.</param>
         public void ApplyRandomAppearance(GameGridElement element)
         {
-            element.ApplyType(elementTypes.GetRandom());
+            element.ApplyType(ElementTypes.GetRandom());
             element.SetHighlighted(_highlightedTileType != ActionType.None && element.TileType == _highlightedTileType);
 
             if (_bodyVariants.Count > 0)

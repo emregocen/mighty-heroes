@@ -29,7 +29,9 @@ namespace MightyHeroes.UI.Battle.Views
 
         private void Awake()
         {
-            if (_pipPrefab != null)
+            // Hide the pip only when it is a template object in the scene. A
+            // prefab asset must not be deactivated: that would modify the asset.
+            if (_pipPrefab != null && _pipPrefab.gameObject.scene.IsValid())
             {
                 _pipPrefab.gameObject.SetActive(false);
             }

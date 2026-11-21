@@ -12,10 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5e3ec82ad34e49fa83b33fd1c41eebd, type: 3}
   m_Name: BattleIntroConfig_Default
   m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Battle.Intro.BattleIntroConfig
-  _cameraSettleDuration: 1
+  _cameraSettleDuration: 0.25
   _heroWalkSpeed: 1.457
   _tauntPostHoldDuration: 0.5
   _fastOrbitDuration: 1.2
   _sweepBackDuration: 2
+  _skipInputDelay: 0.5
+  _skipCameraBlendDuration: 0.4
   _puzzleRevealLeadTime: 0.4
   _puzzleRevealDuration: 1

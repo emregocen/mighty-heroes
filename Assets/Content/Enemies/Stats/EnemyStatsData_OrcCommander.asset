@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c8a34ad759a95470f87f5e124892acf2, type: 3}
-  m_Name: Orc_Warrior_Commander
+  m_Name: EnemyStatsData_OrcCommander
   m_EditorClassIdentifier: Assembly-CSharp::MightyHeroes.Gameplay.Enemy.Stats.EnemyStatsData
   _entityKey: enemy.orc.commander
-  _maxHealth: 70
+  _maxHealth: 90
   _maxShield: 50
   _startingShield: 30
   _baseAttack: 10

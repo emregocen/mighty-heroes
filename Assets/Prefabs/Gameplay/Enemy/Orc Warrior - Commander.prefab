@@ -1,0 +1,87 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &2516055629120437024
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 763958437473869267, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
+      propertyPath: _enemyStatsData
+      value: 
+      objectReference: {fileID: 11400000, guid: 5530d6831b209449a89f42f59b14a6ce, type: 2}
+    - target: {fileID: 1397766157396942266, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1401307258170607268, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1402744550908154340, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2065391164795600621, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2065391164795600621, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2065391164795600621, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2065391164795600621, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2065391164795600621, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2065391164795600621, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2065391164795600621, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2065391164795600621, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2065391164795600621, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 2065391164795600621, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2964138532775437724, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.000000053939814
+      objectReference: {fileID: 0}
+    - target: {fileID: 2964138532775437724, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.00000031592361
+      objectReference: {fileID: 0}
+    - target: {fileID: 2964138532775437724, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.0000004422216
+      objectReference: {fileID: 0}
+    - target: {fileID: 3304950686886907432, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}
+      propertyPath: m_Name
+      value: Orc Warrior - Commander
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: e8aedb8d9c4084fbc8b8681ba63f8315, type: 3}

@@ -1,5 +1,5 @@
-using MightyHeroes.Core.Scene;
 using MightyHeroes.Core.Logging;
+using MightyHeroes.Gameplay.Levels;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,7 +7,8 @@ namespace MightyHeroes.UI.MainMenu
 {
     /// <summary>
     /// Entry point for the main menu scene.
-    /// Wires the play button to the scene transition controller.
+    /// The play button starts the highest unlocked level through BattleLoader,
+    /// which loads the level's environment scene and BattleScene.
     /// </summary>
     public sealed class MainMenuController : MonoBehaviour
     {
@@ -15,6 +16,10 @@ namespace MightyHeroes.UI.MainMenu
 
         [Header("UI")]
         [SerializeField] private Button _playButton;
+
+        [Header("Levels")]
+        [Tooltip("Levels in play order. Play starts the highest unlocked one.")]
+        [SerializeField] private LevelCatalogData _levelCatalog;
 
         // UNITY CALLBACKS
 
@@ -40,15 +45,10 @@ namespace MightyHeroes.UI.MainMenu
 
         private void OnPlayButtonClicked()
         {
-            if (SceneTransitionController.Instance == null)
-            {
-                GameLogger.Log(LogSourceType.UI,
-                    "MainMenuController: SceneTransitionController not found, loading directly.");
-                UnityEngine.SceneManagement.SceneManager.LoadScene(SceneNames.Battle);
-                return;
-            }
-            GameLogger.Log(LogSourceType.UI, "MainMenuController: Play button clicked, transitioning to battle scene.");
-            SceneTransitionController.Instance.LoadScene(SceneNames.Battle);
+            int levelIndex = LevelProgressStore.HighestUnlockedLevel;
+
+            GameLogger.Log(LogSourceType.UI, $"MainMenuController: Play clicked, starting level {levelIndex}.");
+            BattleLoader.LoadLevel(_levelCatalog, levelIndex);
         }
     }
 }

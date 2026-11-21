@@ -1,51 +1,31 @@
+using MightyHeroes.Core.Logging;
 using TMPro;
 using UnityEngine;
 
-/// <summary>
-/// MonoBehaviour bridge that applies a TextStyleConfig on Awake.
-/// </summary>
-public sealed class TextStyleView : MonoBehaviour
+namespace MightyHeroes.UI.Battle.Views
 {
-    // 1) FIELDS
+    /// <summary>
+    /// Applies a TextStyleConfig on Awake to the TMP text component on the same
+    /// GameObject. The text component is found automatically.
+    /// </summary>
+    [RequireComponent(typeof(TMP_Text))]
+    public sealed class TextStyleView : MonoBehaviour
+    {
+        // FIELDS
 
-    [SerializeField] private TMP_Text _text;
-    [SerializeField] private TextStyleConfig _style;
+        [SerializeField] private TextStyleConfig _style;
 
-    // 2) UNITY
-
-        /// <summary>
-
-        /// Applies style when the object becomes active.
-
-        /// </summary>
+        // UNITY CALLBACKS
 
         private void Awake()
-
         {
-
-            if (_text == null)
-
-            {
-
-                Debug.LogError("TextStyleView: TMP_Text reference is null.", this);
-
-                return;
-
-            }
-
             if (_style == null)
-
             {
-
-                Debug.LogError("TextStyleView: TextStyleConfig reference is null.", this);
-
+                GameLogger.Error(LogSourceType.UI, $"TextStyleView on '{name}': TextStyleConfig reference is missing.");
                 return;
-
             }
 
-            Debug.Log($"TextStyleView: Applying style to {_text.name}.", this);
-
-            TextStyleApplier.Apply(_text, _style);
-
+            TextStyleApplier.Apply(GetComponent<TMP_Text>(), _style);
         }
+    }
 }
