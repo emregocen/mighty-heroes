@@ -1,86 +1,124 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace MightyHeroes.UI.MainMenu
 {
+    /// <summary>
+    /// Pulses a UI glow image: scale and alpha follow a shared sine wave on
+    /// unscaled time, with optional constant rotation. Used for the soft halo
+    /// behind main menu buttons. Disables raycasts on the glow image so it
+    /// never blocks the button underneath.
+    /// </summary>
     [DisallowMultipleComponent]
     public class UIGlowPulse : MonoBehaviour
     {
+        // FIELDS
+
         [Header("References")]
-        [SerializeField] private RectTransform glowRect;
-        [SerializeField] private Image glowImage;
+        [Tooltip("Glow rect to scale and rotate. Defaults to this object's RectTransform.")]
+        [FormerlySerializedAs("glowRect")]
+        [SerializeField] private RectTransform _glowRect;
+
+        [Tooltip("Glow image to fade. Defaults to this object's Image.")]
+        [FormerlySerializedAs("glowImage")]
+        [SerializeField] private Image _glowImage;
 
         [Header("Scale Pulse")]
-        [SerializeField] private float minScale = 0.95f;
-        [SerializeField] private float maxScale = 1.15f;
-        [SerializeField] private float pulseSpeed = 2f;
+        [FormerlySerializedAs("minScale")]
+        [SerializeField] private float _minScale = 0.95f;
+
+        [FormerlySerializedAs("maxScale")]
+        [SerializeField] private float _maxScale = 1.15f;
+
+        [Tooltip("Pulse speed in radians per second.")]
+        [FormerlySerializedAs("pulseSpeed")]
+        [SerializeField] private float _pulseSpeed = 2f;
 
         [Header("Alpha Pulse")]
         [Range(0f, 1f)]
-        [SerializeField] private float minAlpha = 0.25f;
+        [FormerlySerializedAs("minAlpha")]
+        [SerializeField] private float _minAlpha = 0.25f;
 
         [Range(0f, 1f)]
-        [SerializeField] private float maxAlpha = 0.75f;
+        [FormerlySerializedAs("maxAlpha")]
+        [SerializeField] private float _maxAlpha = 0.75f;
 
         [Header("Optional Rotation")]
-        [SerializeField] private bool rotate;
-        [SerializeField] private float rotationSpeed = 25f;
+        [FormerlySerializedAs("rotate")]
+        [SerializeField] private bool _rotate;
+
+        [Tooltip("Rotation speed in degrees per second.")]
+        [FormerlySerializedAs("rotationSpeed")]
+        [SerializeField] private float _rotationSpeed = 25f;
 
         private Vector3 _initialScale;
         private Color _initialColor;
 
+        // UNITY CALLBACKS
+
         private void Awake()
         {
-            if (glowRect == null)
-                glowRect = GetComponent<RectTransform>();
+            if (_glowRect == null)
+                _glowRect = GetComponent<RectTransform>();
 
-            if (glowImage == null)
-                glowImage = GetComponent<Image>();
+            if (_glowImage == null)
+                _glowImage = GetComponent<Image>();
 
-            if (glowRect != null)
-                _initialScale = glowRect.localScale;
+            if (_glowRect != null)
+                _initialScale = _glowRect.localScale;
 
-            if (glowImage != null)
+            if (_glowImage != null)
             {
-                _initialColor = glowImage.color;
-                glowImage.raycastTarget = false;
+                _initialColor = _glowImage.color;
+                _glowImage.raycastTarget = false;
             }
         }
 
         private void Update()
         {
-            if (glowRect == null || glowImage == null)
+            if (_glowRect == null || _glowImage == null)
                 return;
 
-            float t = (Mathf.Sin(Time.unscaledTime * pulseSpeed) + 1f) * 0.5f;
-
-            float scale = Mathf.Lerp(minScale, maxScale, t);
-            glowRect.localScale = _initialScale * scale;
-
-            float alpha = Mathf.Lerp(minAlpha, maxAlpha, t);
-            Color color = _initialColor;
-            color.a = alpha;
-            glowImage.color = color;
-
-            if (rotate)
-            {
-                glowRect.Rotate(0f, 0f, rotationSpeed * Time.unscaledDeltaTime);
-            }
+            UpdatePulse();
         }
 
+        // PUBLIC METHODS
+
+        /// <summary>Shows or hides the glow image without stopping the pulse.</summary>
+        /// <param name="isVisible">True to show the glow.</param>
         public void SetGlowVisible(bool isVisible)
         {
-            if (glowImage != null)
-                glowImage.enabled = isVisible;
+            if (_glowImage != null)
+                _glowImage.enabled = isVisible;
         }
 
+        /// <summary>Changes the glow base color. Alpha is still driven by the pulse.</summary>
+        /// <param name="color">New base color.</param>
         public void SetGlowColor(Color color)
         {
-            if (glowImage == null)
+            if (_glowImage == null)
                 return;
 
             _initialColor = color;
-            glowImage.color = color;
+            _glowImage.color = color;
+        }
+
+        // PRIVATE METHODS
+
+        /// <summary>Applies the current pulse value to scale, alpha and rotation.</summary>
+        private void UpdatePulse()
+        {
+            float pulse = (Mathf.Sin(Time.unscaledTime * _pulseSpeed) + 1f) * 0.5f;
+
+            _glowRect.localScale = _initialScale * Mathf.Lerp(_minScale, _maxScale, pulse);
+
+            Color color = _initialColor;
+            color.a = Mathf.Lerp(_minAlpha, _maxAlpha, pulse);
+            _glowImage.color = color;
+
+            if (_rotate)
+                _glowRect.Rotate(0f, 0f, _rotationSpeed * Time.unscaledDeltaTime);
         }
     }
 }
