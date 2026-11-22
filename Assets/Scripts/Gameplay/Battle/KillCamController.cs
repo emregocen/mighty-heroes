@@ -1,8 +1,8 @@
 using System;
 using System.Collections;
-using MightyHeroes.Battle.TurnFlow.Payloads;
 using MightyHeroes.Core.EventSystem;
 using MightyHeroes.Core.Logging;
+using MightyHeroes.Gameplay.Battle.TurnFlow.Payloads;
 using MightyHeroes.Gameplay.Combat.Feedback;
 using MightyHeroes.Gameplay.Combat.Interfaces;
 using MightyHeroes.Gameplay.Combat.Payloads;
@@ -174,7 +174,7 @@ namespace MightyHeroes.Gameplay.Battle
         {
             _eventHub.CombatEvents.KillCamRequestedEvent.Register(OnKillCamRequested);
             _eventHub.HeroEvents.HeroAttackSequenceEndedEvent.Register(OnHeroAttackSequenceEnded);
-            _eventHub.TurnEvents.AllEnemiesDefeatedEvent.Register(OnAllEnemiesDefeated);
+            _eventHub.TurnEvents.TurnAllEnemiesDefeatedEvent.Register(OnAllEnemiesDefeated);
             _eventHub.HeroEvents.HeroVictoryTurnStartedEvent.Register(OnHeroVictoryTurnStarted);
         }
 
@@ -185,7 +185,7 @@ namespace MightyHeroes.Gameplay.Battle
 
             _eventHub.CombatEvents.KillCamRequestedEvent.Unregister(OnKillCamRequested);
             _eventHub.HeroEvents.HeroAttackSequenceEndedEvent.Unregister(OnHeroAttackSequenceEnded);
-            _eventHub.TurnEvents.AllEnemiesDefeatedEvent.Unregister(OnAllEnemiesDefeated);
+            _eventHub.TurnEvents.TurnAllEnemiesDefeatedEvent.Unregister(OnAllEnemiesDefeated);
             _eventHub.HeroEvents.HeroVictoryTurnStartedEvent.Unregister(OnHeroVictoryTurnStarted);
         }
 

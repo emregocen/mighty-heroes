@@ -1,4 +1,4 @@
-namespace MightyHeroes.Battle.TurnFlow.Payloads
+namespace MightyHeroes.Gameplay.Battle.TurnFlow.Payloads
 {
     /// <summary>
     /// Payload raised when all enemies are defeated and the hero wins the battle.

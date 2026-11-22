@@ -1,8 +1,8 @@
 using MightyHeroes.Core.Logging;
 using MightyHeroes.Core.StateMachine.Signals;
-using MightyHeroes.Gameplay.Hero.StateMachine.Signals;
-using MightyHeroes.Battle.TurnFlow.Payloads;
+using MightyHeroes.Gameplay.Battle.TurnFlow.Payloads;
 using MightyHeroes.Gameplay.Hero.Payloads;
+using MightyHeroes.Gameplay.Hero.StateMachine.Signals;
 
 namespace MightyHeroes.Gameplay.Hero.StateMachine.States
 {

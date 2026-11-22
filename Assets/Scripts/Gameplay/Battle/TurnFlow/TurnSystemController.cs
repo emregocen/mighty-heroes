@@ -1,7 +1,7 @@
 using MightyHeroes.Core.Logging;
 using UnityEngine;
 
-namespace MightyHeroes.Battle.TurnFlow
+namespace MightyHeroes.Gameplay.Battle.TurnFlow
 {
     /// <summary>
     /// Unity-facing controller that bridges the Unity lifecycle with the turn state machine.

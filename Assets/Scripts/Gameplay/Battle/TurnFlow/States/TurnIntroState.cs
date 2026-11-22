@@ -1,7 +1,7 @@
-using MightyHeroes.Battle.TurnFlow.Types;
 using MightyHeroes.Core.Logging;
+using MightyHeroes.Gameplay.Battle.TurnFlow.Types;
 
-namespace MightyHeroes.Battle.TurnFlow.States
+namespace MightyHeroes.Gameplay.Battle.TurnFlow.States
 {
     /// <summary>
     /// First state entered when the turn state machine starts.

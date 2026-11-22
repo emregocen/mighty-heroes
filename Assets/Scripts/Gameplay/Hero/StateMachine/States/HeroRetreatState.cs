@@ -1,6 +1,6 @@
-using MightyHeroes.Battle.TurnFlow.Payloads;
 using MightyHeroes.Core.Logging;
 using MightyHeroes.Core.StateMachine.Signals;
+using MightyHeroes.Gameplay.Battle.TurnFlow.Payloads;
 using MightyHeroes.Gameplay.Hero.StateMachine.Signals;
 
 namespace MightyHeroes.Gameplay.Hero.StateMachine.States
@@ -33,13 +33,13 @@ public override void Enter()
     StateMachine.Hero.SetPuzzlePlayable(false);
     StateMachine.Hero.SetCanChangeTarget(false);
 
-    StateMachine.EventHub.TurnEvents.AllEnemiesDefeatedEvent
+    StateMachine.EventHub.TurnEvents.TurnAllEnemiesDefeatedEvent
         .Register(OnAllEnemiesDefeated);
 }
 
 public override void Exit()
 {
-    StateMachine.EventHub.TurnEvents.AllEnemiesDefeatedEvent
+    StateMachine.EventHub.TurnEvents.TurnAllEnemiesDefeatedEvent
         .Unregister(OnAllEnemiesDefeated);
 }
 

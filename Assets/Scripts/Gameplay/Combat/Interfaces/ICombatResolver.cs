@@ -1,4 +1,3 @@
-using MightyHeroes.Gameplay.Combat.Interfaces;
 
 namespace MightyHeroes.Gameplay.Combat.Interfaces
 {

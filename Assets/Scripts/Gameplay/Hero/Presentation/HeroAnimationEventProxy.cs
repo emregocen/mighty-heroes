@@ -1,7 +1,7 @@
 using MightyHeroes.Core.Logging;
 using MightyHeroes.Gameplay.Combat.Types;
-using UnityEngine;
 using MightyHeroes.Gameplay.Hero.StateMachine;
+using UnityEngine;
 
 namespace MightyHeroes.Gameplay.Hero.Presentation
 {

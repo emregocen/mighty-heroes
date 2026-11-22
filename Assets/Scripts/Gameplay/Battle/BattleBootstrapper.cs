@@ -1,13 +1,12 @@
 using System.Collections.Generic;
-using MightyHeroes.Battle.BattleTimer;
-using MightyHeroes.Battle.TurnFlow;
 using MightyHeroes.Core.EventSystem;
 using MightyHeroes.Core.Logging;
-using MightyHeroes.Gameplay.Battle;
 using MightyHeroes.Gameplay.Battle.Environment;
 using MightyHeroes.Gameplay.Battle.Formation;
 using MightyHeroes.Gameplay.Battle.Intro;
 using MightyHeroes.Gameplay.Battle.Targeting;
+using MightyHeroes.Gameplay.Battle.Timer;
+using MightyHeroes.Gameplay.Battle.TurnFlow;
 using MightyHeroes.Gameplay.Combat;
 using MightyHeroes.Gameplay.Combat.Feedback;
 using MightyHeroes.Gameplay.Common.Actions;
@@ -17,10 +16,9 @@ using MightyHeroes.Gameplay.Enemy.StateMachine;
 using MightyHeroes.Gameplay.FloatingText;
 using MightyHeroes.Gameplay.Hero;
 using MightyHeroes.Gameplay.Hero.Actions;
-using MightyHeroes.Gameplay.Hero.Input;
 using MightyHeroes.Gameplay.Hero.Presentation;
 using MightyHeroes.Gameplay.Hero.StateMachine;
-using MightyHeroes.Gameplay.Levels;
+using MightyHeroes.Gameplay.Level;
 using MightyHeroes.Gameplay.Puzzle;
 using MightyHeroes.Gameplay.Ultimate;
 using MightyHeroes.UI.Battle;
@@ -28,7 +26,7 @@ using MightyHeroes.UI.Battle.Presenters;
 using MightyHeroes.UI.Battle.Views;
 using UnityEngine;
 
-namespace MightyHeroes.Core.Battle
+namespace MightyHeroes.Gameplay.Battle
 {
     /// <summary>
     /// Composition root for all battle-scoped systems.

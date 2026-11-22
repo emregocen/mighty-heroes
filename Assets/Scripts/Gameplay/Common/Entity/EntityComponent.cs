@@ -1,11 +1,11 @@
 using System.Collections;
+using MightyHeroes.Core.EventSystem;
+using MightyHeroes.Gameplay.Combat.Interfaces;
+using MightyHeroes.Gameplay.Combat.Modifiers;
 using MightyHeroes.Gameplay.Common.Runtime;
 using MightyHeroes.Gameplay.Common.Stats;
-using MightyHeroes.Gameplay.Combat.Interfaces;
-using UnityEngine;
 using MightyHeroes.Gameplay.Health;
-using MightyHeroes.Core.EventSystem;
-using MightyHeroes.Gameplay.Combat.Modifiers;
+using UnityEngine;
 
 namespace MightyHeroes.Gameplay.Common.Entity
 {

@@ -45,7 +45,6 @@ namespace MightyHeroes.Gameplay.Battle.Intro
         [SerializeField, Min(0f)] private float _skipCameraBlendDuration = 0.4f;
 
         [Header("Puzzle Reveal")]
-        [SerializeField, Min(0f)] private float _puzzleRevealLeadTime = 0.4f;
         [SerializeField, Min(0f)] private float _puzzleRevealDuration = 0.35f;
 
         // PROPERTIES
@@ -55,7 +54,6 @@ namespace MightyHeroes.Gameplay.Battle.Intro
         public float TauntPostHoldDuration => _tauntPostHoldDuration;
         public float FastOrbitDuration => _fastOrbitDuration;
         public float SweepBackDuration => _sweepBackDuration;
-        public float PuzzleRevealLeadTime => _puzzleRevealLeadTime;
         public float PuzzleRevealDuration => _puzzleRevealDuration;
 
         /// <summary>Seconds after the intro starts before a tap can skip it.</summary>

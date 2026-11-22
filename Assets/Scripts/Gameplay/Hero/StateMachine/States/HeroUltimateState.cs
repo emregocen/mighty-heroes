@@ -1,6 +1,6 @@
-using MightyHeroes.Battle.TurnFlow.Payloads;
 using MightyHeroes.Core.Logging;
 using MightyHeroes.Core.StateMachine.Signals;
+using MightyHeroes.Gameplay.Battle.TurnFlow.Payloads;
 using MightyHeroes.Gameplay.Hero.Payloads;
 using MightyHeroes.Gameplay.Hero.StateMachine.Signals;
 using MightyHeroes.Gameplay.Ultimate;
@@ -64,7 +64,7 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
             }
 
             _isVictoryPending = false;
-            StateMachine.EventHub.TurnEvents.AllEnemiesDefeatedEvent.Register(OnAllEnemiesDefeated);
+            StateMachine.EventHub.TurnEvents.TurnAllEnemiesDefeatedEvent.Register(OnAllEnemiesDefeated);
 
             gauge.Consume();
 
@@ -75,11 +75,11 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
         }
 
         /// <summary>
-        /// Unsubscribes from AllEnemiesDefeatedEvent.
+        /// Unsubscribes from TurnAllEnemiesDefeatedEvent.
         /// </summary>
         public override void Exit()
         {
-            StateMachine.EventHub.TurnEvents.AllEnemiesDefeatedEvent.Unregister(OnAllEnemiesDefeated);
+            StateMachine.EventHub.TurnEvents.TurnAllEnemiesDefeatedEvent.Unregister(OnAllEnemiesDefeated);
         }
 
         /// <summary>

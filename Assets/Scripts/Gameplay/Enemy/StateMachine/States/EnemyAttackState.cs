@@ -1,7 +1,7 @@
 using MightyHeroes.Core.Logging;
 using MightyHeroes.Core.StateMachine.Signals;
 using MightyHeroes.Gameplay.Combat.Payloads;
-using MightyHeroes.Gameplay.Combat.StateMachine.Base;
+using MightyHeroes.Gameplay.Combat.StateMachine;
 using MightyHeroes.Gameplay.Combat.Types;
 using MightyHeroes.Gameplay.Enemy.Payloads;
 using MightyHeroes.Gameplay.Enemy.StateMachine.Signals;
@@ -13,7 +13,7 @@ namespace MightyHeroes.Gameplay.Enemy.StateMachine.States
     ///
     /// Responsibilities:
     /// - Handles incoming signals from animation behaviours and FSM-forwarded events.
-    /// - Delegates combo step progression to ComboAttackState base class.
+    /// - Delegates combo step progression to CombatAttackState base class.
     /// - Raises EnemyAttackHit events for each hit frame so CombatSystem can resolve damage.
     /// - Decides whether to return to ReadyState (AP remaining) or finish the enemy turn.
     ///
@@ -24,7 +24,7 @@ namespace MightyHeroes.Gameplay.Enemy.StateMachine.States
     /// - EnemyCombatHitResolvedSignal      : forwarded by EnemyStateMachine from EventHub
     /// - EnemyAttackSequenceEndedSignal    : forwarded by EnemyStateMachine from behaviour
     /// </summary>
-    public sealed class EnemyAttackState : ComboAttackState<EnemyStateMachine>
+    public sealed class EnemyAttackState : CombatAttackState<EnemyStateMachine>
     {
         // ------------------------------------------------------------------
         // CONSTRUCTOR

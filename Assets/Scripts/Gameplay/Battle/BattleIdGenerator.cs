@@ -1,4 +1,4 @@
-namespace MightyHeroes.Core.Battle
+namespace MightyHeroes.Gameplay.Battle
 {
     /// <summary>
     /// Generates unique entity identifiers within a single battle scope.
@@ -25,13 +25,5 @@ namespace MightyHeroes.Core.Battle
             return id;
         }
 
-        /// <summary>
-        /// Resets the generator back to initial state.
-        /// Intended to be used only when a new battle starts.
-        /// </summary>
-        public void Reset()
-        {
-            _nextId = 1;
-        }
     }
 }

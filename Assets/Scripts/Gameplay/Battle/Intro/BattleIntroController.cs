@@ -1,11 +1,11 @@
-using MightyHeroes.Core.Logging;
-using MightyHeroes.Gameplay.Animation;
-using MightyHeroes.Gameplay.Animation.Interfaces;
-using Unity.Cinemachine;
-using UnityEngine;
-using DG.Tweening;
 using System;
 using System.Collections;
+using DG.Tweening;
+using MightyHeroes.Core.Logging;
+using MightyHeroes.Gameplay.Animations;
+using MightyHeroes.Gameplay.Animations.Interfaces;
+using Unity.Cinemachine;
+using UnityEngine;
 
 namespace MightyHeroes.Gameplay.Battle.Intro
 {

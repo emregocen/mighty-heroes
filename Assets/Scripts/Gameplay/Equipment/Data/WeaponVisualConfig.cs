@@ -43,13 +43,9 @@ namespace MightyHeroes.Gameplay.Equipment.Data
         [Tooltip("Particle played during a special or ultimate attack.")]
         [SerializeField] private GameObject _specialEffectPrefab;
 
-        [Tooltip("Particle spawned at the hit point on the target.")]
-        [SerializeField] private GameObject _hitImpactPrefab;
-
         [Header("Effect Lifetime")]
         [SerializeField] private float _slashEffectLifetime    = 0.8f;
         [SerializeField] private float _specialEffectLifetime  = 1.2f;
-        [SerializeField] private float _hitImpactLifetime      = 0.6f;
 
         // ─── PROPERTIES ───────────────────────────────────────────────
 
@@ -95,16 +91,10 @@ namespace MightyHeroes.Gameplay.Equipment.Data
         /// <summary>Gets the special effect prefab for special or ultimate attacks.</summary>
         public GameObject SpecialEffectPrefab => _specialEffectPrefab;
 
-        /// <summary>Gets the hit impact prefab spawned at the point of contact.</summary>
-        public GameObject HitImpactPrefab => _hitImpactPrefab;
-
         /// <summary>Gets the slash effect lifetime in seconds.</summary>
         public float SlashEffectLifetime => _slashEffectLifetime;
 
         /// <summary>Gets the special effect lifetime in seconds.</summary>
         public float SpecialEffectLifetime => _specialEffectLifetime;
-
-        /// <summary>Gets the hit impact lifetime in seconds.</summary>
-        public float HitImpactLifetime => _hitImpactLifetime;
     }
 }

@@ -1,18 +1,18 @@
 // Gameplay/Battle/TurnFlow/States/TurnHeroState.cs
 
-using MightyHeroes.Battle.TurnFlow.Payloads;
-using MightyHeroes.Battle.TurnFlow.Types;
 using MightyHeroes.Core.Logging;
+using MightyHeroes.Gameplay.Battle.TurnFlow.Payloads;
+using MightyHeroes.Gameplay.Battle.TurnFlow.Types;
 using MightyHeroes.Gameplay.Hero.Payloads;
 
-namespace MightyHeroes.Battle.TurnFlow.States
+namespace MightyHeroes.Gameplay.Battle.TurnFlow.States
 {
     /// <summary>
     /// Represents the hero action phase of the turn flow.
     /// During this state, puzzle input is enabled and puzzle results
     /// are interpreted as hero actions.
     ///
-    /// Listens for AllEnemiesDefeatedEvent in addition to HeroTurnEndedEvent
+    /// Listens for TurnAllEnemiesDefeatedEvent in addition to HeroTurnEndedEvent
     /// so the turn FSM can transition to victory when the last enemy dies
     /// during the hero's attack sequence, after the call stack has unwound.
     /// </summary>
@@ -53,13 +53,13 @@ namespace MightyHeroes.Battle.TurnFlow.States
         private void RegisterEvents()
         {
             StateMachine.EventHub.HeroEvents.HeroTurnEndedEvent.Register(OnHeroTurnEnded);
-            StateMachine.EventHub.TurnEvents.AllEnemiesDefeatedEvent.Register(OnAllEnemiesDefeated);
+            StateMachine.EventHub.TurnEvents.TurnAllEnemiesDefeatedEvent.Register(OnAllEnemiesDefeated);
         }
 
         private void UnregisterEvents()
         {
             StateMachine.EventHub.HeroEvents.HeroTurnEndedEvent.Unregister(OnHeroTurnEnded);
-            StateMachine.EventHub.TurnEvents.AllEnemiesDefeatedEvent.Unregister(OnAllEnemiesDefeated);
+            StateMachine.EventHub.TurnEvents.TurnAllEnemiesDefeatedEvent.Unregister(OnAllEnemiesDefeated);
         }
 
         // EVENT HANDLERS

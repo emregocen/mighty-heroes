@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace MightyHeroes.Battle.TurnFlow
+namespace MightyHeroes.Gameplay.Battle.TurnFlow
 {
     /// <summary>
     /// Holds all runtime data required by the turn state machine.
@@ -49,14 +49,6 @@ namespace MightyHeroes.Battle.TurnFlow
         /// Gets the number of currently alive enemies.
         /// </summary>
         public int AliveEnemyCount => _aliveEnemyCount;
-
-        /// <summary>
-        /// Set to true by BattleBootstrapper when AliveEnemyCount reaches zero.
-        /// Read by HeroAttackState.OnSequenceEnded to skip retreat and go directly
-        /// to victory when the last enemy dies during an attack sequence.
-        /// </summary>
-        /// 
-        public bool IsVictoryPending { get; private set; }
 
         // Public methods
 
@@ -114,16 +106,6 @@ namespace MightyHeroes.Battle.TurnFlow
         public void UnregisterEnemy()
         {
             _aliveEnemyCount = Mathf.Max(0, _aliveEnemyCount - 1);
-        }
-
-        /// <summary>
-        /// Marks victory as pending so the hero FSM can check it at sequence end.
-        /// Called by BattleBootstrapper when AliveEnemyCount reaches zero, before
-        /// TurnStateMachine.SwitchToVictoryState is called.
-        /// </summary>
-        public void SetVictoryPending()
-        {
-            IsVictoryPending = true;
         }
     }
 }

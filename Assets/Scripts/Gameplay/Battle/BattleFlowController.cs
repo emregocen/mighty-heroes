@@ -1,16 +1,16 @@
 using System;
-using MightyHeroes.Battle.BattleTimer;
-using MightyHeroes.Battle.BattleTimer.Payloads;
-using MightyHeroes.Battle.TurnFlow;
-using MightyHeroes.Battle.TurnFlow.Payloads;
 using MightyHeroes.Core.EventSystem;
 using MightyHeroes.Core.Logging;
 using MightyHeroes.Gameplay.Battle.Formation;
+using MightyHeroes.Gameplay.Battle.Timer;
+using MightyHeroes.Gameplay.Battle.Timer.Payloads;
+using MightyHeroes.Gameplay.Battle.TurnFlow;
+using MightyHeroes.Gameplay.Battle.TurnFlow.Payloads;
 using MightyHeroes.Gameplay.Health.Payloads;
 using MightyHeroes.Gameplay.Hero;
 using MightyHeroes.Gameplay.Hero.Payloads;
 
-namespace MightyHeroes.Core.Battle
+namespace MightyHeroes.Gameplay.Battle
 {
     /// <summary>
     /// Listens to battle-end signals and orchestrates the resulting state transitions.
@@ -144,7 +144,7 @@ namespace MightyHeroes.Core.Battle
 
             _allEnemiesDefeatedPending = false;
 
-            _eventHub.TurnEvents.AllEnemiesDefeatedEvent.Raise(
+            _eventHub.TurnEvents.TurnAllEnemiesDefeatedEvent.Raise(
                 new TurnAllEnemiesDefeatedPayload(_turnStateMachine.Context.TurnIndex));
         }
 

@@ -7,7 +7,7 @@ namespace MightyHeroes.Core.StateMachine
     ///
     /// Why this exists:
     /// - Prevents repeating boilerplate (Tick, IsTerminal, empty Handle)
-    /// - Enables shared abstract states (e.g., ComboAttackState)
+    /// - Enables shared abstract states (e.g., CombatAttackState)
     /// - Keeps IState as the primary contract
     /// </summary>
     public abstract class BaseState : IState

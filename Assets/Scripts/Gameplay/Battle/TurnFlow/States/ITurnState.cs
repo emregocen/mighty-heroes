@@ -1,6 +1,6 @@
-using MightyHeroes.Battle.TurnFlow.Types;
+using MightyHeroes.Gameplay.Battle.TurnFlow.Types;
 
-namespace MightyHeroes.Battle.TurnFlow.States
+namespace MightyHeroes.Gameplay.Battle.TurnFlow.States
 {
     /// <summary>
     /// Defines the contract for all turn states.
