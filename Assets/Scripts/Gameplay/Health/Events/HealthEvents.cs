@@ -58,11 +58,5 @@ namespace MightyHeroes.Gameplay.Health.Events
         public GameEvent<LifestealAppliedPayload> LifestealAppliedEvent =>
             Registry.GetEvent<LifestealAppliedPayload>();
 
-        /// <summary>
-        /// Raised when a heal visual effect should be played on a target entity.
-        /// Consumed by HealEffectView. Independent of health value changes.
-        /// </summary>
-        public GameEvent<HealEffectRequestedPayload> HealEffectRequestedEvent =>
-            Registry.GetEvent<HealEffectRequestedPayload>();
     }
 }

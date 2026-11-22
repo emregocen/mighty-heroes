@@ -62,5 +62,12 @@ namespace MightyHeroes.Gameplay.Combat.Events
         public GameEvent<KillCamRequestedPayload> KillCamRequestedEvent =>
             Registry.GetEvent<KillCamRequestedPayload>();
 
+        /// <summary>
+        /// Raised when a support action's visual effect (heal, shield, buff)
+        /// should play on an entity. Consumed by SupportEffectView. Independent
+        /// of whether the action changed any value.
+        /// </summary>
+        public GameEvent<SupportEffectRequestedPayload> SupportEffectRequestedEvent =>
+            Registry.GetEvent<SupportEffectRequestedPayload>();
     }
 }

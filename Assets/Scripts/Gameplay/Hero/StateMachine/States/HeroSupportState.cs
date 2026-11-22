@@ -1,7 +1,7 @@
 using MightyHeroes.Core.Logging;
 using MightyHeroes.Core.StateMachine.Signals;
 using MightyHeroes.Gameplay.Common.Actions;
-using MightyHeroes.Gameplay.Health.Payloads;
+using MightyHeroes.Gameplay.Combat.Payloads;
 using MightyHeroes.Gameplay.Hero.StateMachine.Signals;
 
 namespace MightyHeroes.Gameplay.Hero.StateMachine.States
@@ -112,7 +112,7 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
             switch (_supportType)
             {
                 case ActionType.Heal:
-                    ApplyHeal();
+                    StateMachine.Hero.ApplyHeal(_effectValue);
                     break;
 
                 case ActionType.Shield:
@@ -126,21 +126,21 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
                 default:
                     GameLogger.Log(LogSourceType.Hero,
                         $"HeroSupportState: SupportType={_supportType} has no effect implementation yet.");
-                    break;
+                    return;
             }
+
+            RequestSupportEffect();
         }
 
         /// <summary>
-        /// Heals the hero and requests the heal particle effect on the hero.
+        /// Requests the support action's particle effect on the hero.
         /// </summary>
-        private void ApplyHeal()
+        private void RequestSupportEffect()
         {
             int heroId = StateMachine.Hero.EntityId;
 
-            StateMachine.Hero.ApplyHeal(_effectValue);
-
-            StateMachine.EventHub.HealthEvents.HealEffectRequestedEvent.Raise(
-                new HealEffectRequestedPayload(targetEntityId: heroId, sourceEntityId: heroId));
+            StateMachine.EventHub.CombatEvents.SupportEffectRequestedEvent.Raise(
+                new SupportEffectRequestedPayload(targetEntityId: heroId, sourceEntityId: heroId, actionType: _supportType));
         }
 
         /// <summary>
