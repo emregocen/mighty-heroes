@@ -1,4 +1,4 @@
-using MightyHeroes.Gameplay.Levels;
+using MightyHeroes.Gameplay.Level;
 using UnityEditor;
 using UnityEngine;
 

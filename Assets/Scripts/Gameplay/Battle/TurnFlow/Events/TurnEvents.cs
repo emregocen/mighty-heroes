@@ -1,7 +1,7 @@
 using MightyHeroes.Core.EventSystem;
-using MightyHeroes.Battle.TurnFlow.Payloads;
+using MightyHeroes.Gameplay.Battle.TurnFlow.Payloads;
 
-namespace MightyHeroes.Battle.TurnFlow.Events
+namespace MightyHeroes.Gameplay.Battle.TurnFlow.Events
 {
     /// <summary>
     /// Provides access to all turn-related game events.
@@ -75,7 +75,7 @@ namespace MightyHeroes.Battle.TurnFlow.Events
         /// Consumed by HeroStateMachine to set the victory pending flag so the active
         /// hero state can route to victory instead of retreat at sequence end.
         /// </summary>
-        public GameEvent<TurnAllEnemiesDefeatedPayload> AllEnemiesDefeatedEvent =>
+        public GameEvent<TurnAllEnemiesDefeatedPayload> TurnAllEnemiesDefeatedEvent =>
             Registry.GetEvent<TurnAllEnemiesDefeatedPayload>();
     }
 }

@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using MightyHeroes.Core.Logging;
-using MightyHeroes.Battle.TurnFlow.Payloads;
-using MightyHeroes.Battle.TurnFlow.Types;
 using MightyHeroes.Gameplay.Battle.Formation;
+using MightyHeroes.Gameplay.Battle.TurnFlow.Payloads;
+using MightyHeroes.Gameplay.Battle.TurnFlow.Types;
 using MightyHeroes.Gameplay.Enemy;
 using MightyHeroes.Gameplay.Enemy.Payloads;
 
-namespace MightyHeroes.Battle.TurnFlow.States
+namespace MightyHeroes.Gameplay.Battle.TurnFlow.States
 {
     /// <summary>
     /// Controls the enemy action phase of the turn.

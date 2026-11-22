@@ -1,6 +1,6 @@
 // Gameplay/Battle/TurnFlow/Payloads/AllEnemiesDefeatedPayload.cs
 
-namespace MightyHeroes.Battle.TurnFlow.Payloads
+namespace MightyHeroes.Gameplay.Battle.TurnFlow.Payloads
 {
     /// <summary>
     /// Raised by BattleBootstrapper when AliveEnemyCount reaches zero.

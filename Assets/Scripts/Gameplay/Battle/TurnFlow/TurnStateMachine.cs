@@ -1,12 +1,12 @@
 using MightyHeroes.Core.EventSystem;
-using MightyHeroes.Core.StateMachine;
-using MightyHeroes.Battle.TurnFlow.Payloads;
-using MightyHeroes.Battle.TurnFlow.States;
-using MightyHeroes.Battle.TurnFlow.Types;
-using MightyHeroes.Gameplay.Battle.Formation;
 using MightyHeroes.Core.Logging;
+using MightyHeroes.Core.StateMachine;
+using MightyHeroes.Gameplay.Battle.Formation;
+using MightyHeroes.Gameplay.Battle.TurnFlow.Payloads;
+using MightyHeroes.Gameplay.Battle.TurnFlow.States;
+using MightyHeroes.Gameplay.Battle.TurnFlow.Types;
 
-namespace MightyHeroes.Battle.TurnFlow
+namespace MightyHeroes.Gameplay.Battle.TurnFlow
 {
     /// <summary>
     /// State machine responsible for controlling the turn flow.
@@ -30,13 +30,6 @@ namespace MightyHeroes.Battle.TurnFlow
 
         /// <summary>Shared event hub used for publishing turn-related events.</summary>
         public EventHub EventHub { get; }
-
-        /// <summary>
-        /// Gets the type of the currently active turn state.
-        /// Returns None if no turn state is active.
-        /// </summary>
-        public TurnStateType CurrentStateType =>
-            (CurrentState as ITurnState)?.StateType ?? TurnStateType.None;
 
         /// <summary>
         /// Formation line structure used by TurnEnemyState

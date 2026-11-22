@@ -1,7 +1,7 @@
-using MightyHeroes.Battle.TurnFlow.Payloads;
 using MightyHeroes.Core.EventSystem;
 using MightyHeroes.Core.Logging;
 using MightyHeroes.Core.StateMachine;
+using MightyHeroes.Gameplay.Battle.TurnFlow.Payloads;
 using MightyHeroes.Gameplay.Combat.Payloads;
 using MightyHeroes.Gameplay.Combat.Types;
 using MightyHeroes.Gameplay.Enemy.Payloads;

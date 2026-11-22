@@ -1,7 +1,7 @@
 using MightyHeroes.Core.Logging;
-using MightyHeroes.Battle.TurnFlow.Types;
+using MightyHeroes.Gameplay.Battle.TurnFlow.Types;
 
-namespace MightyHeroes.Battle.TurnFlow.States
+namespace MightyHeroes.Gameplay.Battle.TurnFlow.States
 {
     /// <summary>
     /// Finalizes the turn and advances the flow to the next turn start.

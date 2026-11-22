@@ -1,6 +1,6 @@
 using MightyHeroes.Core.EventSystem;
 using MightyHeroes.Core.Logging;
-using MightyHeroes.Gameplay.Animation.Interfaces;
+using MightyHeroes.Gameplay.Animations.Interfaces;
 using MightyHeroes.Gameplay.Combat.Interfaces;
 using MightyHeroes.Gameplay.Combat.Payloads;
 using MightyHeroes.Gameplay.Combat.Types;
@@ -559,15 +559,6 @@ namespace MightyHeroes.Gameplay.Hero
             GameLogger.Log(LogSourceType.Hero, "HeroComponent: NotifyVictoryTurnEnded called.");
 
             _stateMachine.NotifyVictoryTurnEnded();
-        }
-
-        /// <summary>
-        /// Called by HeroAttackMovementController once the hero reaches their cached
-        /// origin position. Forwards to FSM as HeroRetreatEndedSignal.
-        /// </summary>
-        private void NotifyRetreatCompleted()
-        {
-            _stateMachine.NotifyRetreatEnded();
         }
 
         /// <summary>

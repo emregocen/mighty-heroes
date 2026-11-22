@@ -1,5 +1,5 @@
-using MightyHeroes.Battle.BattleTimer.Events;
-using MightyHeroes.Battle.TurnFlow.Events;
+using MightyHeroes.Gameplay.Battle.Timer.Events;
+using MightyHeroes.Gameplay.Battle.TurnFlow.Events;
 using MightyHeroes.Gameplay.Combat.Events;
 using MightyHeroes.Gameplay.Enemy.Events;
 using MightyHeroes.Gameplay.Health.Events;

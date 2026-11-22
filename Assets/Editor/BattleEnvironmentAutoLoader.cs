@@ -1,5 +1,5 @@
 using MightyHeroes.Core.Scene;
-using MightyHeroes.Gameplay.Levels;
+using MightyHeroes.Gameplay.Level;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;

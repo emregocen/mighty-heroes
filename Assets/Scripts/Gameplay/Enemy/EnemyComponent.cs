@@ -1,16 +1,16 @@
-using UnityEngine;
 using MightyHeroes.Core.EventSystem;
 using MightyHeroes.Core.Logging;
-using MightyHeroes.Gameplay.Common.Entity;
-using MightyHeroes.Gameplay.Common.Stats;
+using MightyHeroes.Gameplay.Animations.Interfaces;
 using MightyHeroes.Gameplay.Combat.Interfaces;
 using MightyHeroes.Gameplay.Combat.Payloads;
 using MightyHeroes.Gameplay.Combat.Types;
+using MightyHeroes.Gameplay.Common.Entity;
+using MightyHeroes.Gameplay.Common.Stats;
 using MightyHeroes.Gameplay.Enemy.Presentation;
 using MightyHeroes.Gameplay.Enemy.StateMachine;
 using MightyHeroes.Gameplay.Enemy.Stats;
 using MightyHeroes.UI.Battle.Views;
-using MightyHeroes.Gameplay.Animation.Interfaces;
+using UnityEngine;
 
 namespace MightyHeroes.Gameplay.Enemy
 {

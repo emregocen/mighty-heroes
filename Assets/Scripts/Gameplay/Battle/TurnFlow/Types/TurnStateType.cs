@@ -1,4 +1,4 @@
-namespace MightyHeroes.Battle.TurnFlow.Types
+namespace MightyHeroes.Gameplay.Battle.TurnFlow.Types
 {
     /// <summary>
     /// Defines all possible turn phases.

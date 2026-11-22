@@ -30,10 +30,6 @@ namespace MightyHeroes.Gameplay.Battle.Formation
 
         // FIELDS
 
-        /// <summary>
-        /// Raised whenever the current battle target changes.
-        /// </summary>
-        public event Action<Transform> CurrentTargetTransformChanged;
         private readonly List<BattleLine> _lines = new List<BattleLine>();
         private EnemyComponent _currentTarget;
 

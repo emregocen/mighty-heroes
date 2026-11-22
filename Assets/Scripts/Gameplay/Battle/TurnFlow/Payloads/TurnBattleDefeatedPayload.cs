@@ -1,4 +1,4 @@
-namespace MightyHeroes.Battle.TurnFlow.Payloads
+namespace MightyHeroes.Gameplay.Battle.TurnFlow.Payloads
 {
     /// <summary>
     /// Raised when the hero dies and the battle ends in defeat.
