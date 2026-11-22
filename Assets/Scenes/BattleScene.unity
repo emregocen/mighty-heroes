@@ -4365,16 +4365,16 @@ MonoBehaviour:
   _effects:
   - ActionType: 4
     Prefab: {fileID: 1881552412633134, guid: da7875cab77480d49972b42ca872af40, type: 3}
-    LocalPosition: {x: 0, y: 0, z: 0}
+    LocalPosition: {x: 0, y: 0.2, z: 0}
     Tint: {r: 1, g: 1, b: 1, a: 0}
   - ActionType: 5
-    Prefab: {fileID: 1945864579541184, guid: c15d2abbd967ac944a571134fa3755df, type: 3}
-    LocalPosition: {x: 0, y: 1, z: 0}
-    Tint: {r: 0, g: 0.034497738, b: 0.8301887, a: 0.9372549}
+    Prefab: {fileID: 1764954988504686, guid: 5342957eb894bb148941224ccdd89d23, type: 3}
+    LocalPosition: {x: 0, y: 0, z: 0}
+    Tint: {r: 0.24056602, g: 0.577913, b: 1, a: 0.9372549}
   - ActionType: 3
-    Prefab: {fileID: 1869712184636158, guid: 3b6cfde4f3deb8d4c9146d2e65ed12e4, type: 3}
-    LocalPosition: {x: 0, y: 1, z: 0}
-    Tint: {r: 0.85300016, g: 0.0990566, b: 1, a: 0}
+    Prefab: {fileID: 1298042462260652, guid: 01b067e2a360cd444a6312d3b37c6c01, type: 3}
+    LocalPosition: {x: 0, y: 0, z: 0}
+    Tint: {r: 0.6357317, g: 0.23113209, b: 1, a: 0.7529412}
 --- !u!4 &1596662743 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7294154425121220710, guid: d9237026601db42e48ce109bddd9520e, type: 3}
