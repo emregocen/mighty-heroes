@@ -7,7 +7,7 @@ using MightyHeroes.Gameplay.Combat.Types;
 using MightyHeroes.Gameplay.Common.Actions;
 using MightyHeroes.Gameplay.Common.Entity;
 using MightyHeroes.Gameplay.Common.Stats;
-using MightyHeroes.Gameplay.Health.Presentation;
+using MightyHeroes.Gameplay.Combat.Feedback;
 using MightyHeroes.Gameplay.Hero.Movement;
 using MightyHeroes.Gameplay.Hero.Payloads;
 using MightyHeroes.Gameplay.Hero.Presentation;
@@ -17,6 +17,7 @@ using MightyHeroes.Gameplay.Puzzle;
 using MightyHeroes.Gameplay.Ultimate;
 using MightyHeroes.UI.Battle.Views;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MightyHeroes.Gameplay.Hero
 {
@@ -106,7 +107,8 @@ namespace MightyHeroes.Gameplay.Hero
         [Header("Presentation")]
         [SerializeField] private HeroTargetFocusController _heroTargetFocusController;
         /// <summary>Plays the heal particle effect when this hero receives a heal effect request.</summary>
-        [SerializeField] private HealEffectView _healEffectView;
+        [FormerlySerializedAs("_healEffectView")]
+        [SerializeField] private SupportEffectView _supportEffectView;
 
         [Header("HUD")]
         /// <summary>Hero health bar presentation view.</summary>
@@ -191,7 +193,7 @@ namespace MightyHeroes.Gameplay.Hero
             if (_heroStatsData.UltimateData != null)
                 _ultimateGauge = new UltimateGauge(_eventHub, EntityId, _heroStatsData.UltimateData);
             
-            _healEffectView?.Initialize(_eventHub, EntityId);
+            _supportEffectView?.Initialize(_eventHub, EntityId);
 
             RegisterEvents();
             InitializeHud();
