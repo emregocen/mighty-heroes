@@ -139,6 +139,7 @@ namespace MightyHeroes.Gameplay.Battle
         private BattleTimerRunner _battleTimerRunner;
         private BattleTimerPresenter _battleTimerPresenter;
         private BattleFlowController _battleFlowController;
+        private LevelResultTracker _levelResultTracker;
 
         private readonly List<EnemyStateMachine> _enemyStateMachines = new List<EnemyStateMachine>();
 
@@ -231,6 +232,7 @@ namespace MightyHeroes.Gameplay.Battle
         private void OnDestroy()
         {
             DisposeBattleFlowController();
+            DisposeLevelResultTracker();
             DisposeFloatingText();
             DisposeStatusIcons();
             DisposeUltimateGauge();
@@ -654,18 +656,21 @@ namespace MightyHeroes.Gameplay.Battle
         }
 
         /// <summary>
-        /// Initializes the result screens with the event hub and the level being
-        /// played, so Next Battle and Retry know which level to load.
+        /// Creates the level result tracker (stars and progress on victory) and
+        /// initializes the result screens with it and the level being played,
+        /// so Retry knows which level to load.
         /// </summary>
         private void InitializeBattleResultUI()
         {
+            _levelResultTracker = new LevelResultTracker(_eventHub, _levelCatalog, CurrentLevel, CurrentLevelIndex);
+
             if (_battleResultUIController == null)
             {
                 GameLogger.Log(LogSourceType.BattleSystem, "BattleBootstrapper: BattleResultUIController reference is missing.");
                 return;
             }
 
-            _battleResultUIController.Initialize(_eventHub, _levelCatalog, CurrentLevelIndex);
+            _battleResultUIController.Initialize(_eventHub, _levelCatalog, CurrentLevelIndex, _levelResultTracker);
         }
 
         /// <summary>Initializes the victory camera controller with the battle-scoped EventHub.</summary>
@@ -884,6 +889,13 @@ namespace MightyHeroes.Gameplay.Battle
         }
 
         // PRIVATE METHODS — Disposal
+
+        /// <summary>Disposes the LevelResultTracker to unregister its event handler.</summary>
+        private void DisposeLevelResultTracker()
+        {
+            _levelResultTracker?.Dispose();
+            _levelResultTracker = null;
+        }
 
         /// <summary>Disposes the BattleFlowController to unregister its event handlers.</summary>
         private void DisposeBattleFlowController()
