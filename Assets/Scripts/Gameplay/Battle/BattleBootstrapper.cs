@@ -61,8 +61,7 @@ namespace MightyHeroes.Gameplay.Battle
 
         [Header("UI")]
         [SerializeField] private BattleUIPresenter _battleUIPresenter;
-        [SerializeField] private VictoryUIController _victoryUIController;
-        [SerializeField] private DefeatUIController _defeatUIController;
+        [SerializeField] private BattleResultUIController _battleResultUIController;
 
         [Header("Camera")]
         [SerializeField] private VictoryCameraController _victoryCameraController;
@@ -187,8 +186,7 @@ namespace MightyHeroes.Gameplay.Battle
             InitializeCombatSystem();
             InitializePuzzleSystem();
             InitializeBattleHud();
-            InitializeVictoryUI();
-            InitializeDefeatUI();
+            InitializeBattleResultUI();
             InitializeVictoryCamera();
             InitializeVictoryRotator();
             InitializeBattleTimer();
@@ -655,30 +653,19 @@ namespace MightyHeroes.Gameplay.Battle
             _battleUIPresenter.Initialize(_eventHub);
         }
 
-        /// <summary>Initializes the victory UI controller with the battle-scoped EventHub.</summary>
-        private void InitializeVictoryUI()
+        /// <summary>
+        /// Initializes the result screens with the event hub and the level being
+        /// played, so Next Battle and Retry know which level to load.
+        /// </summary>
+        private void InitializeBattleResultUI()
         {
-            if (_victoryUIController == null)
+            if (_battleResultUIController == null)
             {
-                GameLogger.Log(LogSourceType.BattleSystem,
-                    "BattleBootstrapper: VictoryUIController reference is missing.");
+                GameLogger.Log(LogSourceType.BattleSystem, "BattleBootstrapper: BattleResultUIController reference is missing.");
                 return;
             }
 
-            _victoryUIController.Initialize(_eventHub);
-        }
-
-        /// <summary>Initializes the defeat UI controller with the battle-scoped EventHub.</summary>
-        private void InitializeDefeatUI()
-        {
-            if (_defeatUIController == null)
-            {
-                GameLogger.Log(LogSourceType.BattleSystem,
-                    "BattleBootstrapper: DefeatUIController reference is missing.");
-                return;
-            }
-
-            _defeatUIController.Initialize(_eventHub);
+            _battleResultUIController.Initialize(_eventHub, _levelCatalog, CurrentLevelIndex);
         }
 
         /// <summary>Initializes the victory camera controller with the battle-scoped EventHub.</summary>
