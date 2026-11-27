@@ -1,6 +1,5 @@
 using MightyHeroes.Core.Logging;
 using MightyHeroes.Core.StateMachine.Signals;
-using MightyHeroes.Gameplay.Battle.TurnFlow.Payloads;
 using MightyHeroes.Gameplay.Combat.Payloads;
 using MightyHeroes.Gameplay.Combat.StateMachine;
 using MightyHeroes.Gameplay.Combat.Types;
@@ -16,8 +15,10 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
     /// - Handles incoming signals from animation behaviours and FSM-forwarded events.
     /// - Delegates combo step progression to CombatAttackState base class.
     /// - Raises HeroAttackHit events for each hit frame so CombatSystem can resolve damage.
-    /// - Subscribes to TurnAllEnemiesDefeatedEvent while active to set _isVictoryPending.
-    /// - Decides whether to retreat or go directly to victory at sequence end.
+    /// - Switches to retreat at sequence end. Victory is not decided here:
+    ///   HeroAttackSequenceEndedEvent lets BattleFlowController raise the single
+    ///   victory chain, and HeroStateMachine switches to victory before this
+    ///   state receives the sequence-ended signal.
     /// - Consumes the hero's pending attack buff once the sequence has landed
     ///   at least one hit, so the buff covers every step of a single combo.
     ///
@@ -25,23 +26,9 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
     /// matched tile's ActionType — Attack or MagicAttack) through the base class
     /// and forwarded into HeroAttackHitPayload. This single state handles both
     /// physical and magical attacks; only the damage type differs.
-    ///
-    /// Victory pending pattern:
-    /// TurnAllEnemiesDefeatedEvent can fire mid-combo (inside the hit frame call stack).
-    /// The flag defers the victory transition to OnSequenceEnded, which is the first
-    /// point where the call stack has fully unwound and it is safe to raise
-    /// TurnBattleVictoryEvent.
     /// </summary>
     public sealed class HeroAttackState : CombatAttackState<HeroStateMachine>
     {
-        // FIELDS
-
-        /// <summary>
-        /// Set to true when TurnAllEnemiesDefeatedEvent fires during an active combo.
-        /// Checked in OnSequenceEnded to skip retreat and go directly to victory.
-        /// </summary>
-        private bool _isVictoryPending;
-
         // CONSTRUCTOR
 
         /// <summary>
@@ -55,15 +42,10 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
         // PUBLIC METHODS
 
         /// <summary>
-        /// Subscribes to TurnAllEnemiesDefeatedEvent and raises HeroAttackStartedEvent.
+        /// Raises HeroAttackStartedEvent and starts the combo sequence.
         /// </summary>
         public override void Enter()
         {
-            _isVictoryPending = false;
-
-            StateMachine.EventHub.TurnEvents.TurnAllEnemiesDefeatedEvent
-                .Register(OnAllEnemiesDefeated);
-
             GameLogger.Log(LogSourceType.Hero, "Enter HeroAttackState");
 
             StateMachine.EventHub.HeroEvents.HeroAttackStartedEvent.Raise(
@@ -76,13 +58,11 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
         }
 
         /// <summary>
-        /// Unsubscribes from TurnAllEnemiesDefeatedEvent on state exit.
+        /// Logs the state exit.
         /// </summary>
         public override void Exit()
         {
             GameLogger.Log(LogSourceType.Hero, "HeroAttackState.Exit called.");
-            StateMachine.EventHub.TurnEvents.TurnAllEnemiesDefeatedEvent
-                .Unregister(OnAllEnemiesDefeated);
         }
 
         /// <summary>
@@ -182,42 +162,20 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
         // PRIVATE METHODS
 
         /// <summary>
-        /// Handles the end of a full attack sequence.
-        /// If all enemies were defeated during this sequence, raises TurnBattleVictoryEvent
-        /// directly — this is the first safe point where the attack call stack has unwound.
-        /// Otherwise transitions to retreat.
+        /// Handles the end of a full attack sequence: consumes the attack buff
+        /// and transitions to retreat. On the winning sequence the hero is
+        /// already in victory and never receives this call.
         /// </summary>
         private void OnSequenceEnded()
         {
             GameLogger.Log(LogSourceType.Hero,
-                $"HeroAttackState - OnSequenceEnded called. IsVictoryPending={_isVictoryPending}");
+                "HeroAttackState - OnSequenceEnded called.");
 
             if (LastHitStep > 0)
                 StateMachine.Hero.ConsumeAttackBuff();
 
-            if (_isVictoryPending)
-            {
-                GameLogger.Log(LogSourceType.Hero, "HeroAttackState - Switching to VictoryState.");
-                StateMachine.SwitchToVictoryState();
-                return;
-            }
-
             GameLogger.Log(LogSourceType.Hero, "HeroAttackState - Switching to RetreatState.");
             StateMachine.SwitchToRetreatState();
-        }
-
-        // EVENT HANDLERS
-
-        /// <summary>
-        /// Called when all enemies are defeated during an active combo sequence.
-        /// Sets the pending flag — actual victory transition is deferred to
-        /// OnSequenceEnded so the attack call stack can unwind cleanly first.
-        /// </summary>
-        private void OnAllEnemiesDefeated(TurnAllEnemiesDefeatedPayload payload)
-        {
-            GameLogger.Log(LogSourceType.Hero, "HeroAttackState - OnAllEnemiesDefeated received.");
-
-            _isVictoryPending = true;
         }
     }
 }

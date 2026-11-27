@@ -29,6 +29,13 @@ namespace MightyHeroes.Core.StateMachine
         protected IState CurrentState => _currentState;
 
         /// <summary>
+        /// True when the active state is terminal (e.g. victory or defeat).
+        /// SwitchState ignores every transition from a terminal state, so callers
+        /// can check this to skip side effects that would follow a transition.
+        /// </summary>
+        public bool IsInTerminalState => _currentState != null && _currentState.IsTerminal;
+
+        /// <summary>
         /// Indicates whether the current state is terminal.
         /// Terminal states cannot transition to any other state.
         /// </summary>

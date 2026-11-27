@@ -27,16 +27,11 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine
     /// state's Enter/Exit. Battle-lifetime subscriptions are set up once in the
     /// constructor and torn down in Dispose.
     ///
-    /// Design note — no battle-end guard in this FSM:
-    /// Unlike EnemyStateMachine, HeroStateMachine has no IsBattleEnded flag or
-    /// SwitchToReadyState guard. This asymmetry is intentional:
-    /// When the hero dies, HeroComponent.OnDamageIntent calls SwitchToDefeatedState,
-    /// which transitions the hero FSM to the terminal HeroDefeatedState immediately.
-    /// BattleBootstrapper.OnEntityDied then calls TurnContext.EndBattle(), halting
-    /// the TurnStateMachine. There is no re-entry path into hero active states after
-    /// death, so no guard is needed. EnemyStateMachine requires its guard because
-    /// enemies can receive a turn signal while already processing the hero's final
-    /// attack in the same turn cycle.
+    /// Design note — battle end:
+    /// Victory and defeat are terminal states. BaseStateMachine ignores every
+    /// transition from a terminal state, so late calls (e.g. retreat after the
+    /// winning combo) are dropped. Victory has a single entry point:
+    /// OnBattleVictory, raised by TurnStateMachine when it enters TurnVictoryState.
     /// </summary>
     public sealed class HeroStateMachine : BaseStateMachine
     {
@@ -176,7 +171,7 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine
 
         /// <summary>
         /// Transitions hero to terminal victory state.
-        /// Called when BattleVictoryEvent is received in HeroIdleState.
+        /// Only called from OnBattleVictory (TurnBattleVictoryEvent).
         /// No further state transitions occur after this point.
         /// </summary>
         public void SwitchToVictoryState()
