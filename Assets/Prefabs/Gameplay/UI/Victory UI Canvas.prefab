@@ -84,6 +84,7 @@ GameObject:
   - component: {fileID: 3980557449461102222}
   - component: {fileID: 4565256556059116585}
   - component: {fileID: 4410930324182915436}
+  - component: {fileID: 745840010750912731}
   m_Layer: 5
   m_Name: Victory UI Canvas
   m_TagString: Untagged
@@ -172,6 +173,23 @@ CanvasGroup:
   m_Interactable: 0
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &745840010750912731
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6632975380224725771}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GraphicRaycaster
+  m_IgnoreReversedGraphics: 1
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!1 &9160671254926627182
 GameObject:
   m_ObjectHideFlags: 0

@@ -8,7 +8,8 @@ namespace MightyHeroes.UI.MainMenu
     /// Pulses a UI glow image: scale and alpha follow a shared sine wave on
     /// unscaled time, with optional constant rotation. Used for the soft halo
     /// behind main menu buttons. Disables raycasts on the glow image so it
-    /// never blocks the button underneath.
+    /// never blocks the button underneath, unless the image belongs to a
+    /// Selectable (e.g. the pulse sits on a button itself).
     /// </summary>
     [DisallowMultipleComponent]
     public class UIGlowPulse : MonoBehaviour
@@ -71,7 +72,10 @@ namespace MightyHeroes.UI.MainMenu
             if (_glowImage != null)
             {
                 _initialColor = _glowImage.color;
-                _glowImage.raycastTarget = false;
+
+                // A glow never blocks clicks, but a button's own image must stay clickable.
+                if (_glowImage.GetComponent<Selectable>() == null)
+                    _glowImage.raycastTarget = false;
             }
         }
 
