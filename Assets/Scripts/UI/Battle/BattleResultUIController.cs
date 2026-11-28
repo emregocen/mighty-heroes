@@ -18,7 +18,8 @@ namespace MightyHeroes.UI.Battle
     /// animation); on HeroVictoryIdleStartedEvent VictoryPanelView plays the star
     /// rating from LevelResultTracker; Collect Rewards opens RewardPanelView with
     /// random gold and XP; OK returns to the main menu.
-    /// Defeat (on TurnBattleDefeatedEvent): Retry and Main Menu.
+    /// Defeat (on TurnBattleDefeatedEvent): DefeatPanelView plays its reveal;
+    /// Continue returns to the main menu.
     /// Both screens share one reveal: battle UI fades out, the puzzle slides
     /// down, then the result canvas fades in. Scene changes go through
     /// BattleLoader, so the fade and the level's environment scene are used.
@@ -61,13 +62,10 @@ namespace MightyHeroes.UI.Battle
         [Header("Defeat")]
         [SerializeField] private CanvasGroup _defeatCanvasGroup;
 
-        [Tooltip("Reloads the current level.")]
-        [SerializeField] private Button _retryButton;
-
-        [SerializeField] private Button _defeatMainMenuButton;
+        [Tooltip("Defeat screen content: ribbon, emblem, lose text and Continue.")]
+        [SerializeField] private DefeatPanelView _defeatPanel;
 
         private EventHub _eventHub;
-        private LevelCatalogData _levelCatalog;
         private int _currentLevelIndex;
         private LevelResultTracker _resultTracker;
         private bool _isResultShown;
@@ -93,8 +91,8 @@ namespace MightyHeroes.UI.Battle
                 _rewardPanel.gameObject.SetActive(false);
             }
 
-            AddListener(_retryButton, OnRetryClicked);
-            AddListener(_defeatMainMenuButton, OnMainMenuClicked);
+            if (_defeatPanel != null)
+                _defeatPanel.ContinueClicked += OnMainMenuClicked;
         }
 
         private void OnDestroy()
@@ -107,8 +105,8 @@ namespace MightyHeroes.UI.Battle
             if (_rewardPanel != null)
                 _rewardPanel.OkClicked -= OnRewardOkClicked;
 
-            RemoveListener(_retryButton, OnRetryClicked);
-            RemoveListener(_defeatMainMenuButton, OnMainMenuClicked);
+            if (_defeatPanel != null)
+                _defeatPanel.ContinueClicked -= OnMainMenuClicked;
         }
 
         // PUBLIC METHODS
@@ -118,13 +116,12 @@ namespace MightyHeroes.UI.Battle
         /// Called by BattleBootstrapper during scene setup.
         /// </summary>
         /// <param name="eventHub">Battle-scoped event hub.</param>
-        /// <param name="levelCatalog">Catalog the current level belongs to.</param>
+        /// <param name="levelCatalog">Catalog the current level belongs to (kept for a future Retry).</param>
         /// <param name="currentLevelIndex">Index of the current level in the catalog.</param>
         /// <param name="resultTracker">Provides the turns and stars of the win.</param>
         public void Initialize(EventHub eventHub, LevelCatalogData levelCatalog, int currentLevelIndex, LevelResultTracker resultTracker)
         {
             _eventHub = eventHub;
-            _levelCatalog = levelCatalog;
             _currentLevelIndex = Mathf.Max(0, currentLevelIndex);
             _resultTracker = resultTracker;
 
@@ -240,18 +237,6 @@ namespace MightyHeroes.UI.Battle
             GameLogger.Warning(LogSourceType.UI, $"BattleResultUIController: '{canvas.name}' had no GraphicRaycaster, added one at runtime. Add it to the prefab.");
         }
 
-        private static void AddListener(Button button, UnityEngine.Events.UnityAction action)
-        {
-            if (button != null)
-                button.onClick.AddListener(action);
-        }
-
-        private static void RemoveListener(Button button, UnityEngine.Events.UnityAction action)
-        {
-            if (button != null)
-                button.onClick.RemoveListener(action);
-        }
-
         // EVENT HANDLERS
 
         private void OnBattleVictory(TurnBattleVictoryPayload payload)
@@ -278,6 +263,12 @@ namespace MightyHeroes.UI.Battle
         {
             GameLogger.Log(LogSourceType.BattleSystem, $"BattleResultUIController: defeat, showing result screen. RemainingEnemies={payload.RemainingEnemyCount}");
 
+            if (_isResultShown)
+                return;
+
+            if (_defeatPanel != null)
+                _defeatPanel.Play(DelayBeforeFadeIn + FadeDuration * 0.5f);
+
             ShowResult(_defeatCanvasGroup);
         }
 
@@ -298,14 +289,6 @@ namespace MightyHeroes.UI.Battle
         private void OnRewardOkClicked()
         {
             OnMainMenuClicked();
-        }
-
-        private void OnRetryClicked()
-        {
-            if (!TryBeginLeaving())
-                return;
-
-            BattleLoader.LoadLevel(_levelCatalog, _currentLevelIndex);
         }
 
         private void OnMainMenuClicked()

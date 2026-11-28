@@ -14,8 +14,9 @@ using Object = UnityEngine.Object;
 namespace MightyHeroes.EditorTools
 {
     /// <summary>
-    /// Builds the victory and reward panel hierarchy under the Victory UI Canvas
-    /// and wires VictoryPanelView, RewardPanelView and BattleResultUIController.
+    /// Builds the victory and reward panels under the Victory UI Canvas and the
+    /// defeat panel under the Defeat UI Canvas, and wires VictoryPanelView,
+    /// RewardPanelView, DefeatPanelView and BattleResultUIController.
     ///
     /// Non-destructive: an element that already exists (matched by name inside
     /// its panel) is never changed; only missing elements and missing components
@@ -23,11 +24,12 @@ namespace MightyHeroes.EditorTools
     /// layout, sprites, fonts and styles of the approved design (27 Nov 2026),
     /// so a rebuilt panel looks like the current one. One Undo reverts a run.
     /// </summary>
-    public static class VictoryPanelBuilder
+    public static class ResultPanelBuilder
     {
         // CONSTANTS
 
         private const string CanvasName = "Victory UI Canvas";
+        private const string DefeatCanvasName = "Defeat UI Canvas";
         private const int StarCount = 3;
 
         private const string SyntySprites = "Assets/ThirdParty/Synty/InterfaceFantasyWarriorHUD/Sprites/";
@@ -40,6 +42,8 @@ namespace MightyHeroes.EditorTools
         private const string ButtonGlowSpritePath = "Assets/Art/Puzzle/Sprites/Tile_Glow_Square.png";
         private const string FontPath = "Assets/ThirdParty/Synty/InterfaceFantasyWarriorHUD/Fonts/Grenze/Grenze-SemiBold SDF.asset";
         private const string RatingStylePath = "Assets/Configs/Text Styles/TextStyle_Rating.asset";
+
+        private const float ButtonFramePixelsPerUnitMultiplier = 3f;
 
         private static readonly Vector2 TopCenter = new Vector2(0.5f, 1f);
         private static readonly Vector2 BottomCenter = new Vector2(0.5f, 0f);
@@ -57,7 +61,7 @@ namespace MightyHeroes.EditorTools
         [MenuItem("Mighty Heroes/UI/Build Victory Panel")]
         public static void BuildVictoryPanel()
         {
-            Transform canvas = FindCanvas();
+            Transform canvas = FindCanvas(CanvasName);
 
             if (canvas == null)
             {
@@ -77,6 +81,43 @@ namespace MightyHeroes.EditorTools
             Selection.activeGameObject = victoryPanel.gameObject;
 
             Debug.Log("Mighty Heroes: victory and reward panels are complete. Existing elements were not changed.");
+        }
+
+        /// <summary>Builds or completes the defeat panel on the selected (or the scene's) Defeat UI Canvas.</summary>
+        [MenuItem("Mighty Heroes/UI/Build Defeat Panel")]
+        public static void BuildDefeatPanel()
+        {
+            Transform canvas = FindCanvas(DefeatCanvasName);
+
+            if (canvas == null)
+            {
+                EditorUtility.DisplayDialog("Build Defeat Panel", $"Select the '{DefeatCanvasName}' object in the BattleScene hierarchy and run the command again.", "OK");
+                return;
+            }
+
+            Undo.SetCurrentGroupName("Build Defeat Panel");
+            int undoGroup = Undo.GetCurrentGroup();
+
+            DefeatPanelView defeatPanel = BuildDefeatPanel(canvas);
+
+            BattleResultUIController controller = Object.FindFirstObjectByType<BattleResultUIController>(FindObjectsInactive.Include);
+
+            if (controller != null)
+            {
+                var serialized = new SerializedObject(controller);
+                AssignIfEmpty(serialized, "_defeatPanel", defeatPanel);
+                serialized.ApplyModifiedProperties();
+            }
+            else
+            {
+                Debug.LogWarning("Mighty Heroes: no BattleResultUIController in the scene; assign Defeat Panel by hand.");
+            }
+
+            Undo.CollapseUndoOperations(undoGroup);
+            EditorSceneManager.MarkSceneDirty(canvas.gameObject.scene);
+            Selection.activeGameObject = defeatPanel.gameObject;
+
+            Debug.Log("Mighty Heroes: defeat panel is complete. Existing elements were not changed.");
         }
 
         // PRIVATE METHODS — Victory panel
@@ -212,6 +253,36 @@ namespace MightyHeroes.EditorTools
             }
         }
 
+        // PRIVATE METHODS — Defeat panel
+
+        /// <summary>Creates the missing defeat elements (ribbon, emblem, lose text, Continue) and wires DefeatPanelView.</summary>
+        private static DefeatPanelView BuildDefeatPanel(Transform canvas)
+        {
+            RectTransform panel = FindOrCreate(canvas, canvas, "Defeat Panel", Vector2.zero, Vector2.one, Center, Vector2.zero, Vector2.zero, out _);
+
+            RectTransform header = FindOrCreate(panel, panel, "Header", TopCenter, TopCenter, TopCenter, Vector2.zero, new Vector2(700f, 560f), out bool isNewHeader);
+
+            if (isNewHeader)
+                header.SetAsFirstSibling();
+
+            RectTransform ribbon = FindOrCreateImage(panel, header, "Ribbon", TopCenter, TopCenter, Vector2.zero, new Vector2(300f, 500f), Load<Sprite>(RibbonSpritePath), Color.white, Image.Type.Sliced, out _);
+            RectTransform emblem = FindOrCreateImage(panel, ribbon, "Emblem", Center, Center, new Vector2(0f, 110f), new Vector2(300f, 300f), Load<Sprite>(EmblemSpritePath), EmblemColor, Image.Type.Simple, out _);
+
+            TMP_Text loseText = FindOrCreateText(panel, panel, "Lose Text", BottomCenter, new Vector2(0f, 300f), new Vector2(700f, 120f), "YOU LOSE!", 80f, FontStyles.Bold, RatingStylePath, out _);
+            Button continueButton = FindOrCreateButton(panel, panel, "Continue Button", new Vector2(0f, 150f), new Vector2(340f, 90f), "Continue", 28f);
+
+            DefeatPanelView view = GetOrAdd<DefeatPanelView>(panel.gameObject);
+
+            var serialized = new SerializedObject(view);
+            AssignIfEmpty(serialized, "_ribbon", ribbon);
+            AssignIfEmpty(serialized, "_emblem", emblem);
+            AssignIfEmpty(serialized, "_loseText", loseText);
+            AssignIfEmpty(serialized, "_continueButton", continueButton);
+            serialized.ApplyModifiedProperties();
+
+            return view;
+        }
+
         // PRIVATE METHODS — Reward panel
 
         /// <summary>Creates the missing reward popup elements and wires RewardPanelView. A new popup starts inactive.</summary>
@@ -271,15 +342,15 @@ namespace MightyHeroes.EditorTools
 
         // PRIVATE METHODS — Elements
 
-        /// <summary>Uses the selection when it is the canvas, otherwise finds it by name in the open scenes.</summary>
-        private static Transform FindCanvas()
+        /// <summary>Uses the selection when it is the named canvas, otherwise finds it by name in the open scenes.</summary>
+        private static Transform FindCanvas(string canvasName)
         {
             GameObject selected = Selection.activeGameObject;
 
-            if (selected != null && selected.name == CanvasName)
+            if (selected != null && selected.name == canvasName)
                 return selected.transform;
 
-            Canvas canvas = Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None).FirstOrDefault(c => c.name == CanvasName);
+            Canvas canvas = Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None).FirstOrDefault(c => c.name == canvasName);
             return canvas != null ? canvas.transform : null;
         }
 
@@ -390,7 +461,10 @@ namespace MightyHeroes.EditorTools
             AddGlowPulse(glow.gameObject, 0.95f, 1.05f, 3f, 0.6f, 1f);
 
             CreateStretchedImage(rect, "SPR_Background", Load<Sprite>(ButtonBackgroundSpritePath), ButtonBackgroundColor, Image.Type.Simple, Vector2.zero);
-            CreateStretchedImage(rect, "SPR_Frame", Load<Sprite>(ButtonFrameSpritePath), ButtonFrameColor, Image.Type.Sliced, new Vector2(14f, 14f));
+            RectTransform frame = CreateStretchedImage(rect, "SPR_Frame", Load<Sprite>(ButtonFrameSpritePath), ButtonFrameColor, Image.Type.Sliced, new Vector2(14f, 14f));
+
+            // The frame sprite is 512 px with wide borders; a multiplier of 3 keeps them thin on a 90 px tall button.
+            frame.GetComponent<Image>().pixelsPerUnitMultiplier = ButtonFramePixelsPerUnitMultiplier;
 
             var labelRect = new GameObject("Text (TMP)", typeof(RectTransform));
             labelRect.layer = rect.gameObject.layer;
