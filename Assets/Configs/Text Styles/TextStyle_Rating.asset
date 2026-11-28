@@ -15,10 +15,10 @@ MonoBehaviour:
   FaceColor: {r: 1, g: 1, b: 1, a: 1}
   OutlineColor: {r: 0, g: 0, b: 0, a: 1}
   OutlineWidth: 0.4
-  UseUnderlay: 0
+  UseUnderlay: 1
   UnderlayColor: {r: 0, g: 0, b: 0, a: 1}
   UnderlayOffset: {x: 1, y: -1}
   UnderlaySoftness: 0.3
   UseGlow: 0
-  GlowColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  GlowPower: 0.3
+  GlowColor: {r: 0.0754717, g: 0.07237976, b: 0.036667857, a: 0.87058824}
+  GlowPower: 0.575

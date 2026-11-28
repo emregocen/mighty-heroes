@@ -155,6 +155,12 @@ namespace MightyHeroes.Gameplay.Battle
         /// <summary>Catalog index of the level being played, or -1 when no level is used.</summary>
         public int CurrentLevelIndex { get; private set; } = -1;
 
+        /// <summary>True unless the current level turns the ultimate off.</summary>
+        private bool IsUltimateEnabled => CurrentLevel == null || CurrentLevel.IsUltimateEnabled;
+
+        /// <summary>True unless the current level turns the attack buff off.</summary>
+        private bool IsBuffEnabled => CurrentLevel == null || CurrentLevel.IsBuffEnabled;
+
         private FloatingTextService _floatingTextService;
         private FloatingTextPresenter _floatingTextPresenter;
         private StatusIconPresenter _statusIconPresenter;
@@ -468,7 +474,7 @@ namespace MightyHeroes.Gameplay.Battle
                 _heroComponent,
                 heroActionResolver);
 
-            _heroComponent.Initialize(_heroStateMachine, _idGenerator.Generate());
+            _heroComponent.Initialize(_heroStateMachine, _idGenerator.Generate(), IsUltimateEnabled);
             _heroComponent.StartStateMachine();
 
             GameLogger.Log(LogSourceType.BattleSystem,
@@ -643,7 +649,27 @@ namespace MightyHeroes.Gameplay.Battle
             _puzzleController.Initialize(_eventHub);
 
             if (CurrentLevel != null && _puzzleController.Grid != null)
-                _puzzleController.Grid.ConfigureBoard(CurrentLevel.BoardRows, CurrentLevel.BoardColumns, CurrentLevel.TileTypes);
+                _puzzleController.Grid.ConfigureBoard(CurrentLevel.BoardRows, CurrentLevel.BoardColumns, ResolveTileTypes());
+        }
+
+        /// <summary>
+        /// Returns the level's tile types, without Buff when the level turns the
+        /// attack buff off.
+        /// </summary>
+        private IReadOnlyList<ActionType> ResolveTileTypes()
+        {
+            if (IsBuffEnabled)
+                return CurrentLevel.TileTypes;
+
+            var tileTypes = new List<ActionType>();
+
+            foreach (ActionType tileType in CurrentLevel.TileTypes)
+            {
+                if (tileType != ActionType.Buff)
+                    tileTypes.Add(tileType);
+            }
+
+            return tileTypes;
         }
 
         /// <summary>
@@ -841,7 +867,7 @@ namespace MightyHeroes.Gameplay.Battle
         {
             _statusIconPresenter = new StatusIconPresenter(_eventHub);
 
-            if (_heroComponent != null)
+            if (_heroComponent != null && IsBuffEnabled)
                 _statusIconPresenter.RegisterView(_heroComponent.EntityId, _heroComponent.StatusIconBarView);
 
             if (_enemyFormation == null)

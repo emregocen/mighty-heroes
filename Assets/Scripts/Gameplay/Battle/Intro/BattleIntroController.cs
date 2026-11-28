@@ -22,8 +22,10 @@ namespace MightyHeroes.Gameplay.Battle.Intro
     ///     parallel, and since the orbit rig reads the hero's live position every
     ///     frame, the hero stays centered throughout regardless of which
     ///     animation is still running.
-    ///  4. Hero plays taunt at TauntPose. While the taunt plays, the lower body
-    ///     layer is blended in so the legs hold the idle pose and do not slide.
+    ///  4. Hero plays taunt at TauntPose. Once the base layer has settled in
+    ///     idle, the lower body layer is set to full weight before the taunt is
+    ///     triggered, so the taunt only moves the upper body and the legs keep
+    ///     the stance the walk ended in.
     ///     If the taunt runs longer than SlowOrbitDuration, the camera simply
     ///     holds at TauntPose (the orbit tween has already completed) until the
     ///     taunt animation signals it has ended (via IIntroSignalReceiver),
@@ -47,7 +49,12 @@ namespace MightyHeroes.Gameplay.Battle.Intro
         private const int IntroCameraPriority = 20;
         private const int BattleCameraActivePriority = 10;
         private const int InactivePriority = 0;
-        private const float LocomotionBlendOutDuration = 0.2f;
+        /// <summary>
+        /// Time over which the hero slows to a stop at the end of the walk. The
+        /// locomotion blend follows the same speed curve, so the steps slow down
+        /// with the body and the feet do not slide.
+        /// </summary>
+        private const float WalkStopDuration = 0.4f;
         private const float SkipHintFadeDuration = 0.25f;
         private const float SkipHintPulseMinAlpha = 0.45f;
         private const float SkipHintPulseDuration = 0.8f;
@@ -89,7 +96,6 @@ namespace MightyHeroes.Gameplay.Battle.Intro
         [Header("Hero Taunt Lower Body Lock")]
         [Tooltip("Animator layer that holds the idle pose for the legs (shared with LowerBodyLockBehaviour). Weight is driven by code during the taunt.")]
         [SerializeField] private string _tauntLowerBodyLayerName = "LowerBodyLock";
-        [SerializeField] private float _lowerBodyLockBlendInDuration = 0.1f;
         [SerializeField] private float _lowerBodyLockBlendOutDuration = 0.15f;
 
         [Header("Hero Sword")]
@@ -122,7 +128,6 @@ namespace MightyHeroes.Gameplay.Battle.Intro
         private Tween _lowerBodyLockTween;
         private Tween _walkTween;
         private Tween _orbitTween;
-        private Tween _locomotionBlendTween;
         private Tween _skipHintTween;
         private Action _onSwordDrawn;
         private Action _onComplete;
@@ -269,7 +274,10 @@ namespace MightyHeroes.Gameplay.Battle.Intro
                 ? Vector3.Distance(_heroRoot.position, _heroBattlePosition)
                 : 0f;
 
-            float walkDuration = walkDistance / Mathf.Max(_config.HeroWalkSpeed, 0.01f);
+            float walkSpeed = Mathf.Max(_config.HeroWalkSpeed, 0.01f);
+            float stopDuration = Mathf.Min(WalkStopDuration, 2f * walkDistance / walkSpeed);
+            float cruiseDuration = Mathf.Max(0f, walkDistance / walkSpeed - stopDuration * 0.5f);
+            float walkDuration = cruiseDuration + stopDuration;
 
             GameLogger.Log(LogSourceType.BattleSystem,
                 $"Intro Phase 1 — hero walk + slow orbit start. walkDuration={walkDuration:F2} ");
@@ -279,9 +287,7 @@ namespace MightyHeroes.Gameplay.Battle.Intro
             // Hero walk and camera slow-orbit run in parallel — neither blocks the other.
             if (_heroRoot != null && _hasHeroPositions && walkDuration > 0f)
             {
-                _walkTween = _heroRoot
-                    .DOMove(_heroBattlePosition, walkDuration)
-                    .SetEase(Ease.Linear);
+                _walkTween = CreateWalkTween(_heroRoot.position, _heroBattlePosition, walkSpeed, cruiseDuration, stopDuration);
 
                 _orbitTween = TweenOrbitTo(_tauntPose, walkDuration, _slowOrbitEase);
             }
@@ -295,8 +301,11 @@ namespace MightyHeroes.Gameplay.Battle.Intro
 
             GameLogger.Log(LogSourceType.BattleSystem, "Intro Phase 1 — hero walk complete.");
 
-            yield return BlendLocomotionToIdle();
             StopLocomotion();
+
+            // Let the base layer finish its walk-to-idle transition, so the legs
+            // are in the idle stance the lock layer holds before the taunt starts.
+            yield return WaitForBaseLayerSettled();
 
             GameLogger.Log(LogSourceType.BattleSystem, "Intro Phase 2 — taunt start.");
             StartTaunt();
@@ -420,16 +429,14 @@ namespace MightyHeroes.Gameplay.Battle.Intro
                 HideSkipHint();
         }
 
-        /// <summary>Kills the walk, orbit and locomotion blend tweens of the sequence.</summary>
+        /// <summary>Kills the walk and orbit tweens of the sequence.</summary>
         private void KillSequenceTweens()
         {
             _walkTween?.Kill();
             _orbitTween?.Kill();
-            _locomotionBlendTween?.Kill();
 
             _walkTween = null;
             _orbitTween = null;
-            _locomotionBlendTween = null;
         }
 
         /// <summary>Temporarily replaces the brain's default blend with a short one.</summary>
@@ -525,15 +532,59 @@ namespace MightyHeroes.Gameplay.Battle.Intro
                 .SetEase(ease);
         }
 
-        private IEnumerator BlendLocomotionToIdle()
+        /// <summary>
+        /// Waits until the hero's base layer is not in a transition (one frame
+        /// first, so a transition requested this frame has started).
+        /// </summary>
+        private IEnumerator WaitForBaseLayerSettled()
         {
             if (_heroAnimator == null)
                 yield break;
 
-            _locomotionBlendTween = DOVirtual.Float(1f, 0f, LocomotionBlendOutDuration,
-                value => _heroAnimator.SetFloat(AnimLocomotionBlend, value));
+            yield return null;
 
-            yield return _locomotionBlendTween.WaitForCompletion();
+            while (_heroAnimator.IsInTransition(0))
+                yield return null;
+        }
+
+        /// <summary>
+        /// Moves the hero to the battle position at walk speed, then slows to a
+        /// stop over stopDuration. The locomotion blend is driven by the same
+        /// speed (1 while cruising, down to 0 at the stop), so the walk cycle
+        /// matches the movement and the feet stay planted.
+        /// </summary>
+        /// <param name="from">Start position.</param>
+        /// <param name="to">Battle position.</param>
+        /// <param name="speed">Cruise speed in units per second.</param>
+        /// <param name="cruiseDuration">Seconds at full speed.</param>
+        /// <param name="stopDuration">Seconds of linear deceleration to zero.</param>
+        private Tween CreateWalkTween(Vector3 from, Vector3 to, float speed, float cruiseDuration, float stopDuration)
+        {
+            float distance = Vector3.Distance(from, to);
+            float totalDuration = cruiseDuration + stopDuration;
+
+            return DOVirtual.Float(0f, totalDuration, totalDuration, time =>
+            {
+                float travelled;
+                float speedRatio;
+
+                if (time <= cruiseDuration)
+                {
+                    travelled = speed * time;
+                    speedRatio = 1f;
+                }
+                else
+                {
+                    float stopTime = Mathf.Min(time - cruiseDuration, stopDuration);
+                    travelled = speed * cruiseDuration + speed * (stopTime - stopTime * stopTime / (2f * stopDuration));
+                    speedRatio = 1f - stopTime / stopDuration;
+                }
+
+                _heroRoot.position = Vector3.Lerp(from, to, distance > 0f ? Mathf.Clamp01(travelled / distance) : 1f);
+
+                if (_heroAnimator != null)
+                    _heroAnimator.SetFloat(AnimLocomotionBlend, speedRatio);
+            }).SetEase(Ease.Linear);
         }
 
         // PRIVATE METHODS — Hero animation
@@ -558,7 +609,7 @@ namespace MightyHeroes.Gameplay.Battle.Intro
         }
 
         /// <summary>
-        /// Blends the lower body lock layer in, then triggers the taunt on the base layer.
+        /// Locks the legs with the lower body lock layer, then triggers the taunt on the base layer.
         /// </summary>
         private void StartTaunt()
         {
@@ -567,7 +618,14 @@ namespace MightyHeroes.Gameplay.Battle.Intro
 
             _isTaunting = true;
             TauntStarted?.Invoke();
-            BlendLowerBodyLock(1f, _lowerBodyLockBlendInDuration);
+
+            // Lock the legs at once, before the taunt trigger: the base layer is
+            // already in idle, so the lock layer's idle legs match and nothing
+            // moves, and the taunt's own legs never show (it plays upper body only).
+            _lowerBodyLockTween?.Kill();
+
+            if (_tauntLowerBodyLayerIndex >= 0)
+                _heroAnimator.SetLayerWeight(_tauntLowerBodyLayerIndex, 1f);
 
             _heroAnimator.SetInteger(AnimTauntVariant, 1);
             _heroAnimator.SetTrigger(AnimTaunt);

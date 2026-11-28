@@ -18,6 +18,8 @@ MonoBehaviour:
   _boardRows: 4
   _boardColumns: 5
   _tileTypes: 010000000500000004000000i
+  _isUltimateEnabled: 0
+  _isBuffEnabled: 0
   _enemies:
   - _enemy: {fileID: 11400000, guid: 4948a895a21a4f7f890b2dd06bfea087, type: 2}
     _rowIndex: 0

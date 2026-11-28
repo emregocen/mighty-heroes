@@ -180,7 +180,8 @@ namespace MightyHeroes.Gameplay.Hero
         /// </summary>
         /// <param name="stateMachine">Battle-scoped hero state machine.</param>
         /// <param name="entityId">Unique entity identifier assigned by BattleBootstrapper.</param>
-        public void Initialize(HeroStateMachine stateMachine, int entityId)
+        /// <param name="isUltimateEnabled">False skips the ultimate gauge, so the hero has no ultimate in this battle.</param>
+        public void Initialize(HeroStateMachine stateMachine, int entityId, bool isUltimateEnabled)
         {
             GameLogger.Log(LogSourceType.Hero, "HeroComponent.Initialize called.");
 
@@ -190,9 +191,9 @@ namespace MightyHeroes.Gameplay.Hero
             base.Initialize(entityId);
             base.InitializeHealth(_eventHub, _heroStatsData.MaxHealth, _heroStatsData.MaxShield, _heroStatsData.StartingShield);
 
-            if (_heroStatsData.UltimateData != null)
+            if (isUltimateEnabled && _heroStatsData.UltimateData != null)
                 _ultimateGauge = new UltimateGauge(_eventHub, EntityId, _heroStatsData.UltimateData);
-            
+
             _supportEffectView?.Initialize(_eventHub, EntityId);
 
             RegisterEvents();
