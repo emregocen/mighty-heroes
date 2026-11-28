@@ -1,6 +1,5 @@
 using MightyHeroes.Core.Logging;
 using MightyHeroes.Core.StateMachine.Signals;
-using MightyHeroes.Gameplay.Battle.TurnFlow.Payloads;
 using MightyHeroes.Gameplay.Hero.StateMachine.Signals;
 
 namespace MightyHeroes.Gameplay.Hero.StateMachine.States
@@ -10,42 +9,35 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
     /// Waits for HeroRetreatEndedSignal, which is routed through
     /// HeroComponent → HeroStateMachine from the controller's RetreatCompleted
     /// event. This state has no direct knowledge of the movement controller.
+    /// Victory is not handled here; HeroStateMachine switches to victory on
+    /// TurnBattleVictoryEvent and cancels the retreat itself.
     /// </summary>
     public sealed class HeroRetreatState : HeroBaseState
     {
         // CONSTRUCTOR
 
         /// <summary>Creates a new hero retreat state.</summary>
-        public HeroRetreatState(HeroStateMachine stateMachine)
-            : base(stateMachine) { }
+        public HeroRetreatState(HeroStateMachine stateMachine) : base(stateMachine)
+        {
+        }
 
         // PUBLIC METHODS
 
         /// <summary>
         /// Disables puzzle input and target selection for the retreat duration.
-        /// Movement is already running — controller started it before FSM
+        /// Movement is already running; the controller started it before the FSM
         /// transitioned here.
         /// </summary>
-public override void Enter()
-{
-    GameLogger.Log(LogSourceType.Hero, "HeroRetreatState: Enter");
+        public override void Enter()
+        {
+            GameLogger.Log(LogSourceType.Hero, "HeroRetreatState: Enter");
 
-    StateMachine.Hero.SetPuzzlePlayable(false);
-    StateMachine.Hero.SetCanChangeTarget(false);
-
-    StateMachine.EventHub.TurnEvents.TurnAllEnemiesDefeatedEvent
-        .Register(OnAllEnemiesDefeated);
-}
-
-public override void Exit()
-{
-    StateMachine.EventHub.TurnEvents.TurnAllEnemiesDefeatedEvent
-        .Unregister(OnAllEnemiesDefeated);
-}
+            StateMachine.Hero.SetPuzzlePlayable(false);
+            StateMachine.Hero.SetCanChangeTarget(false);
+        }
 
         /// <summary>
         /// Routes HeroRetreatEndedSignal into the next transition.
-        /// Victory is intercepted at FSM level via battle-lifetime subscription.
         /// </summary>
         public override void Handle(IStateSignal signal)
         {
@@ -58,25 +50,18 @@ public override void Exit()
         /// <summary>
         /// Transitions to ReadyState if AP remains, otherwise ends the hero turn.
         /// </summary>
-private void OnRetreatEnded()
-{
-    if (!StateMachine.Hero.HasRemainingActionPoints)
-    {
-        GameLogger.Log(LogSourceType.Hero, "HeroRetreatState: No AP remaining, finishing turn.");
-        StateMachine.SwitchToIdleState();
-        StateMachine.FinishHeroTurn();
-        return;
-    }
+        private void OnRetreatEnded()
+        {
+            if (!StateMachine.Hero.HasRemainingActionPoints)
+            {
+                GameLogger.Log(LogSourceType.Hero, "HeroRetreatState: No AP remaining, finishing turn.");
+                StateMachine.SwitchToIdleState();
+                StateMachine.FinishHeroTurn();
+                return;
+            }
 
-    GameLogger.Log(LogSourceType.Hero, "HeroRetreatState: Returning to ready.");
-    StateMachine.SwitchToReadyState();
-}
-
-private void OnAllEnemiesDefeated(TurnAllEnemiesDefeatedPayload payload)
-{
-    GameLogger.Log(LogSourceType.Hero, "HeroRetreatState: All enemies defeated, switching to victory.");
-    StateMachine.Hero.CancelRetreat();
-    StateMachine.SwitchToVictoryState();
-}
+            GameLogger.Log(LogSourceType.Hero, "HeroRetreatState: Returning to ready.");
+            StateMachine.SwitchToReadyState();
+        }
     }
 }

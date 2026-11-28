@@ -1,6 +1,5 @@
 using MightyHeroes.Core.Logging;
 using MightyHeroes.Core.StateMachine.Signals;
-using MightyHeroes.Gameplay.Battle.TurnFlow.Payloads;
 using MightyHeroes.Gameplay.Hero.Payloads;
 using MightyHeroes.Gameplay.Hero.StateMachine.Signals;
 using MightyHeroes.Gameplay.Ultimate;
@@ -19,8 +18,9 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
     /// - Effect frame: raise UltimateHitEvent once; CombatSystem damages every
     ///   target of the target mode (front line for the demo).
     /// - Sequence end: raise HeroAttackSequenceEndedEvent so BattleFlowController
-    ///   can drain a pending victory and the kill-cam can release, then
-    ///   UltimateEndedEvent, then continue to victory, ready or turn end.
+    ///   can raise the single victory chain and the kill-cam can release, then
+    ///   UltimateEndedEvent. If that chain already moved the hero to victory,
+    ///   stop; otherwise continue to ready or turn end.
     ///
     /// If the effect frame never arrives, the hit is applied once on sequence end.
     /// </summary>
@@ -31,7 +31,6 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
         private readonly int _variant;
         private readonly int _tier;
         private bool _isHitApplied;
-        private bool _isVictoryPending;
 
         // CONSTRUCTOR
 
@@ -63,23 +62,12 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
                 return;
             }
 
-            _isVictoryPending = false;
-            StateMachine.EventHub.TurnEvents.TurnAllEnemiesDefeatedEvent.Register(OnAllEnemiesDefeated);
-
             gauge.Consume();
 
             GameLogger.Log(LogSourceType.Hero, $"Enter HeroUltimateState Tier={_tier} ApCost={gauge.Data.ApCostMode}");
 
             StateMachine.EventHub.HeroEvents.UltimateStartedEvent.Raise(new UltimateStartedPayload(StateMachine.Hero.EntityId, _tier));
             StateMachine.Hero.PlayUltimate(_variant);
-        }
-
-        /// <summary>
-        /// Unsubscribes from TurnAllEnemiesDefeatedEvent.
-        /// </summary>
-        public override void Exit()
-        {
-            StateMachine.EventHub.TurnEvents.TurnAllEnemiesDefeatedEvent.Unregister(OnAllEnemiesDefeated);
         }
 
         /// <summary>
@@ -148,10 +136,9 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
             StateMachine.EventHub.HeroEvents.HeroAttackSequenceEndedEvent.Raise(new HeroAttackSequenceEndedPayload());
             StateMachine.EventHub.HeroEvents.UltimateEndedEvent.Raise(new UltimateEndedPayload(StateMachine.Hero.EntityId));
 
-            if (_isVictoryPending)
+            if (StateMachine.IsInTerminalState)
             {
-                GameLogger.Log(LogSourceType.Hero, "HeroUltimateState: all enemies defeated, switching to victory.");
-                StateMachine.SwitchToVictoryState();
+                GameLogger.Log(LogSourceType.Hero, "HeroUltimateState: battle ended during the ultimate, not continuing.");
                 return;
             }
 
@@ -169,13 +156,6 @@ namespace MightyHeroes.Gameplay.Hero.StateMachine.States
             }
 
             StateMachine.SwitchToReadyState();
-        }
-
-        // EVENT HANDLERS
-
-        private void OnAllEnemiesDefeated(TurnAllEnemiesDefeatedPayload payload)
-        {
-            _isVictoryPending = true;
         }
     }
 }

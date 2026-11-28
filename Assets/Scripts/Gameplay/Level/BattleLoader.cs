@@ -49,5 +49,22 @@ namespace MightyHeroes.Gameplay.Level
             for (int i = 1; i < scenes.Length; i++)
                 SceneManager.LoadScene(scenes[i], LoadSceneMode.Additive);
         }
+
+        /// <summary>
+        /// Loads the main menu through SceneTransitionController (with fade),
+        /// or directly when no transition controller exists.
+        /// </summary>
+        public static void LoadMainMenu()
+        {
+            GameLogger.Log(LogSourceType.UI, "BattleLoader: loading main menu.");
+
+            if (SceneTransitionController.Instance != null)
+            {
+                SceneTransitionController.Instance.LoadScene(SceneNames.MainMenu);
+                return;
+            }
+
+            SceneManager.LoadScene(SceneNames.MainMenu, LoadSceneMode.Single);
+        }
     }
 }

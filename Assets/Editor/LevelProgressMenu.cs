@@ -16,7 +16,7 @@ namespace MightyHeroes.EditorTools
         public static void ResetLevelProgress()
         {
             LevelProgressStore.ResetProgress();
-            Debug.Log("Mighty Heroes: level progress reset. Only the first level is unlocked.");
+            Debug.Log("Mighty Heroes: level progress reset. Only the first level is unlocked and no stars are saved.");
         }
     }
 }

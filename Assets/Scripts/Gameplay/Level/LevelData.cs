@@ -43,6 +43,13 @@ namespace MightyHeroes.Gameplay.Level
         [Tooltip("Enemy placements. Row 0 is the front row; slot order is left to right on screen.")]
         [SerializeField] private List<LevelEnemySlot> _enemies = new List<LevelEnemySlot>();
 
+        [Header("Star Rating")]
+        [Tooltip("Winning in this many turns or fewer gives 3 stars.")]
+        [SerializeField, Min(1)] private int _threeStarMaxTurns = 3;
+
+        [Tooltip("Winning in this many turns or fewer gives 2 stars. Any slower win gives 1 star.")]
+        [SerializeField, Min(1)] private int _twoStarMaxTurns = 5;
+
         // PROPERTIES
 
         /// <summary>Name shown in UI.</summary>
@@ -65,5 +72,11 @@ namespace MightyHeroes.Gameplay.Level
 
         /// <summary>Enemy placements of the level.</summary>
         public IReadOnlyList<LevelEnemySlot> Enemies => _enemies;
+
+        /// <summary>Maximum turns for a 3-star win.</summary>
+        public int ThreeStarMaxTurns => _threeStarMaxTurns;
+
+        /// <summary>Maximum turns for a 2-star win.</summary>
+        public int TwoStarMaxTurns => _twoStarMaxTurns;
     }
 }

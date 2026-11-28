@@ -27,3 +27,5 @@ MonoBehaviour:
     _rowIndex: 0
     _slotIndex: 1
     _positionOffset: {x: 0, y: 0, z: 0}
+  _threeStarMaxTurns: 3
+  _twoStarMaxTurns: 5
