@@ -2652,7 +2652,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
   m_UseReflectionProbes: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 50
@@ -4211,7 +4211,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4410930324182915436, guid: de38cb8d492e04fb3bddef3a23b4454e, type: 3}
       propertyPath: m_Alpha
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4542910418579044409, guid: de38cb8d492e04fb3bddef3a23b4454e, type: 3}
       propertyPath: m_IsActive
@@ -5233,15 +5233,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2810037744695541887, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0.9
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2810037744695541887, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2810037744695541887, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
       propertyPath: m_AnchorMin.x
-      value: 0.9
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2815377279175396712, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
       propertyPath: m_AnchorMax.y
@@ -5601,15 +5601,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5047402265644826401, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5047402265644826401, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5047402265644826401, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
       propertyPath: m_AnchorMin.x
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5181159517053927373, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
       propertyPath: m_AnchorMax.y
@@ -5997,15 +5997,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7344082025229059099, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0.9
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7344082025229059099, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7344082025229059099, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
       propertyPath: m_AnchorMin.x
-      value: 0.9
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7360303555570688763, guid: c73e6936223c64b89a0e89be86ce67c9, type: 3}
       propertyPath: m_Name
