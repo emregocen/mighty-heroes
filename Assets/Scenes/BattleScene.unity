@@ -8318,7 +8318,6 @@ MonoBehaviour:
   _heroRoot: {fileID: 1596662743}
   _heroAnimator: {fileID: 1596662745}
   _tauntLowerBodyLayerName: LowerBodyLock
-  _lowerBodyLockBlendInDuration: 0.1
   _lowerBodyLockBlendOutDuration: 0.15
   _swordProp: {fileID: 1073657069}
   _skipHintGroup: {fileID: 1767736164}
