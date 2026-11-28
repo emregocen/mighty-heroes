@@ -39,6 +39,13 @@ namespace MightyHeroes.Gameplay.Level
         [Tooltip("Tile types that can spawn on the board. Each type needs an entry in the grid's element type list.")]
         [SerializeField] private List<ActionType> _tileTypes = new List<ActionType> { ActionType.Attack, ActionType.Shield, ActionType.Heal };
 
+        [Header("Features")]
+        [Tooltip("Off: the hero has no ultimate in this level. No gauge bar, no charge, no 'ultimate ready' callout and no tile highlight.")]
+        [SerializeField] private bool _isUltimateEnabled = true;
+
+        [Tooltip("Off: no attack buff in this level. Buff tiles are removed from the board and the hero's buff indicator is hidden.")]
+        [SerializeField] private bool _isBuffEnabled = true;
+
         [Header("Enemies")]
         [Tooltip("Enemy placements. Row 0 is the front row; slot order is left to right on screen.")]
         [SerializeField] private List<LevelEnemySlot> _enemies = new List<LevelEnemySlot>();
@@ -69,6 +76,12 @@ namespace MightyHeroes.Gameplay.Level
 
         /// <summary>Tile types that can spawn on the board.</summary>
         public IReadOnlyList<ActionType> TileTypes => _tileTypes;
+
+        /// <summary>True when the hero can charge and use the ultimate in this level.</summary>
+        public bool IsUltimateEnabled => _isUltimateEnabled;
+
+        /// <summary>True when the attack buff (Buff tiles and indicators) is used in this level.</summary>
+        public bool IsBuffEnabled => _isBuffEnabled;
 
         /// <summary>Enemy placements of the level.</summary>
         public IReadOnlyList<LevelEnemySlot> Enemies => _enemies;
